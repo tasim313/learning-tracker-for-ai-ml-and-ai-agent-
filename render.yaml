@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: learning-tracker
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: DATA_DIR
+        value: /var/data/learning-tracker
+      - key: BACKUP_RETENTION
+        value: 7
+    disk:
+      name: learning-tracker-data
+      mountPath: /var/data/learning-tracker
+      sizeGB: 1
