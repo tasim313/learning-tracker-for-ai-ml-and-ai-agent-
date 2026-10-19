@@ -1,0 +1,1808 @@
+{
+  "phases": [
+    {
+      "order": 1,
+      "title": "Python & Mathematics Foundations",
+      "summary": "Establish rock-solid programming discipline and mathematical intuitions for machine learning algorithms.",
+      "estimatedHours": 60,
+      "objectives": "Establish rock-solid programming discipline and mathematical intuitions for machine learning algorithms.",
+      "topicsOutline": "Python data structures, OOP, Exceptions, Typing, JSON/APIs, File I/O, Git/GitHub, Linux CLI, Linear Algebra (Vectors, Matrices, Dot Products), Probability & Statistics, Derivatives & Gradient Descent.",
+      "prerequisites": "Basic computer literacy, terminal comfort",
+      "exercise": "1. Implement matrix multiplication from scratch without NumPy.\n2. Write gradient descent optimization for 2D function.\n3. Build CLI tool with API fetching and JSON caching.",
+      "deliverable": "GitHub repo with clean Python utilities, math scratch notebooks, unit tests with pytest.",
+      "successCriteria": "Pass self-assessment test: explain eigenvalues, dot products, and write OOP Python classes with type hints and tests without reference.",
+      "recommendedResources": "Python Docs, 3Blue1Brown Essense of Linear Algebra, Khan Academy Statistics"
+    },
+    {
+      "order": 2,
+      "title": "Data Analysis & Traditional Machine Learning",
+      "summary": "Master data preprocessing, feature engineering, and classical machine learning algorithms with scikit-learn.",
+      "estimatedHours": 75,
+      "objectives": "Master data preprocessing, feature engineering, and classical machine learning algorithms with scikit-learn.",
+      "topicsOutline": "NumPy array operations, Pandas DataFrames, Data Cleaning, Exploratory Data Analysis (EDA), Matplotlib/Seaborn, Supervised Learning (Linear/Logistic Regression, Decision Trees, Random Forests, XGBoost), Unsupervised Learning (K-Means, PCA), Overfitting, Cross-validation, Precision/Recall/F1, Data Leakage.",
+      "prerequisites": "Phase 1: Python, Linear Algebra, Statistics",
+      "exercise": "1. Customer churn prediction with XGBoost.\n2. B2B Sales transaction exploratory data analysis.\n3. Implement Logistic Regression from scratch.",
+      "deliverable": "Project 1: Sales Data Analysis & Project 2: Customer Purchase Prediction Model with full EDA notebook and metrics report.",
+      "successCriteria": "Achieve F1 > 0.82 on test split; demonstrate understanding of bias-variance tradeoff and confusion matrix.",
+      "recommendedResources": "Google ML Crash Course, scikit-learn User Guide, Pandas official docs"
+    },
+    {
+      "order": 3,
+      "title": "Deep Learning & Neural Networks",
+      "summary": "Build intuition for neural network architectures, backpropagation, and tensor computing with PyTorch.",
+      "estimatedHours": 80,
+      "objectives": "Build intuition for neural network architectures, backpropagation, and tensor computing with PyTorch.",
+      "topicsOutline": "Tensors, Autograd, Multi-Layer Perceptrons (MLP), Activation Functions (ReLU, GELU, Softmax), Loss Functions (MSE, Cross-Entropy), Optimizers (SGD, AdamW), PyTorch Dataset/DataLoader, Regularization (Dropout, Weight Decay), Convolutional & Sequence Networks, Embeddings.",
+      "prerequisites": "Phase 2: NumPy, Calculus, ML concepts",
+      "exercise": "1. Build micrograd / mini autograd engine in Python.\n2. Train PyTorch neural network for customer intent classification.\n3. Implement custom PyTorch Dataset for tabular/text data.",
+      "deliverable": "Project 3: Customer Message Intent Classification model trained and evaluated in PyTorch.",
+      "successCriteria": "Explain backpropagation forward/backward pass mathematics on whiteboard; train stable PyTorch model without overfitting.",
+      "recommendedResources": "PyTorch Official Tutorials, fast.ai Practical Deep Learning, Andrej Karpathy nn-zero-to-hero"
+    },
+    {
+      "order": 4,
+      "title": "LLM Fundamentals & Transformer Architecture",
+      "summary": "Understand how Large Language Models work internally from tokenization to attention mechanisms.",
+      "estimatedHours": 70,
+      "objectives": "Understand how Large Language Models work internally from tokenization to attention mechanisms.",
+      "topicsOutline": "Tokenization (BPE, WordPiece, tiktoken), Transformer Architecture (Encoder, Decoder, Encoder-Decoder), Scaled Dot-Product Attention, Multi-Head Attention, Positional Encodings, Pretraining Objectives, Causal Masking, Context Windows, KV Caching, Quantization (GGUF, AWQ, bitsandbytes).",
+      "prerequisites": "Phase 3: PyTorch, Neural networks, Embeddings",
+      "exercise": "1. Build self-attention and multi-head attention module in PyTorch.\n2. Tokenize text using tiktoken and examine token distributions.\n3. Run local quantized Llama-3 model using llama.cpp / Ollama.",
+      "deliverable": "Clean PyTorch notebook with annotated Transformer attention layer and local inference benchmark script.",
+      "successCriteria": "Explain scaled dot-product attention equation QK^T / sqrt(d_k) and KV caching latency trade-offs without consulting notes.",
+      "recommendedResources": "Attention Is All You Need paper, Hugging Face NLP Course, Jay Alammar The Illustrated Transformer"
+    },
+    {
+      "order": 5,
+      "title": "Prompt Engineering & LLM App Development",
+      "summary": "Master programmatic interactions with state-of-the-art LLMs using official APIs, structured outputs, and evaluation.",
+      "estimatedHours": 55,
+      "objectives": "Master programmatic interactions with state-of-the-art LLMs using official APIs, structured outputs, and evaluation.",
+      "topicsOutline": "System Prompts, In-Context Learning, Few-shot prompting, Chain-of-Thought (CoT), Structured Outputs (JSON Schema / Pydantic validation), OpenAI & Gemini APIs, Error handling & retries, Token management & Cost optimization, Prompt injection defenses.",
+      "prerequisites": "Phase 1 (Python APIs) & Phase 4 (LLM basics)",
+      "exercise": "1. Build B2B lead enrichment pipeline extracting structured JSON from raw company websites.\n2. Implement robust retry with exponential backoff for rate limits.\n3. Benchmark prompt variants across 50 test leads.",
+      "deliverable": "Structured extraction library with Pydantic models, JSON schema validation, and token cost counter.",
+      "successCriteria": "100% valid JSON output compliance over 100 test cases using native structured output modes.",
+      "recommendedResources": "OpenAI Structured Outputs Guide, Gemini API Cookbook, Anthropic Prompt Engineering Interactive Tutorial"
+    },
+    {
+      "order": 6,
+      "title": "Embeddings, Vector Databases & RAG",
+      "summary": "Construct enterprise-grade Retrieval-Augmented Generation pipelines grounded in private product documentation.",
+      "estimatedHours": 70,
+      "objectives": "Construct enterprise-grade Retrieval-Augmented Generation pipelines grounded in private product documentation.",
+      "topicsOutline": "Embedding models (text-embedding-3, BGE, Voyage), Chunking strategies (fixed, semantic, recursive, markdown), Vector similarity (Cosine, Dot Product), Vector databases (ChromaDB, pgvector), Hybrid Search (Dense + Sparse BM25), Reranking (Cohere, Cross-Encoder), Grounding & Citations, RAG Evaluation (RAGAS / TruLens).",
+      "prerequisites": "Phase 5: LLM APIs, Python",
+      "exercise": "1. Build document ingestion pipeline with semantic chunking.\n2. Set up PostgreSQL with pgvector for persistent vector search.\n3. Implement hybrid search with cross-encoder reranking.",
+      "deliverable": "Project 4: Enterprise Product Knowledge Assistant using RAG with citation grounding and evaluation notebook.",
+      "successCriteria": "Zero hallucination on factual product specifications; retrieval precision > 88% on domain test benchmark.",
+      "recommendedResources": "LangChain / LlamaIndex docs, Pinecone Learning Center, pgvector documentation"
+    },
+    {
+      "order": 7,
+      "title": "AI Agent Fundamentals & Tool Calling",
+      "summary": "Learn core agentic patterns: reasoning loops, tool calling schemas, environment execution, and state persistence.",
+      "estimatedHours": 75,
+      "objectives": "Learn core agentic patterns: reasoning loops, tool calling schemas, environment execution, and state persistence.",
+      "topicsOutline": "Agent Architectures (ReAct, Plan-and-Solve, Reflection), Function Calling / Tool Calling schemas, Tool argument validation with Pydantic, Memory design (short-term buffer, long-term vector/SQL), Execution sandboxing, State persistence, Error recovery & tool retries.",
+      "prerequisites": "Phase 5 & 6: Structured Outputs, LLM APIs, Vector Stores",
+      "exercise": "1. Build ReAct agent loop from scratch in pure Python.\n2. Equip agent with tools: web search, calculator, SQL query, CRM contact lookup.\n3. Implement persistent SQLite session state.",
+      "deliverable": "Project 5: Tool-Using Autonomous Research Agent capable of multi-step company research.",
+      "successCriteria": "Agent successfully completes 3-step tool chains with proper parameter passing and zero execution crashes.",
+      "recommendedResources": "OpenAI Function Calling Guide, Anthropic Building Effective Agents, LangGraph official tutorials"
+    },
+    {
+      "order": 8,
+      "title": "Agent Orchestration & Multi-Agent Systems",
+      "summary": "Orchestrate complex workflows, human-in-the-loop approvals, and specialized multi-agent collaboration.",
+      "estimatedHours": 75,
+      "objectives": "Orchestrate complex workflows, human-in-the-loop approvals, and specialized multi-agent collaboration.",
+      "topicsOutline": "State Graphs with LangGraph, Multi-Agent patterns (Supervisor, Hierarchical, Peer-to-Peer), CrewAI framework, Conditional routing, Dynamic replanning, Human-in-the-loop (HITL) checkpoints & approval gates, Guardrails (NeMo Guardrails, Llama Guard), Context distillation.",
+      "prerequisites": "Phase 7: Tool Calling & Agent Fundamentals",
+      "exercise": "1. Build a LangGraph workflow with human-approval checkpoint before sending email.\n2. Create 3-agent team: Lead Researcher, Email Drafter, Quality Reviewer.\n3. Implement fallback routing when primary tool fails.",
+      "deliverable": "Project 6: Lead Qualification & Scoring Agent + Project 9: Collaborative Multi-Agent Sales Workflow.",
+      "successCriteria": "Multi-agent workflow handles unexpected tool failure gracefully and pauses execution for human approval on high-value actions.",
+      "recommendedResources": "LangGraph Documentation, CrewAI Masterclass, Llama Guard docs"
+    },
+    {
+      "order": 9,
+      "title": "AI Sales Agent Development (Autonomous Sales Employee)",
+      "summary": "Synthesize all agentic capabilities into a dedicated, commercial-grade AI Sales Employee.",
+      "estimatedHours": 95,
+      "objectives": "Synthesize all agentic capabilities into a dedicated, commercial-grade AI Sales Employee.",
+      "topicsOutline": "12 Core Capabilities: Prospecting, BANT Lead Scoring, Consultative Needs Discovery, Multi-channel Communication (Email/Chat/WhatsApp), Knowledge RAG, Price Negotiation within business guardrails, Automated Follow-up sequences, PDF Quotation generation, CRM synchronization (HubSpot/Postgres), Analytics logging, Human escalation triggers.",
+      "prerequisites": "Phases 6, 7, 8: RAG, Tool Calling, Orchestration",
+      "exercise": "1. Build BANT scoring engine that scores leads from conversation transcripts.\n2. Implement price negotiation agent with strict discount ceilings.\n3. Connect agent to WhatsApp Business sandbox and SendGrid email API.",
+      "deliverable": "Project 7: AI Sales Employee with Follow-ups & Project 8: AI Negotiation and Quotation Assistant.",
+      "successCriteria": "End-to-end simulated customer engagement: agent researches lead, answers questions from RAG, qualifies budget, negotiates price within policy, and outputs signed quote.",
+      "recommendedResources": "HubSpot API Docs, Meta WhatsApp Cloud API Docs, ReportLab PDF documentation"
+    },
+    {
+      "order": 10,
+      "title": "Model Fine-Tuning & Customization",
+      "summary": "Master when and how to fine-tune open-weight and proprietary models for domain-specific sales style and cost reduction.",
+      "estimatedHours": 60,
+      "objectives": "Master when and how to fine-tune open-weight and proprietary models for domain-specific sales style and cost reduction.",
+      "topicsOutline": "When to Prompt vs RAG vs Fine-tune, Dataset preparation & formatting (ShareGPT, Alpaca, JSONL), Parameter-Efficient Fine-Tuning (PEFT, LoRA, QLoRA), SFT (Supervised Fine-Tuning) with TRL / Unsloth, Evaluation with benchmark test suites, Model merging and GGUF export.",
+      "prerequisites": "Phase 4 & Phase 3: PyTorch, Transformer basics, Quantization",
+      "exercise": "1. Format 500 sales objection-handling pairs into JSONL.\n2. Fine-tune Llama-3-8B with QLoRA using Unsloth on Google Colab / Lambda Labs.\n3. Compare fine-tuned model vs prompt-engineered base model on benchmark set.",
+      "deliverable": "Fine-tuned specialized sales objection-handling adapter, training loss curves, and evaluation comparison report.",
+      "successCriteria": "Fine-tuned model achieves > 92% adherence to company sales methodology with 3x lower inference cost than frontier APIs.",
+      "recommendedResources": "Hugging Face PEFT & TRL docs, Unsloth documentation, Axolotl GitHub"
+    },
+    {
+      "order": 11,
+      "title": "Production Deployment, Security & Monitoring",
+      "summary": "Engineer reliable, secure, containerized cloud infrastructure for real business usage.",
+      "estimatedHours": 70,
+      "objectives": "Engineer reliable, secure, containerized cloud infrastructure for real business usage.",
+      "topicsOutline": "FastAPI async backend, Docker containerization, PostgreSQL database design, Redis message queuing & background tasks, Authentication & API keys, Observability (LangSmith / OpenLLMetry / Arize Phoenix), Rate limiting & token quotas, Security (OWASP Top 10 for LLMs, Prompt Injection, Data Leakage).",
+      "prerequisites": "Phase 1 (Python, Linux, Git) & Backend familiarity",
+      "exercise": "1. Dockerize full agent system with docker-compose (FastAPI, Redis, Postgres, pgvector).\n2. Instrument agent with OpenTelemetry tracing and LangSmith dashboard.\n3. Add prompt injection sanitization layer and rate limiter.",
+      "deliverable": "Project 10: Production-Ready AI Sales Platform deployed on Render / Hetzner with healthchecks and monitoring.",
+      "successCriteria": "Server maintains 99.5% uptime under simulated load test; zero token quota leaks; full trace visibility on all agent decisions.",
+      "recommendedResources": "Docker Docs, FastAPI Production Guide, OWASP LLM Top 10, LangSmith Docs"
+    },
+    {
+      "order": 12,
+      "title": "Advanced AI Engineering & Commercialization",
+      "summary": "Package, market, and commercially sell specialized AI agents to business clients.",
+      "estimatedHours": 65,
+      "objectives": "Package, market, and commercially sell specialized AI agents to business clients.",
+      "topicsOutline": "Product-Market Fit for AI agents, Commercial pricing models (per-agent seat vs usage/success fee), Client onboarding workflows, Multi-tenant data segregation, Sales demos & interactive landing pages, SLA definitions, Customer feedback loops, Maintenance & ongoing agent retraining.",
+      "prerequisites": "All previous phases: Full working product",
+      "exercise": "1. Draft commercial SaaS terms & SLA agreement for AI Sales Employee.\n2. Build interactive public demo on Render / Vercel.\n3. Conduct 5 customer discovery interviews with sales agency leaders.",
+      "deliverable": "Live commercial offering: Landing page, documentation, interactive sales demo, and validated pricing packages.",
+      "successCriteria": "Secure at least 1 pilot business customer or formal letter of intent (LOI) to deploy AI Sales Employee.",
+      "recommendedResources": "Y Combinator Startup School, Stripe Billing Docs, Commercial Product Validation Sheet"
+    }
+  ],
+  "topics": [
+    {
+      "id": "workbook-LRN-001",
+      "phaseId": "phase-1",
+      "subject": "Python",
+      "title": "Data Structures & OOP",
+      "description": "Master Python OOP design patterns and type hints for AI agent state representations Subtopics: Classes, Dunder methods, TypedDict",
+      "objectives": [
+        "Master Python OOP design patterns and type hints for AI agent state representations"
+      ],
+      "prerequisites": [],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Code custom Pydantic-style class with validation",
+      "deliverable": "Code custom Pydantic-style class with validation",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-002",
+      "phaseId": "phase-1",
+      "subject": "Python",
+      "title": "API & JSON Serialization",
+      "description": "Build robust async API fetchers with automatic JSON deserialization and error retry loops Subtopics: requests, httpx, json module, Pydantic",
+      "objectives": [
+        "Build robust async API fetchers with automatic JSON deserialization and error retry loops"
+      ],
+      "prerequisites": [
+        "workbook-LRN-001"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 150,
+      "practicalExercise": "Build CLI weather fetcher with exponential backoff",
+      "deliverable": "Build CLI weather fetcher with exponential backoff",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-003",
+      "phaseId": "phase-1",
+      "subject": "Mathematics",
+      "title": "Linear Algebra",
+      "description": "Understand vector geometry and matrix operations essential for embeddings and attention layers Subtopics: Vectors, Dot products, Matrix Multiplication",
+      "objectives": [
+        "Understand vector geometry and matrix operations essential for embeddings and attention layers"
+      ],
+      "prerequisites": [],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Implement 2D and 3D matrix multiply without external libraries",
+      "deliverable": "Implement 2D and 3D matrix multiply without external libraries",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-004",
+      "phaseId": "phase-1",
+      "subject": "Mathematics",
+      "title": "Probability & Statistics",
+      "description": "Develop statistical intuition for model confidence scores and A/B test lead conversions Subtopics: Normal distribution, Bayes Theorem, Hypothesis Testing",
+      "objectives": [
+        "Develop statistical intuition for model confidence scores and A/B test lead conversions"
+      ],
+      "prerequisites": [
+        "workbook-LRN-003"
+      ],
+      "priority": "medium",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Calculate conditional probability of lead conversion using Bayes rule",
+      "deliverable": "Calculate conditional probability of lead conversion using Bayes rule",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-005",
+      "phaseId": "phase-1",
+      "subject": "Mathematics",
+      "title": "Calculus & Optimization",
+      "description": "Understand loss landscapes and how gradient descent updates weights in ML models Subtopics: Partial derivatives, Gradients, Chain Rule",
+      "objectives": [
+        "Understand loss landscapes and how gradient descent updates weights in ML models"
+      ],
+      "prerequisites": [
+        "workbook-LRN-003"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Write Python script finding minimum of f(x,y)=x^2+2y^2 via gradient descent",
+      "deliverable": "Write Python script finding minimum of f(x,y)=x^2+2y^2 via gradient descent",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-006",
+      "phaseId": "phase-2",
+      "subject": "Data Analysis",
+      "title": "NumPy & Pandas",
+      "description": "Master fast vectorized operations and sales dataset manipulation using Pandas Subtopics: Array broadcasting, DataFrame filtering, GroupBy",
+      "objectives": [
+        "Master fast vectorized operations and sales dataset manipulation using Pandas"
+      ],
+      "prerequisites": [
+        "workbook-LRN-001",
+        "workbook-LRN-003"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Analyze 10,000 sales transactions and calculate cohort retention",
+      "deliverable": "Analyze 10,000 sales transactions and calculate cohort retention",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-007",
+      "phaseId": "phase-2",
+      "subject": "Data Analysis",
+      "title": "Exploratory Data Analysis",
+      "description": "Learn to identify data quality anomalies, skewness, and correlations in B2B CRM datasets Subtopics: Missing data handling, Outlier detection, Seaborn",
+      "objectives": [
+        "Learn to identify data quality anomalies, skewness, and correlations in B2B CRM datasets"
+      ],
+      "prerequisites": [
+        "workbook-LRN-006"
+      ],
+      "priority": "medium",
+      "estimatedMinutes": 150,
+      "practicalExercise": "Produce correlation heatmap and boxplots for lead response times",
+      "deliverable": "Produce correlation heatmap and boxplots for lead response times",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-008",
+      "phaseId": "phase-2",
+      "subject": "Machine Learning",
+      "title": "Supervised Learning",
+      "description": "Understand regression assumptions, classification boundaries, and sigmoid activation Subtopics: Linear & Logistic Regression, Odds Ratio",
+      "objectives": [
+        "Understand regression assumptions, classification boundaries, and sigmoid activation"
+      ],
+      "prerequisites": [
+        "workbook-LRN-005",
+        "workbook-LRN-006"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Build customer churn classifier using LogisticRegression with Scikit-learn",
+      "deliverable": "Build customer churn classifier using LogisticRegression with Scikit-learn",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-009",
+      "phaseId": "phase-2",
+      "subject": "Machine Learning",
+      "title": "Tree Ensembles",
+      "description": "Master feature importance, bagging, boosting, and handling non-linear business tabular data Subtopics: Decision Trees, Random Forest, XGBoost",
+      "objectives": [
+        "Master feature importance, bagging, boosting, and handling non-linear business tabular data"
+      ],
+      "prerequisites": [
+        "workbook-LRN-008"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Train XGBoost classifier predicting whether an inbound lead will book a demo",
+      "deliverable": "Train XGBoost classifier predicting whether an inbound lead will book a demo",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-010",
+      "phaseId": "phase-2",
+      "subject": "Machine Learning",
+      "title": "Model Evaluation & Validation",
+      "description": "Evaluate classifiers realistically and avoid data leakage in time-series sales pipelines Subtopics: Confusion Matrix, ROC-AUC, F1-score, Cross-Validation",
+      "objectives": [
+        "Evaluate classifiers realistically and avoid data leakage in time-series sales pipelines"
+      ],
+      "prerequisites": [
+        "workbook-LRN-009"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Generate precision-recall curve and evaluate cost of false positive sales calls",
+      "deliverable": "Generate precision-recall curve and evaluate cost of false positive sales calls",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-011",
+      "phaseId": "phase-3",
+      "subject": "Deep Learning",
+      "title": "PyTorch Tensors & Autograd",
+      "description": "Master tensor manipulation, broadcasting rules, and automatic differentiation in PyTorch Subtopics: Tensor shapes, GPU tensors, autograd backwards()",
+      "objectives": [
+        "Master tensor manipulation, broadcasting rules, and automatic differentiation in PyTorch"
+      ],
+      "prerequisites": [
+        "workbook-LRN-003",
+        "workbook-LRN-005"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Write custom linear layer and autograd training loop in PyTorch",
+      "deliverable": "Write custom linear layer and autograd training loop in PyTorch",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-012",
+      "phaseId": "phase-3",
+      "subject": "Deep Learning",
+      "title": "Neural Network Architectures",
+      "description": "Build multi-layer perceptron networks, understand learning rate schedules and regularization Subtopics: MLP, Loss functions, AdamW, Dropout",
+      "objectives": [
+        "Build multi-layer perceptron networks, understand learning rate schedules and regularization"
+      ],
+      "prerequisites": [
+        "workbook-LRN-011"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Train PyTorch MLP classifying customer inquiries into 5 intent categories",
+      "deliverable": "Train PyTorch MLP classifying customer inquiries into 5 intent categories",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-013",
+      "phaseId": "phase-3",
+      "subject": "Deep Learning",
+      "title": "Word & Text Embeddings",
+      "description": "Understand how dense semantic representations capture conceptual relationships between words Subtopics: Word2Vec, Cosine Similarity, PyTorch nn.Embedding",
+      "objectives": [
+        "Understand how dense semantic representations capture conceptual relationships between words"
+      ],
+      "prerequisites": [
+        "workbook-LRN-012"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Compute cosine similarity between customer objections using embedding vectors",
+      "deliverable": "Compute cosine similarity between customer objections using embedding vectors",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-014",
+      "phaseId": "phase-4",
+      "subject": "LLMs",
+      "title": "Tokenization & Vocabularies",
+      "description": "Understand token boundaries, whitespace sensitivity, token economics, and tokenizer pitfalls Subtopics: Byte-Pair Encoding (BPE), tiktoken, SentencePiece",
+      "objectives": [
+        "Understand token boundaries, whitespace sensitivity, token economics, and tokenizer pitfalls"
+      ],
+      "prerequisites": [
+        "workbook-LRN-001"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 150,
+      "practicalExercise": "Tokenize 100 sales emails with tiktoken and measure token cost efficiency",
+      "deliverable": "Tokenize 100 sales emails with tiktoken and measure token cost efficiency",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-015",
+      "phaseId": "phase-4",
+      "subject": "LLMs",
+      "title": "Transformer Attention Mechanism",
+      "description": "Deconstruct queries, keys, values (Q, K, V) and mathematical intuitions behind self-attention Subtopics: Scaled Dot-Product Attention, Multi-Head Attention",
+      "objectives": [
+        "Deconstruct queries, keys, values (Q, K, V) and mathematical intuitions behind self-attention"
+      ],
+      "prerequisites": [
+        "workbook-LRN-011",
+        "workbook-LRN-014"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 240,
+      "practicalExercise": "Code single-head and multi-head attention module in pure PyTorch",
+      "deliverable": "Code single-head and multi-head attention module in pure PyTorch",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-016",
+      "phaseId": "phase-4",
+      "subject": "LLMs",
+      "title": "Local Model Inference & Quantization",
+      "description": "Deploy open-source LLMs (Llama-3, Mistral) on Ubuntu Linux with GPU acceleration Subtopics: GGUF, Ollama, vLLM, llama.cpp, 4-bit/8-bit precision",
+      "objectives": [
+        "Deploy open-source LLMs (Llama-3, Mistral) on Ubuntu Linux with GPU acceleration"
+      ],
+      "prerequisites": [
+        "workbook-LRN-014"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Benchmark tokens/sec and VRAM usage of Llama-3-8B 4-bit vs 8-bit locally",
+      "deliverable": "Benchmark tokens/sec and VRAM usage of Llama-3-8B 4-bit vs 8-bit locally",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-017",
+      "phaseId": "phase-5",
+      "subject": "LLM APIs",
+      "title": "Structured Outputs & JSON Schema",
+      "description": "Enforce 100% deterministic JSON schemas from LLM generation for programmatic agent workflows Subtopics: Pydantic, OpenAI response_format, Gemini structured mode",
+      "objectives": [
+        "Enforce 100% deterministic JSON schemas from LLM generation for programmatic agent workflows"
+      ],
+      "prerequisites": [
+        "workbook-LRN-002",
+        "workbook-LRN-014"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Extract structured BANT lead qualification JSON from raw sales call transcripts",
+      "deliverable": "Extract structured BANT lead qualification JSON from raw sales call transcripts",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-018",
+      "phaseId": "phase-5",
+      "subject": "LLM APIs",
+      "title": "System Prompt Engineering",
+      "description": "Craft bulletproof system instructions that resist jailbreaking and maintain brand voice Subtopics: Role conditioning, Few-shot demonstrations, Guardrail instructions",
+      "objectives": [
+        "Craft bulletproof system instructions that resist jailbreaking and maintain brand voice"
+      ],
+      "prerequisites": [
+        "workbook-LRN-017"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Build AI Sales Rep persona with strict guardrails against unauthorized discounting",
+      "deliverable": "Build AI Sales Rep persona with strict guardrails against unauthorized discounting",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-019",
+      "phaseId": "phase-5",
+      "subject": "LLM APIs",
+      "title": "Evaluation & Cost Tracking",
+      "description": "Build regression test suite to measure prompt performance across 50 simulated lead scenarios Subtopics: Prompt bench, Token counting, Latency tracking, LLM-as-a-judge",
+      "objectives": [
+        "Build regression test suite to measure prompt performance across 50 simulated lead scenarios"
+      ],
+      "prerequisites": [
+        "workbook-LRN-017"
+      ],
+      "priority": "medium",
+      "estimatedMinutes": 150,
+      "practicalExercise": "Write automated evaluation script scoring sales responses on a 1-5 rubric",
+      "deliverable": "Write automated evaluation script scoring sales responses on a 1-5 rubric",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-020",
+      "phaseId": "phase-6",
+      "subject": "RAG",
+      "title": "Document Chunking & Processing",
+      "description": "Clean and split product manuals, pricing sheets, and objection docs into optimal vector chunks Subtopics: Semantic chunking, Markdown splitting, Metadata tagging",
+      "objectives": [
+        "Clean and split product manuals, pricing sheets, and objection docs into optimal vector chunks"
+      ],
+      "prerequisites": [
+        "workbook-LRN-014"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Process 50-page enterprise software catalog into chunked JSON with page metadata",
+      "deliverable": "Process 50-page enterprise software catalog into chunked JSON with page metadata",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-021",
+      "phaseId": "phase-6",
+      "subject": "RAG",
+      "title": "Vector Search with pgvector & Chroma",
+      "description": "Store and query embeddings efficiently in production PostgreSQL with pgvector extension Subtopics: HNSW indexing, Cosine similarity, PostgreSQL pgvector",
+      "objectives": [
+        "Store and query embeddings efficiently in production PostgreSQL with pgvector extension"
+      ],
+      "prerequisites": [
+        "workbook-LRN-020"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Deploy PostgreSQL container with pgvector and query top-5 matching product docs",
+      "deliverable": "Deploy PostgreSQL container with pgvector and query top-5 matching product docs",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-022",
+      "phaseId": "phase-6",
+      "subject": "RAG",
+      "title": "Hybrid Search & Cross-Encoder Reranking",
+      "description": "Combine keyword exact-matching with semantic retrieval to eliminate retrieval blindspots Subtopics: Dense vector search, BM25 keyword search, Cohere Rerank",
+      "objectives": [
+        "Combine keyword exact-matching with semantic retrieval to eliminate retrieval blindspots"
+      ],
+      "prerequisites": [
+        "workbook-LRN-021"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Build hybrid retrieval pipeline that accurately finds specific product part numbers",
+      "deliverable": "Build hybrid retrieval pipeline that accurately finds specific product part numbers",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-023",
+      "phaseId": "phase-6",
+      "subject": "RAG",
+      "title": "Grounding, Citations & Hallucination Defense",
+      "description": "Force LLM to produce verified bracketed citations and refuse ungrounded speculative answers Subtopics: Context window injection, Citation extraction, RAG Triad",
+      "objectives": [
+        "Force LLM to produce verified bracketed citations and refuse ungrounded speculative answers"
+      ],
+      "prerequisites": [
+        "workbook-LRN-022"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Build Product Knowledge Assistant that includes exact manual page references",
+      "deliverable": "Build Product Knowledge Assistant that includes exact manual page references",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-024",
+      "phaseId": "phase-7",
+      "subject": "AI Agents",
+      "title": "Function & Tool Calling Schemas",
+      "description": "Define strict tool interfaces that allow LLMs to invoke external Python functions predictably Subtopics: OpenAI tools parameter, JSON schema tool definitions",
+      "objectives": [
+        "Define strict tool interfaces that allow LLMs to invoke external Python functions predictably"
+      ],
+      "prerequisites": [
+        "workbook-LRN-017"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Write tool schemas for `check_inventory(sku)` and `get_client_crm_profile(email)`",
+      "deliverable": "Write tool schemas for `check_inventory(sku)` and `get_client_crm_profile(email)`",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-025",
+      "phaseId": "phase-7",
+      "subject": "AI Agents",
+      "title": "ReAct Loop Architecture",
+      "description": "Build pure-Python autonomous execution loop that executes tools and feeds output back to LLM Subtopics: Thought-Action-Observation loop, Parse error handling",
+      "objectives": [
+        "Build pure-Python autonomous execution loop that executes tools and feeds output back to LLM"
+      ],
+      "prerequisites": [
+        "workbook-LRN-024"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 240,
+      "practicalExercise": "Implement ReAct agent from scratch without LangChain, calling 3 tools sequentially",
+      "deliverable": "Implement ReAct agent from scratch without LangChain, calling 3 tools sequentially",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-026",
+      "phaseId": "phase-7",
+      "subject": "AI Agents",
+      "title": "State Persistence & Memory Design",
+      "description": "Design multi-turn conversation memory that persists agent state across user restarts Subtopics: SQLite thread memory, Summary buffers, Key-value memory",
+      "objectives": [
+        "Design multi-turn conversation memory that persists agent state across user restarts"
+      ],
+      "prerequisites": [
+        "workbook-LRN-025"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Save and resume multi-turn sales conversation thread from SQLite database",
+      "deliverable": "Save and resume multi-turn sales conversation thread from SQLite database",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-027",
+      "phaseId": "phase-8",
+      "subject": "Agent Systems",
+      "title": "State Graphs with LangGraph",
+      "description": "Model non-linear business workflows with explicit routing, state updates, and branching Subtopics: StateGraph, Nodes, Edges, Conditional branches",
+      "objectives": [
+        "Model non-linear business workflows with explicit routing, state updates, and branching"
+      ],
+      "prerequisites": [
+        "workbook-LRN-026"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 240,
+      "practicalExercise": "Build LangGraph workflow routing inquiries to either Technical FAQ or Sales Rep",
+      "deliverable": "Build LangGraph workflow routing inquiries to either Technical FAQ or Sales Rep",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-028",
+      "phaseId": "phase-8",
+      "subject": "Agent Systems",
+      "title": "Human-in-the-Loop (HITL) Checkpoints",
+      "description": "Implement safety approvals requiring human sign-off before sending discount quotes or emails Subtopics: Interrupt before tool call, Review approval, Resume state",
+      "objectives": [
+        "Implement safety approvals requiring human sign-off before sending discount quotes or emails"
+      ],
+      "prerequisites": [
+        "workbook-LRN-027"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Build approval queue where manager reviews discounts > 15% before sending",
+      "deliverable": "Build approval queue where manager reviews discounts > 15% before sending",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-029",
+      "phaseId": "phase-8",
+      "subject": "Agent Systems",
+      "title": "Multi-Agent Collaboration with CrewAI",
+      "description": "Orchestrate collaborative agent teams (Lead Researcher, Copywriter, Compliance Officer) Subtopics: Role playing, Task delegation, Shared memory, Manager agent",
+      "objectives": [
+        "Orchestrate collaborative agent teams (Lead Researcher, Copywriter, Compliance Officer)"
+      ],
+      "prerequisites": [
+        "workbook-LRN-027"
+      ],
+      "priority": "medium",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Build 3-agent SDR team researching company website and drafting custom pitch",
+      "deliverable": "Build 3-agent SDR team researching company website and drafting custom pitch",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-030",
+      "phaseId": "phase-9",
+      "subject": "Sales Agent",
+      "title": "BANT Lead Qualification Engine",
+      "description": "Build deterministic lead scoring logic that extracts qualifying signals from chat history Subtopics: Budget, Authority, Need, Timing scoring algorithm",
+      "objectives": [
+        "Build deterministic lead scoring logic that extracts qualifying signals from chat history"
+      ],
+      "prerequisites": [
+        "workbook-LRN-017",
+        "workbook-LRN-027"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 240,
+      "practicalExercise": "Code Python scoring engine that rates leads 0-100 based on BANT answers",
+      "deliverable": "Code Python scoring engine that rates leads 0-100 based on BANT answers",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-031",
+      "phaseId": "phase-9",
+      "subject": "Sales Agent",
+      "title": "Omnichannel Integration (WhatsApp & Email)",
+      "description": "Connect agent graph to incoming webhooks to conduct real-time conversations on WhatsApp Subtopics: WhatsApp Cloud API, SendGrid API, Webhooks",
+      "objectives": [
+        "Connect agent graph to incoming webhooks to conduct real-time conversations on WhatsApp"
+      ],
+      "prerequisites": [
+        "workbook-LRN-002",
+        "workbook-LRN-027"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 270,
+      "practicalExercise": "Deploy FastAPI webhook receiving WhatsApp messages and returning agent responses",
+      "deliverable": "Deploy FastAPI webhook receiving WhatsApp messages and returning agent responses",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-032",
+      "phaseId": "phase-9",
+      "subject": "Sales Agent",
+      "title": "Automated PDF Quotation Generator",
+      "description": "Equip agent with tool generating formal branded PDF sales quotes with dynamic line items Subtopics: ReportLab, Jinja2 PDF templates, Stripe payment links",
+      "objectives": [
+        "Equip agent with tool generating formal branded PDF sales quotes with dynamic line items"
+      ],
+      "prerequisites": [
+        "workbook-LRN-024"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Agent generates validated PDF quote with price and terms and sends via email tool",
+      "deliverable": "Agent generates validated PDF quote with price and terms and sends via email tool",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-033",
+      "phaseId": "phase-10",
+      "subject": "Fine-Tuning",
+      "title": "Dataset Preparation for Sales Dialogue",
+      "description": "Prepare high-quality curated dataset of 300+ sales objection handling dialogues Subtopics: JSONL format, ChatML, Objection-handling pairs",
+      "objectives": [
+        "Prepare high-quality curated dataset of 300+ sales objection handling dialogues"
+      ],
+      "prerequisites": [
+        "workbook-LRN-001",
+        "workbook-LRN-017"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Validate dataset schema and split into 80/20 train/eval JSONL files",
+      "deliverable": "Validate dataset schema and split into 80/20 train/eval JSONL files",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-034",
+      "phaseId": "phase-10",
+      "subject": "Fine-Tuning",
+      "title": "LoRA / QLoRA with Unsloth / TRL",
+      "description": "Fine-tune Llama-3-8B on sales objection dataset with minimal VRAM on cloud GPU Subtopics: Rank r, Alpha, LoRA target modules, 4-bit quantization",
+      "objectives": [
+        "Fine-tune Llama-3-8B on sales objection dataset with minimal VRAM on cloud GPU"
+      ],
+      "prerequisites": [
+        "workbook-LRN-016",
+        "workbook-LRN-033"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 240,
+      "practicalExercise": "Run QLoRA training run and plot training loss convergence curve",
+      "deliverable": "Run QLoRA training run and plot training loss convergence curve",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-035",
+      "phaseId": "phase-11",
+      "subject": "Production",
+      "title": "Docker Containerization & Compose",
+      "description": "Containerize FastAPI agent backend, PostgreSQL database, and Redis background queues Subtopics: Dockerfile, multi-stage builds, docker-compose.yml",
+      "objectives": [
+        "Containerize FastAPI agent backend, PostgreSQL database, and Redis background queues"
+      ],
+      "prerequisites": [
+        "workbook-LRN-002"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 210,
+      "practicalExercise": "Run full multi-container agent stack with single `docker-compose up` command",
+      "deliverable": "Run full multi-container agent stack with single `docker-compose up` command",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    },
+    {
+      "id": "workbook-LRN-036",
+      "phaseId": "phase-11",
+      "subject": "Production",
+      "title": "LLM Security & OWASP Defense",
+      "description": "Harden sales agent against adversarial system prompt extraction and unauthorized behavior Subtopics: Prompt injection defenses, Data leakage, Rate limiting",
+      "objectives": [
+        "Harden sales agent against adversarial system prompt extraction and unauthorized behavior"
+      ],
+      "prerequisites": [
+        "workbook-LRN-018",
+        "workbook-LRN-024"
+      ],
+      "priority": "high",
+      "estimatedMinutes": 180,
+      "practicalExercise": "Implement input sanitizer filter and automated test suite testing 20 injection attacks",
+      "deliverable": "Implement input sanitizer filter and automated test suite testing 20 injection attacks",
+      "completionCriteria": "Demonstrate the objective independently and save evidence.",
+      "practicalRequired": true,
+      "status": "not-started",
+      "confidence": null
+    }
+  ],
+  "resources": [
+    {
+      "id": "workbook-RES-001",
+      "title": "Google Machine Learning Crash Course",
+      "url": "https://developers.google.com/machine-learning/crash-course",
+      "type": "course",
+      "phaseId": "phase-2",
+      "topicIds": [
+        "workbook-LRN-004",
+        "workbook-LRN-005"
+      ],
+      "difficulty": "beginner",
+      "estimatedMinutes": 900,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Google · Machine Learning. Learn foundational ML concepts, gradient descent, loss functions, classification, and neural network intuitions. Access: Free.",
+      "takeaways": "Complete all embedded Colab exercises and model tuning tasks."
+    },
+    {
+      "id": "workbook-RES-002",
+      "title": "Google Foundational ML & Data Prep Courses",
+      "url": "https://developers.google.com/machine-learning/data-prep",
+      "type": "documentation",
+      "phaseId": "phase-2",
+      "topicIds": [],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 600,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Google · Data Engineering. Master data transformation, feature scaling, numerical bucketing, categorical encoding, and handling missing values. Access: Free.",
+      "takeaways": "Clean an uncurated customer dataset and transform features for regression modeling."
+    },
+    {
+      "id": "workbook-RES-003",
+      "title": "Google Gemini API Documentation",
+      "url": "https://ai.google.dev/docs",
+      "type": "documentation",
+      "phaseId": "phase-5",
+      "topicIds": [],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 480,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Google · LLM APIs. Learn Gemini model families (Flash, Pro), multimodal inputs, system instructions, safety settings, and token limits. Access: Free / Freemium.",
+      "takeaways": "Build a Python client calling Gemini-1.5-Flash with custom safety thresholds and system prompt."
+    },
+    {
+      "id": "workbook-RES-004",
+      "title": "Google Gemini API Cookbook",
+      "url": "https://github.com/google-gemini/cookbook",
+      "type": "repository",
+      "phaseId": "phase-5",
+      "topicIds": [
+        "workbook-LRN-018",
+        "workbook-LRN-023"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 720,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Google · LLM Applications. Practical recipe code for RAG, function calling, structured extraction, audio/video analysis, and document reasoning. Access: Free.",
+      "takeaways": "Implement the official function calling and structured JSON output notebook recipes."
+    },
+    {
+      "id": "workbook-RES-005",
+      "title": "OpenAI Developer Platform Documentation",
+      "url": "https://platform.openai.com/docs",
+      "type": "documentation",
+      "phaseId": "phase-5",
+      "topicIds": [],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 600,
+      "status": "to-study",
+      "rating": null,
+      "notes": "OpenAI · LLM APIs. Understand Chat Completions, context windows, seed parameters, role system, streaming responses, and token usage. Access: Paid API.",
+      "takeaways": "Create multi-turn chat wrapper handling token limits and streaming outputs to terminal."
+    },
+    {
+      "id": "workbook-RES-006",
+      "title": "OpenAI Function Calling Guide",
+      "url": "https://platform.openai.com/docs/guides/function-calling",
+      "type": "documentation",
+      "phaseId": "phase-7",
+      "topicIds": [
+        "workbook-LRN-024"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 480,
+      "status": "to-study",
+      "rating": null,
+      "notes": "OpenAI · AI Agents. Learn strict tool schemas, parallel tool calls, tool choice parameters, and executing function responses. Access: Paid API.",
+      "takeaways": "Build agent with 3 simulated business tools: CRM lookup, inventory query, discount calculator."
+    },
+    {
+      "id": "workbook-RES-007",
+      "title": "OpenAI Structured Outputs Guide",
+      "url": "https://platform.openai.com/docs/guides/structured-outputs",
+      "type": "documentation",
+      "phaseId": "phase-5",
+      "topicIds": [
+        "workbook-LRN-017"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 360,
+      "status": "to-study",
+      "rating": null,
+      "notes": "OpenAI · LLM Applications. Master 100% reliable schema adherence with constrained decoding and native Pydantic integration. Access: Paid API.",
+      "takeaways": "Extract validated lead BANT qualification objects directly from messy sales call transcripts."
+    },
+    {
+      "id": "workbook-RES-008",
+      "title": "OpenAI Retrieval, Evals & Agent Building Guide",
+      "url": "https://platform.openai.com/docs/guides/evals",
+      "type": "documentation",
+      "phaseId": "phase-7",
+      "topicIds": [
+        "workbook-LRN-019"
+      ],
+      "difficulty": "beginner",
+      "estimatedMinutes": 720,
+      "status": "to-study",
+      "rating": null,
+      "notes": "OpenAI · Evaluation & Agents. Learn rigorous LLM evaluation methodologies, synthetic dataset creation, and agent benchmarking. Access: Free / Paid API.",
+      "takeaways": "Build an automated evaluation pipeline measuring sales agent response accuracy against 30 gold standards."
+    },
+    {
+      "id": "workbook-RES-009",
+      "title": "Meta Llama Documentation & Model Card",
+      "url": "https://llama.meta.com/docs",
+      "type": "documentation",
+      "phaseId": "phase-4",
+      "topicIds": [
+        "workbook-LRN-016"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 600,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Meta · Open-Weight LLMs. Understand Llama-3 architecture, tokenizer nuances, prompt formatting, context window expansion, and licensing terms. Access: Free.",
+      "takeaways": "Download and verify Llama-3-8B weights on Ubuntu Linux environment."
+    },
+    {
+      "id": "workbook-RES-010",
+      "title": "Meta Llama Cookbook",
+      "url": "https://github.com/meta-llama/llama-cookbook",
+      "type": "repository",
+      "phaseId": "phase-6",
+      "topicIds": [],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 900,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Meta · LLM Engineering. Production code for local inference with vLLM/Ollama, fine-tuning with PEFT, synthetic data, and RAG pipelines. Access: Free.",
+      "takeaways": "Run end-to-end local RAG pipeline with Llama-3-8B and ChromaDB."
+    },
+    {
+      "id": "workbook-RES-011",
+      "title": "Meta Llama Fine-Tuning & Quantization Guide",
+      "url": "https://github.com/meta-llama/llama-recipes",
+      "type": "documentation",
+      "phaseId": "phase-10",
+      "topicIds": [
+        "workbook-LRN-033",
+        "workbook-LRN-034"
+      ],
+      "difficulty": "beginner",
+      "estimatedMinutes": 840,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Meta · Fine-Tuning. Learn LoRA, QLoRA, FSDP distributed training, and quantizing Llama models for high-throughput inference. Access: Free (Compute Req).",
+      "takeaways": "Fine-tune Llama-3-8B on an objection-handling dataset using QLoRA."
+    },
+    {
+      "id": "workbook-RES-012",
+      "title": "Hugging Face NLP Course",
+      "url": "https://huggingface.co/learn/nlp-course",
+      "type": "course",
+      "phaseId": "phase-3",
+      "topicIds": [
+        "workbook-LRN-013",
+        "workbook-LRN-014"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 1500,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Hugging Face · NLP & Transformers. Master Transformers from scratch, tokenizers, pipeline API, fine-tuning with Trainer, and evaluation metrics. Access: Free.",
+      "takeaways": "Fine-tune a DistilBERT text classification model for customer email urgency detection."
+    },
+    {
+      "id": "workbook-RES-013",
+      "title": "Hugging Face Transformers Documentation",
+      "url": "https://huggingface.co/docs/transformers",
+      "type": "documentation",
+      "phaseId": "phase-4",
+      "topicIds": [
+        "workbook-LRN-015",
+        "workbook-LRN-020"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 1200,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Hugging Face · Transformers. Comprehensive API reference for model loading, quantization configurations (bitsandbytes, AWQ), generation parameters. Access: Free.",
+      "takeaways": "Write custom generation loop with temperature, top_p, and stop token controls."
+    },
+    {
+      "id": "workbook-RES-014",
+      "title": "PyTorch Official Tutorials (Deep Learning with PyTorch)",
+      "url": "https://pytorch.org/tutorials",
+      "type": "tutorial",
+      "phaseId": "phase-3",
+      "topicIds": [
+        "workbook-LRN-011",
+        "workbook-LRN-012"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 1200,
+      "status": "to-study",
+      "rating": null,
+      "notes": "PyTorch · Deep Learning. Learn tensors, autograd, nn.Module, Dataset/DataLoader, optimizers, and model saving/loading. Access: Free.",
+      "takeaways": "Build and train a 3-layer neural network from scratch on custom tabular sales data."
+    },
+    {
+      "id": "workbook-RES-015",
+      "title": "Practical Deep Learning for Coders (Part 1 & 2)",
+      "url": "https://course.fast.ai",
+      "type": "course",
+      "phaseId": "phase-3",
+      "topicIds": [],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 1800,
+      "status": "to-study",
+      "rating": null,
+      "notes": "fast.ai · Deep Learning. Top-down, code-first introduction to deep learning, training dynamics, transfer learning, and model debugging. Access: Free.",
+      "takeaways": "Train an image classifier and tabular prediction model using fastai/PyTorch."
+    },
+    {
+      "id": "workbook-RES-016",
+      "title": "scikit-learn Official User Guide",
+      "url": "https://scikit-learn.org/stable/user_guide.html",
+      "type": "documentation",
+      "phaseId": "phase-2",
+      "topicIds": [
+        "workbook-LRN-008",
+        "workbook-LRN-009",
+        "workbook-LRN-010"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 1200,
+      "status": "to-study",
+      "rating": null,
+      "notes": "scikit-learn · Machine Learning. In-depth documentation of linear models, trees, ensembles, clustering, preprocessing pipelines, and cross-validation. Access: Free.",
+      "takeaways": "Build a production Scikit-Learn Pipeline combining ColumnTransformer and RandomForestClassifier."
+    },
+    {
+      "id": "workbook-RES-017",
+      "title": "Python 3 Official Documentation & Typing Guide",
+      "url": "https://docs.python.org/3/",
+      "type": "documentation",
+      "phaseId": "phase-1",
+      "topicIds": [
+        "workbook-LRN-001",
+        "workbook-LRN-032"
+      ],
+      "difficulty": "beginner",
+      "estimatedMinutes": 900,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Python.org · Programming. Master data models, OOP, async io, typing module (TypeVar, Protocol), and exception hierarchies. Access: Free.",
+      "takeaways": "Write an asynchronous task worker with typed protocol interfaces and custom exception handlers."
+    },
+    {
+      "id": "workbook-RES-018",
+      "title": "NumPy Official Documentation & Quickstart",
+      "url": "https://numpy.org/doc/stable/user/quickstart.html",
+      "type": "documentation",
+      "phaseId": "phase-1",
+      "topicIds": [
+        "workbook-LRN-003"
+      ],
+      "difficulty": "beginner",
+      "estimatedMinutes": 480,
+      "status": "to-study",
+      "rating": null,
+      "notes": "NumPy · Scientific Computing. Master multi-dimensional arrays, indexing, slicing, vectorization, linear algebra routines, and broadcasting. Access: Free.",
+      "takeaways": "Implement cosine similarity and matrix multiplication from scratch using NumPy arrays."
+    },
+    {
+      "id": "workbook-RES-019",
+      "title": "Pandas Official Documentation & User Guide",
+      "url": "https://pandas.pydata.org/docs/user_guide/",
+      "type": "documentation",
+      "phaseId": "phase-2",
+      "topicIds": [
+        "workbook-LRN-006",
+        "workbook-LRN-007"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 720,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Pandas · Data Analysis. DataFrames, Series, merging, indexing, time series, aggregation, and handling dirty business data. Access: Free.",
+      "takeaways": "Load 50,000 CRM rows, clean timestamps, engineer lead velocity features, and export clean CSV."
+    },
+    {
+      "id": "workbook-RES-020",
+      "title": "LangGraph Documentation & Agent Tutorials",
+      "url": "https://langchain-ai.github.io/langgraph/",
+      "type": "documentation",
+      "phaseId": "phase-7",
+      "topicIds": [
+        "workbook-LRN-022",
+        "workbook-LRN-025",
+        "workbook-LRN-026",
+        "workbook-LRN-027",
+        "workbook-LRN-028",
+        "workbook-LRN-030"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 1080,
+      "status": "to-study",
+      "rating": null,
+      "notes": "LangChain · AI Agents. Learn state graphs, cyclical agent loops, persistence, human-in-the-loop checkpoints, and multi-agent coordination. Access: Free.",
+      "takeaways": "Build stateful sales qualification graph with conditional routing and human approval pauses."
+    },
+    {
+      "id": "workbook-RES-021",
+      "title": "CrewAI Official Documentation",
+      "url": "https://docs.crewai.com/",
+      "type": "documentation",
+      "phaseId": "phase-8",
+      "topicIds": [
+        "workbook-LRN-029"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 600,
+      "status": "to-study",
+      "rating": null,
+      "notes": "CrewAI · Multi-Agent. Role-based autonomous multi-agent teams, task delegation, shared memory, and tools. Access: Free.",
+      "takeaways": "Create a 3-agent team: Lead Researcher, Pitch Drafter, and QA Auditor."
+    },
+    {
+      "id": "workbook-RES-022",
+      "title": "FastAPI Official Documentation",
+      "url": "https://fastapi.tiangolo.com/",
+      "type": "documentation",
+      "phaseId": "phase-11",
+      "topicIds": [
+        "workbook-LRN-002",
+        "workbook-LRN-031"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 720,
+      "status": "to-study",
+      "rating": null,
+      "notes": "FastAPI · Backend Engineering. Async API design, Pydantic validation, dependency injection, OpenAPI documentation, and background tasks. Access: Free.",
+      "takeaways": "Build production webhook API endpoint receiving messages, invoking agent graph, and returning async response."
+    },
+    {
+      "id": "workbook-RES-023",
+      "title": "PostgreSQL & pgvector Official Documentation",
+      "url": "https://github.com/pgvector/pgvector",
+      "type": "documentation",
+      "phaseId": "phase-6",
+      "topicIds": [
+        "workbook-LRN-021"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 480,
+      "status": "to-study",
+      "rating": null,
+      "notes": "pgvector / PostgreSQL · Database & Vectors. Vector storage in relational DBs, IVFFlat and HNSW indexes, hybrid SQL + vector queries. Access: Free.",
+      "takeaways": "Write SQL query combining metadata filtering (customer_industry='SaaS') with vector cosine similarity."
+    },
+    {
+      "id": "workbook-RES-024",
+      "title": "Docker Documentation & Container Best Practices",
+      "url": "https://docs.docker.com/",
+      "type": "documentation",
+      "phaseId": "phase-11",
+      "topicIds": [
+        "workbook-LRN-035"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 600,
+      "status": "to-study",
+      "rating": null,
+      "notes": "Docker · DevOps & Deployment. Dockerfiles, multi-stage builds, non-root user security, docker-compose orchestration, environment variables. Access: Free.",
+      "takeaways": "Create multi-container docker-compose stack running FastAPI, PostgreSQL pgvector, and Redis."
+    },
+    {
+      "id": "workbook-RES-025",
+      "title": "OWASP Top 10 for Large Language Model Applications",
+      "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+      "type": "documentation",
+      "phaseId": "phase-11",
+      "topicIds": [
+        "workbook-LRN-036"
+      ],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 360,
+      "status": "to-study",
+      "rating": null,
+      "notes": "OWASP · AI Security. Prompt injection, insecure output handling, training data poisoning, model denial of service, excessive agency. Access: Free.",
+      "takeaways": "Audit your sales agent against all 10 vulnerabilities and implement sanitization & tool permission boundaries."
+    }
+  ],
+  "projects": [
+    {
+      "id": "workbook-PRJ-001",
+      "title": "Sales Data Analysis & Customer Segmentation",
+      "description": "Sales teams lack visibility into which customer segments generate the highest lifetime value and have the shortest sales cycles.\n\nAcceptance criteria: Clean reproducible Jupyter notebook producing RFM segments, visual charts, and actionable sales recommendations without execution errors.\nTesting requirements: Pytest asserting data cleaning functions handle NaNs and duplicate transaction IDs properly.\nTarget date from workbook: 2026-12-20",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "Pandas",
+        "NumPy",
+        "Matplotlib",
+        "Seaborn",
+        "Jupyter Notebook"
+      ],
+      "testResults": "",
+      "plannedHours": 25.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Missing transaction records and dirty timestamp formats in real-world CRM extracts.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-001-task-1",
+          "title": "Data hygiene & outlier treatment.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-001-task-2",
+          "title": "Calculate RFM scores.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-001-task-3",
+          "title": "Segment customers into 4 quartiles.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-001-task-4",
+          "title": "Produce markdown executive summary.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-002",
+      "title": "Customer Purchase Prediction Model",
+      "description": "Sales reps waste 60% of their time calling cold leads who have almost zero probability of purchasing enterprise software.\n\nAcceptance criteria: Classifier achieves ROC-AUC > 0.85 and Precision > 75% on held-out test split, outperforming naive baseline by 3x.\nTesting requirements: Cross-validation verification asserting zero feature leakage between train and test folds.\nTarget date from workbook: 2026-12-31",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "Scikit-Learn",
+        "XGBoost",
+        "Pandas",
+        "Joblib"
+      ],
+      "testResults": "",
+      "plannedHours": 30.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Overfitting to historical data due to shifting customer behavior seasonality.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-002-task-1",
+          "title": "Feature selection & train/test split.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-002-task-2",
+          "title": "Address class imbalance with SMOTE/class weights.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-002-task-3",
+          "title": "Grid search hyperparameter tuning.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-002-task-4",
+          "title": "Save trained pipeline to .joblib.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-003",
+      "title": "Customer Message Intent & Urgency Classifier",
+      "description": "Customer inquiries arrive in high volume across email and chat without automated routing to appropriate specialists.\n\nAcceptance criteria: Model achieves Macro F1 > 0.84 across 5 intent classes on 1,000 test messages.\nTesting requirements: Unit tests asserting model handles empty strings, emojis, and very long text inputs gracefully.\nTarget date from workbook: 2027-01-25",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "PyTorch",
+        "Hugging Face Tokenizers",
+        "Scikit-Learn"
+      ],
+      "testResults": "",
+      "plannedHours": 35.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Ambiguous multi-intent messages (e.g. asking both about pricing and filing a technical bug).",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-003-task-1",
+          "title": "Dataset labeling and preprocessing.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-003-task-2",
+          "title": "Implement PyTorch MLP with embedding layer.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-003-task-3",
+          "title": "Training loop with early stopping.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-003-task-4",
+          "title": "Evaluate confusion matrix.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-004",
+      "title": "Product Knowledge Assistant using RAG",
+      "description": "Sales reps and potential buyers struggle to find accurate technical specifications and pricing details buried in 200-page product catalogs.\n\nAcceptance criteria: Answers factual product questions with 100% citation accuracy; refuses out-of-domain questions with zero hallucination.\nTesting requirements: Automated test suite using RAGAS asserting Faithfulness > 0.90 and Answer Relevance > 0.88.\nTarget date from workbook: 2027-04-20",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "pgvector",
+        "PostgreSQL",
+        "LangChain/LlamaIndex",
+        "OpenAI/Gemini Embeddings"
+      ],
+      "testResults": "",
+      "plannedHours": 40.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Chunk boundary splitting that separates pricing table headers from price values.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-004-task-1",
+          "title": "Set up Docker PostgreSQL pgvector.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-004-task-2",
+          "title": "Chunk company product manuals.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-004-task-3",
+          "title": "Ingest embeddings.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-004-task-4",
+          "title": "Build RAG retrieval query pipeline.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-004-task-5",
+          "title": "Benchmark retrieval precision.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-005",
+      "title": "Tool-Using Autonomous Research Agent",
+      "description": "Pre-call prospect research requires manual searching across LinkedIn, Google, company websites, and CRM systems, taking 30 minutes per lead.\n\nAcceptance criteria: Agent independently executes 3-4 tool calls in sequence to research an unfamiliar company and outputs complete structured lead profile.\nTesting requirements: Mocked API tests verifying tool call failure recovery and circuit breaking after 5 iterations.\nTarget date from workbook: 2027-05-25",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "OpenAI Function Calling",
+        "Tavily Search API",
+        "Pydantic",
+        "Requests"
+      ],
+      "testResults": "",
+      "plannedHours": 35.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Infinite loops when LLM cannot find answer from web search results.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-005-task-1",
+          "title": "Define tool schemas with Pydantic.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-005-task-2",
+          "title": "Implement execution dispatcher.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-005-task-3",
+          "title": "Build autonomous ReAct loop with max iteration limits.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-005-task-4",
+          "title": "Output formatted executive briefing.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-006",
+      "title": "Lead Qualification & BANT Scoring Agent",
+      "description": "Inbound leads receive generic follow-ups because sales teams cannot interview every prospect to establish Budget, Authority, Need, and Timing.\n\nAcceptance criteria: Agent sustains multi-turn conversation, gathers all 4 BANT criteria without sounding robotic, and calculates accurate qualification score.\nTesting requirements: Simulated conversation test suite running 20 distinct buyer personas through qualification flow.\nTarget date from workbook: 2027-06-25",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "LangGraph",
+        "Pydantic",
+        "SQLite persistence"
+      ],
+      "testResults": "",
+      "plannedHours": 45.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Prospects resisting budget questions or giving evasive answers.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-006-task-1",
+          "title": "Define StateGraph schema.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-006-task-2",
+          "title": "Implement qualification nodes.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-006-task-3",
+          "title": "Build BANT scoring logic.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-006-task-4",
+          "title": "Add SQLite checkpointer.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-007",
+      "title": "Autonomous AI Sales Employee with Follow-ups",
+      "description": "Over 70% of sales opportunities die from poor follow-up cadence; human reps forget to follow up after the first email or message.\n\nAcceptance criteria: System executes timed follow-up sequences across 10 simulated leads, pauses immediately when a reply is detected, and updates CRM status.\nTesting requirements: Integration tests verifying webhook reply triggers cancellation of future queued follow-up tasks.\nTarget date from workbook: 2027-07-31",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "Celery / Redis",
+        "PostgreSQL",
+        "SendGrid API",
+        "WhatsApp Cloud API"
+      ],
+      "testResults": "",
+      "plannedHours": 50.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Deliverability and spam filtering risks with automated email sequences.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-007-task-1",
+          "title": "Build Celery scheduled task worker.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-007-task-2",
+          "title": "Implement webhook handlers for message replies.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-007-task-3",
+          "title": "Integrate SendGrid and WhatsApp Cloud APIs.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-007-task-4",
+          "title": "Test follow-up state transitions.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-008",
+      "title": "AI Price Negotiation & Quotation Generator Assistant",
+      "description": "Custom sales quoting takes hours of manual back-and-forth; sales reps often offer unauthorized discounts or make pricing calculation errors.\n\nAcceptance criteria: Agent negotiates within authorized bounds, produces a clean, professional PDF quote, and emails it to the buyer with an active payment link.\nTesting requirements: 100 automated adversarial tests confirming the agent never agrees to discounts exceeding business policy.\nTarget date from workbook: 2027-08-15",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "ReportLab / WeasyPrint",
+        "Jinja2",
+        "Stripe API",
+        "Pydantic"
+      ],
+      "testResults": "",
+      "plannedHours": 40.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Adversarial prompt injection attacks where buyers convince the LLM to give 90% discounts.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-008-task-1",
+          "title": "Program mathematical discount rules.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-008-task-2",
+          "title": "Design HTML/Jinja2 PDF quote template.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-008-task-3",
+          "title": "Build Stripe payment intent generator.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-008-task-4",
+          "title": "Connect quote generation tool to agent.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-009",
+      "title": "Collaborative Multi-Agent Sales Team",
+      "description": "Complex enterprise sales require specialized roles: SDR for prospecting, Solution Engineer for technical Q&A, and Account Executive for closing.\n\nAcceptance criteria: Multi-agent team collaboratively handles lead from first touch through technical product inquiry to final contract quotation seamlessly.\nTesting requirements: End-to-end integration tests measuring token efficiency and inter-agent latency.\nTarget date from workbook: 2027-08-31",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Python",
+        "LangGraph",
+        "CrewAI",
+        "ChromaDB",
+        "FastAPI"
+      ],
+      "testResults": "",
+      "plannedHours": 45.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Token explosion and latency compounding across multiple sequential LLM calls.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-009-task-1",
+          "title": "Define individual agent personas and system prompts.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-009-task-2",
+          "title": "Implement supervisor routing node in LangGraph.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-009-task-3",
+          "title": "Build shared conversation state schema.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-009-task-4",
+          "title": "Run full enterprise sales cycle simulation.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "id": "workbook-PRJ-010",
+      "title": "Production-Ready AI Sales Platform (Commercial MVP)",
+      "description": "Commercial businesses require a secure, multi-tenant, monitored web platform with human-in-the-loop oversight to safely deploy AI sales reps.\n\nAcceptance criteria: Fully working commercial platform deployed online; handles live chats, executes tool calls, allows human intervention, and logs all metrics reliably.\nTesting requirements: End-to-end Cypress/Playwright frontend tests, Locust load testing (50 concurrent users), and OWASP security vulnerability scan.\nTarget date from workbook: 2027-10-15",
+      "status": "planned",
+      "evidenceUrl": "",
+      "updatedAt": "2026-10-19T00:00:00.000Z",
+      "targetUsers": "",
+      "topicIds": [],
+      "technologies": [
+        "Next.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "FastAPI",
+        "PostgreSQL (pgvector)",
+        "Docker",
+        "Render/Hetzner",
+        "LangSmith"
+      ],
+      "testResults": "",
+      "plannedHours": 70.0,
+      "actualHours": 0,
+      "demoUrl": "",
+      "documentationUrl": "",
+      "knownLimitations": "Cold start latency on cloud hosts and managing API key rate limits under peak load.",
+      "portfolioReady": false,
+      "tasks": [
+        {
+          "id": "workbook-PRJ-010-task-1",
+          "title": "Build FastAPI production backend with JWT auth.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-010-task-2",
+          "title": "Build Next.js operational dashboard.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-010-task-3",
+          "title": "Write Dockerfile & docker-compose stack.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-010-task-4",
+          "title": "Deploy to Render with persistent disk & PostgreSQL.",
+          "completed": false
+        },
+        {
+          "id": "workbook-PRJ-010-task-5",
+          "title": "Conduct load test & security audit.",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

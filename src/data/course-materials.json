@@ -1,0 +1,1304 @@
+{
+  "courses": [
+    {
+      "sourceSheet": "CSE425_T",
+      "courseCode": "CSE425",
+      "courseTitle": "CSE425 Theory",
+      "semester": "Spring 2026",
+      "items": [
+        {
+          "row": 3,
+          "scheduledDate": "",
+          "title": "Syllabus & Lecture Plan",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1Iwf3kchrHnalDK7hUH9Gh0j2Hde6BeEpQtI1hx-ZCf0/"
+        },
+        {
+          "row": 5,
+          "scheduledDate": "",
+          "title": "Recorded Lectures (YT Playlist Link)",
+          "status": "",
+          "url": "https://youtube.com/playlist?list=PLDUh101LvvVq_OecMtCC6hic6Lv_5tJpT"
+        },
+        {
+          "row": 7,
+          "scheduledDate": "",
+          "title": "Central Folder [Books/Slides/Book Chapters]",
+          "status": "",
+          "url": "https://drive.google.com/drive/folders/1-ajwfo5OTWC5M7fHG6dfipLqBJchUH3O"
+        },
+        {
+          "row": 9,
+          "scheduledDate": "",
+          "title": "Project Guideline (Max 2 Members Group)",
+          "status": "",
+          "url": "https://drive.google.com/file/d/15FkiVZuxLRqM1V48eFZGBDLdjvK8ULTK/"
+        },
+        {
+          "row": 10,
+          "scheduledDate": "",
+          "title": "Project Supplementary Implementation Guide",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1uAi2PG8Wcr-p5r7OBkb8KMrHIJrUz0WT/"
+        },
+        {
+          "row": 13,
+          "scheduledDate": "02 Feb",
+          "title": "Intro",
+          "status": "",
+          "url": ""
+        },
+        {
+          "row": 15,
+          "scheduledDate": "09 Feb",
+          "title": "Perceptron",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1L16qZzMvLvOtMR1RkPVvAm5uqqRj2lVO/"
+        },
+        {
+          "row": 16,
+          "scheduledDate": "09 Feb",
+          "title": "Perceptron Learning Algorithm",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1ChlbNIAz6_JBkQNFkMr9857iBQR-2d5g/"
+        },
+        {
+          "row": 17,
+          "scheduledDate": "09 Feb",
+          "title": "Perceptron Maths",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1ruOTGCiwMcc0Xw8uH-fiZdQ9wWC1b94H/"
+        },
+        {
+          "row": 19,
+          "scheduledDate": "16 Feb",
+          "title": "XOR Solution",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1zD-D_6CRlI0SrXx9KPoW7D2Thb9EPUu9/"
+        },
+        {
+          "row": 20,
+          "scheduledDate": "16 Feb",
+          "title": "MLP Backprop (Intro)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1S2OPN3hwZsGJxs_tg3mlGrTi-eEBgRlX/"
+        },
+        {
+          "row": 21,
+          "scheduledDate": "16 Feb",
+          "title": "Boolean Function (Slides)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/10CO7WddpXQ-xiA80V2aPGlnKsGdANX2d/"
+        },
+        {
+          "row": 22,
+          "scheduledDate": "16 Feb",
+          "title": "Boolean Function (Notes)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1dF8cNHk4NBJ7Yuc-QrV2dxkPgUSkDVvx/"
+        },
+        {
+          "row": 24,
+          "scheduledDate": "18, 23 Feb",
+          "title": "MLP Backprop (Derivation, Maths, Matrix)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1uEMlBImcYJRMVIMrHtiTaeAYLDgGj39U/"
+        },
+        {
+          "row": 25,
+          "scheduledDate": "18, 23 Feb",
+          "title": "MLP Backprop (Understanding Delta)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/16ee61lyxbsV_beZDr9QBVIjxMfQ72Zm_/"
+        },
+        {
+          "row": 26,
+          "scheduledDate": "18, 23 Feb",
+          "title": "MLP Backprop : Scalar vs Matrix",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1cpqMdrVStZj5Jf_cS7qTsuSclwH0s3_G/"
+        },
+        {
+          "row": 27,
+          "scheduledDate": "18, 23 Feb",
+          "title": "Perceptron vs Backpropagation",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1brfL0810tkT5Ctq3lh1ORfxqMCPyP4lK/"
+        },
+        {
+          "row": 29,
+          "scheduledDate": "",
+          "title": "Activation Functions",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1lgR_CZFnmpQMgI9hz6hMztkMDAAx5XKE/"
+        },
+        {
+          "row": 30,
+          "scheduledDate": "",
+          "title": "Relationship Tanh and Sigmoid",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1UfQ8eQb3AgtHur_y9GtfQfM15aOIsO1X/"
+        },
+        {
+          "row": 31,
+          "scheduledDate": "",
+          "title": "Loss Functions",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1ntqzj13kSBondF4En_Xd54d200fLUFuz/"
+        },
+        {
+          "row": 33,
+          "scheduledDate": "23, 25 Feb",
+          "title": "Computation Graph (Intro + Basic Example)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1M2CRRdePAte5gGHtiq4gqtpCcMcCU-eJ/"
+        },
+        {
+          "row": 35,
+          "scheduledDate": "23, 25 Feb\n(Practice Problem)",
+          "title": "Computation Graph (Basic Examples)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1fiyLayCNlDRZOXWE7OKIKGmX0vFfct_9/"
+        },
+        {
+          "row": 36,
+          "scheduledDate": "23, 25 Feb\n(Practice Problem)",
+          "title": "Computation Graph (20 Examples)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1EKOoB4htAPf-iBWKlFiNJI5kh51KhxZk/"
+        },
+        {
+          "row": 38,
+          "scheduledDate": "Practice Problem",
+          "title": "Computation Graph (MMM, Class Note)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1_jFQKlwo29ZkSGgCltIit-TOSu6VLqoh/"
+        },
+        {
+          "row": 39,
+          "scheduledDate": "Practice Problem",
+          "title": "Computation Graph (MMM, Class Note II)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1aUnz5tzovSu3p3JOhlDFQvwpDXNeMUJ_/"
+        },
+        {
+          "row": 41,
+          "scheduledDate": "27 Feb",
+          "title": "Overfitting & Bias Variance",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/12Doha7XLsJyYT8sOH7UXPuIKgxZG3-ul/"
+        },
+        {
+          "row": 42,
+          "scheduledDate": "27 Feb",
+          "title": "Regularization",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1Zcs8mY1Bg-JaIFJ9qauFEZU4DiQe5IHJ/"
+        },
+        {
+          "row": 43,
+          "scheduledDate": "27 Feb",
+          "title": "L1/L2 Regularization Short Note",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1XA7gqDTcchZZXpNTgAWUiTiaCGx5flrL/"
+        },
+        {
+          "row": 44,
+          "scheduledDate": "27 Feb",
+          "title": "Regularization (StatQuest Book Chapter)",
+          "status": "Reference",
+          "url": "https://drive.google.com/file/d/1j3lBGmQuTryHs5vscR1Lze7OrSRadFmX/"
+        },
+        {
+          "row": 45,
+          "scheduledDate": "27 Feb",
+          "title": "Batch Normalization",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1LEFMryBelKkFRDV5lG1m47CLqmnNMKvc/"
+        },
+        {
+          "row": 46,
+          "scheduledDate": "27 Feb",
+          "title": "Optimization",
+          "status": "Reference",
+          "url": "https://drive.google.com/file/d/1fna0byNmJdvr0o6Df1cn9wyM7RnVsc08/"
+        },
+        {
+          "row": 47,
+          "scheduledDate": "27 Feb",
+          "title": "Optimization",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/16DJs7gFYjcvUeM7s4Pwh6egt1hSKfFNg/"
+        },
+        {
+          "row": 49,
+          "scheduledDate": "",
+          "title": "Regularization (MMM Slides)",
+          "status": "MMM Sir",
+          "url": "https://drive.google.com/file/d/1Z8hjzBAAbf4bi-qTWxNAWkiK07q9dhgX/"
+        },
+        {
+          "row": 50,
+          "scheduledDate": "",
+          "title": "Dropout (MMM Slides)",
+          "status": "MMM Sir",
+          "url": "https://drive.google.com/file/d/1Nkf2IhGBpv6niMPK_7xJ-lYNAuX348iV/"
+        },
+        {
+          "row": 52,
+          "scheduledDate": "Practice Problem",
+          "title": "Math Problems  (NN Training, Normalization, Optimization)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1GsG4hZQB1HxKVLhuwAw-sAgy4_xSWfgu/"
+        },
+        {
+          "row": 54,
+          "scheduledDate": "4 March",
+          "title": "Limitations of MLP and why we use RNN",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1EDROQK7eAjoZX1u1rxxCHGOES3zd1-AN/"
+        },
+        {
+          "row": 55,
+          "scheduledDate": "4 March",
+          "title": "RNN Intro (Stanford Slides)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1JdRCsTMGlWqaIk1Rpvh3EzoTFfCtBVoU/"
+        },
+        {
+          "row": 56,
+          "scheduledDate": "4 March",
+          "title": "RNN (Stanford Slide Math Problem)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1Aq8wT8GVFPw-jxWJNT8DDejx4Qp1zaWu/"
+        },
+        {
+          "row": 58,
+          "scheduledDate": "Practice Problem",
+          "title": "RNN Equations & Basic Example (Slides)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1lRDW8fYAXQRJRiFRofRs8dM_Kx9I4Yxr/"
+        },
+        {
+          "row": 59,
+          "scheduledDate": "Practice Problem",
+          "title": "^ Recorded Lecture for this Math Problem",
+          "status": "MMM Sir",
+          "url": "https://youtu.be/mVfK9h_W8tY?list=PLDUh101LvvVq_OecMtCC6hic6Lv_5tJpT&t=1901"
+        },
+        {
+          "row": 61,
+          "scheduledDate": "9 March",
+          "title": "RNN BPTT",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1tPiGimtneUcqFKRNySShxZAP8lkKaj3d/"
+        },
+        {
+          "row": 62,
+          "scheduledDate": "9 March",
+          "title": "RNN BPTT",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1ix8dQhQxav35AsmA_qzx8aGmq5av465Q/"
+        },
+        {
+          "row": 63,
+          "scheduledDate": "9 March",
+          "title": "RNN BPTT Note",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1Y58xFz2MBs9C2lzk7TZJOy2MVPxGvgHj/"
+        },
+        {
+          "row": 64,
+          "scheduledDate": "9 March",
+          "title": "BPTT of RNN (reference article)",
+          "status": "Reference",
+          "url": "https://mmuratarat.github.io/2019-02-07/bptt-of-rnn"
+        },
+        {
+          "row": 66,
+          "scheduledDate": "11, 15 March",
+          "title": "RNN Variants Slides",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1ix8dQhQxav35AsmA_qzx8aGmq5av465Q/"
+        },
+        {
+          "row": 67,
+          "scheduledDate": "11, 15 March",
+          "title": "RNN Variants Note",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1zRjJgS-8SVo5nASArv5DWVrPQ1nC-OXI/"
+        },
+        {
+          "row": 68,
+          "scheduledDate": "11, 15 March",
+          "title": "Other Variants",
+          "status": "Mandatory",
+          "url": "https://docs.google.com/presentation/d/1vTbB4eltxpQ05mlGcaYNFlt5HJw2dT0hrq2tjFXqvIE/"
+        },
+        {
+          "row": 69,
+          "scheduledDate": "11, 15 March",
+          "title": "Why LSTMs Stop Your Gradients From Vanishing: A View from the Backwards Pass",
+          "status": "Reference",
+          "url": "https://weberna.github.io/blog/2017/11/15/LSTM-Vanishing-Gradients.html"
+        },
+        {
+          "row": 71,
+          "scheduledDate": "Practice Problem",
+          "title": "RNN Variants",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1PVNv34COqYhDXYcLcCMQpQ_tHREGPIuc/"
+        },
+        {
+          "row": 72,
+          "scheduledDate": "Practice Problem",
+          "title": "LSTM (Math Problem for Practice)",
+          "status": "Mandatory",
+          "url": "https://www.byhand.ai/p/26-lstm"
+        },
+        {
+          "row": 74,
+          "scheduledDate": "Practice Problem",
+          "title": "Fall 2025 Quiz 02  (Computational Graph, RNN)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1xjpSxiUGnbyrQkutBQOCoQZccv7Zm2cy/"
+        },
+        {
+          "row": 75,
+          "scheduledDate": "Practice Problem",
+          "title": "Fall 2025 Quiz 03 (Optimization)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1MoSw0VNR1T866o_WhfEJE7QTs7NvoraF/"
+        },
+        {
+          "row": 77,
+          "scheduledDate": "Quiz 01 (02 March)",
+          "title": "Question and Sample Solution",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1c3V7tcLS_WYy3Rlg8Lk0Y-XoLiasNDiD/"
+        },
+        {
+          "row": 78,
+          "scheduledDate": "Quiz 02 (15 April)",
+          "title": "Question and Sample Solution",
+          "status": "",
+          "url": ""
+        },
+        {
+          "row": 80,
+          "scheduledDate": "Theory Midterm Exam Week | From 30 March to 07 April",
+          "title": "Theory Midterm Exam Week | From 30 March to 07 April",
+          "status": "Theory Midterm Exam Week | From 30 March to 07 April",
+          "url": ""
+        },
+        {
+          "row": 82,
+          "scheduledDate": "8, 15 April",
+          "title": "Autoencoder, VAE, LSTM AE (Meanxai)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1TBFC2FvNFzamhtJBQ73o8U-sIZXHCFlr/"
+        },
+        {
+          "row": 83,
+          "scheduledDate": "8, 15 April",
+          "title": "LSTM AE (Note)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/17SOoxsabZUo9THQ58Yl5tM0aAKXUXZEJ/"
+        },
+        {
+          "row": 84,
+          "scheduledDate": "8, 15 April",
+          "title": "KLDivergence (Note)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1dVQYBlLlZJ2xeGDnRPY5B8f_alOyWeyp/"
+        },
+        {
+          "row": 85,
+          "scheduledDate": "8, 15 April",
+          "title": "Autoencoder Slides (Sebastian)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/16yCuGyTgdDi7o-wMArgUAfeC3ED65rIB/"
+        },
+        {
+          "row": 86,
+          "scheduledDate": "8, 15 April",
+          "title": "VAE Slides (Sebastian)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1IC6GhZDSGE2Q9BWT5tI32GKfHzsalh72/"
+        },
+        {
+          "row": 88,
+          "scheduledDate": "",
+          "title": "VAE Slides (MMM Sir)",
+          "status": "Reference",
+          "url": "https://drive.google.com/file/d/1BaDUZg221PfP4xqqnJXTfqgEFJqM1lvD/"
+        },
+        {
+          "row": 90,
+          "scheduledDate": "Practice Problem",
+          "title": "Math Problems  (Autoencoder, VAE, LSTM AE )",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/11pFDDLndeBU5HegGPfO77IF06Mu2BBps/"
+        },
+        {
+          "row": 92,
+          "scheduledDate": "4/15/2026",
+          "title": "CNN Intro",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/16if_fNTtqrxUDCPCYidz98--KC8b5z1n/"
+        },
+        {
+          "row": 94,
+          "scheduledDate": "20, 22 April",
+          "title": "CNN (Sebastian)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1RvZQ6zDVPzNbl_cJzaGsxrlACoFc92Sf/"
+        },
+        {
+          "row": 95,
+          "scheduledDate": "20, 22 April",
+          "title": "CNN (Meanxai)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1O3C3o7hbuOcp5qCiqwiF5w95MOqFGVGg/"
+        },
+        {
+          "row": 96,
+          "scheduledDate": "20, 22 April",
+          "title": "Depthwise / Depthwise Separable Convolution",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1tMoiEGx46INRtMfHRyQM5yGQ4RzZyTSg/"
+        },
+        {
+          "row": 97,
+          "scheduledDate": "20, 22 April",
+          "title": "CNN Other Topics (Stanford)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1U6EzaxcNqwuDUWAvqIS1VsOQsW3eXhnP/"
+        },
+        {
+          "row": 98,
+          "scheduledDate": "20, 22 April",
+          "title": "CNN Stanford Blog [Optional]",
+          "status": "Reference",
+          "url": "https://cs231n.github.io/convolutional-networks/"
+        },
+        {
+          "row": 100,
+          "scheduledDate": "",
+          "title": "CNN Math Problems",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1vDC8d6vmVGZ-77N6MNUoMNbzuQiUqqQl/"
+        },
+        {
+          "row": 101,
+          "scheduledDate": "",
+          "title": "CNN Maths (MMM Sir)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1LpvlbYvWMSToTArApAvEi96ouElgjsBd/"
+        },
+        {
+          "row": 102,
+          "scheduledDate": "",
+          "title": "CNN to Later Architectures (MMM Sir Notes)",
+          "status": "Reference",
+          "url": "https://drive.google.com/file/d/1bzPlvTx8Ayo0LMtJjrBt0seLwhNj8CNb/"
+        },
+        {
+          "row": 104,
+          "scheduledDate": "27, 29 April",
+          "title": "Attention & Transformers Slides",
+          "status": "Mandatory",
+          "url": "https://docs.google.com/presentation/d/1asMW9Y3yYiD4bt1NVRwh0GqokZ-0ytpt7F4gxQqcGzQ/"
+        },
+        {
+          "row": 105,
+          "scheduledDate": "27, 29 April",
+          "title": "Transformer Brief Slide (MMM Sir)",
+          "status": "Reference",
+          "url": "https://drive.google.com/file/d/1nG4JE76QutMe_Z4D3TRJNTncgR8FjEMY/"
+        },
+        {
+          "row": 107,
+          "scheduledDate": "",
+          "title": "Transformers (in details)",
+          "status": "Reference",
+          "url": "https://www.vizuaranewsletter.com/p/the-transformers"
+        },
+        {
+          "row": 109,
+          "scheduledDate": "Practice Problem",
+          "title": "Attention & Transformers Math Problems",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/11yfb-F023y8wS45BxU5-oZIuognyx_Eq/"
+        },
+        {
+          "row": 110,
+          "scheduledDate": "Practice Problem",
+          "title": "Attention Maths (MMM Sir)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1Bznv9J-_MWuVfksnjVeDeFdlMPEbNtuq/"
+        },
+        {
+          "row": 111,
+          "scheduledDate": "Practice Problem",
+          "title": "PE, Masked Attention, Cross Attention Maths (MMM Sir)",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1ksdNscFuacyi5Bdtz4SnDkAgVIaIxY4T/"
+        },
+        {
+          "row": 113,
+          "scheduledDate": "6 May",
+          "title": "Graph Neural Network (Slides)",
+          "status": "Mandatory",
+          "url": "https://docs.google.com/presentation/d/1yu0wXG5_DwK-6NzKO1yOtTqbeVYrbCr_uhVNjQ7uCIk/"
+        },
+        {
+          "row": 114,
+          "scheduledDate": "6 May",
+          "title": "Graph Neural Network (MMM Sir)",
+          "status": "Reference",
+          "url": "https://drive.google.com/file/d/1FFdJjss16yf9tKW5b7c9Afc1dvR5jZXW/"
+        },
+        {
+          "row": 116,
+          "scheduledDate": "Practice Problem",
+          "title": "Graph Neural Network",
+          "status": "Mandatory",
+          "url": "https://drive.google.com/file/d/1NojEbkFfgeoYeM6KETibRVoGycm5iM6c/"
+        },
+        {
+          "row": 118,
+          "scheduledDate": "Quiz",
+          "title": "Quiz 03",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1rJMjN4wVlnlmV_TFrtqiteQ2yPAmwGr0/"
+        },
+        {
+          "row": 119,
+          "scheduledDate": "Quiz",
+          "title": "Quiz 04",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1wastKVaB6hajBBio91mY8wj7gifRx6j0/"
+        },
+        {
+          "row": 120,
+          "scheduledDate": "Quiz",
+          "title": "Quiz 05 (Makeup Quiz)",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1e4VHwlZnXZOpU0ueClSe2hlr-tdybz-Q/"
+        }
+      ]
+    },
+    {
+      "sourceSheet": "CSE221_T",
+      "courseCode": "CSE221",
+      "courseTitle": "CSE221 Theory",
+      "semester": "Spring 2026",
+      "items": [
+        {
+          "row": 3,
+          "scheduledDate": "Spring 2026",
+          "title": "Lecture Plan [Central]",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1F6y_LDd8WMxFrcokitB0kCRlVb9didtRU12dE_C6s04/"
+        },
+        {
+          "row": 5,
+          "scheduledDate": "",
+          "title": "Central Folder [Outline/Books/Slides]",
+          "status": "",
+          "url": "https://drive.google.com/drive/folders/17MIftbWMXQDEE0nAWK3htI34yW6rxcAb"
+        },
+        {
+          "row": 7,
+          "scheduledDate": "",
+          "title": "Past Mid & Final Ques",
+          "status": "",
+          "url": "https://drive.google.com/drive/folders/1DKsqpOoEWTg3LmI5XN0vPptIJQYX2Rtt"
+        },
+        {
+          "row": 9,
+          "scheduledDate": "Spring 2026",
+          "title": "Class Recording Playlist",
+          "status": "",
+          "url": "https://www.youtube.com/playlist?list=PLDUh101LvvVoiO5oSlxf7yiPau4vl0FMO"
+        },
+        {
+          "row": 81,
+          "scheduledDate": "12 April",
+          "title": "DFS Traversal",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1j7cPYMmPcrnKmkM-tlb7KPOQUhgxMsD5/"
+        },
+        {
+          "row": 83,
+          "scheduledDate": "12 April",
+          "title": "Edge Classification",
+          "status": "",
+          "url": "https://drive.google.com/file/d/17t7ZboKIgmT1UwkptCYYJL0mhzHSEVId/"
+        },
+        {
+          "row": 84,
+          "scheduledDate": "12 April",
+          "title": "Edge Classification",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1ViEFKGwpw3wuGqEMKB7kmTQoANVetXwd/"
+        },
+        {
+          "row": 85,
+          "scheduledDate": "12 April",
+          "title": "Edge Classification",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1JkJuVU1ZpGog-HXW8ESKc5w9TtXhOHkD/"
+        },
+        {
+          "row": 87,
+          "scheduledDate": "12 April",
+          "title": "Cycle Detection w/ DFS",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1JxerKAv8urbruPWLhKctahfWlT-ZDwj1/"
+        },
+        {
+          "row": 88,
+          "scheduledDate": "12 April",
+          "title": "Cycle Detection w/ DFS",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1gXy4lqPm2xVoBqzBdfd4KPAynYl8Spyr/"
+        },
+        {
+          "row": 89,
+          "scheduledDate": "12 April",
+          "title": "Cycle Detection w/ DFS",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1lyCxb0qLAGwSY7h8GSLawBaYbWEpPJ9o/"
+        },
+        {
+          "row": 91,
+          "scheduledDate": "4/19/2026",
+          "title": "Topological Sorting by CLRS",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1HupOFBlcttpm8UQcjPKMWROfAXTc9jla/"
+        },
+        {
+          "row": 92,
+          "scheduledDate": "4/19/2026",
+          "title": "Topological Sorting Notes",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1ijhXYFXBn6sSos_H7rfDdrrbLPckWx_R"
+        },
+        {
+          "row": 93,
+          "scheduledDate": "4/19/2026",
+          "title": "DAG and Algo for Topological Sorting",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1hTv6qO-87WrKa2WFbKcNefHicR9O4Ntw/"
+        },
+        {
+          "row": 94,
+          "scheduledDate": "4/19/2026",
+          "title": "3 DAGs with Possible Topological Sorting",
+          "status": "",
+          "url": "https://drive.google.com/file/d/13O35MN71-1S9XNukFXGotoR8__I-7yuT/"
+        },
+        {
+          "row": 96,
+          "scheduledDate": "4/19/2026",
+          "title": "SCC by CLRS",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1GVPI1-Zp79CIabNdCF3yVaHXcfH67GkC/"
+        },
+        {
+          "row": 97,
+          "scheduledDate": "4/19/2026",
+          "title": "SCC Algo",
+          "status": "",
+          "url": "https://drive.google.com/file/d/17ESveXwUDnqJOJbtb1iA9DGW8VcqKqRy/"
+        },
+        {
+          "row": 99,
+          "scheduledDate": "21/24 April",
+          "title": "Dijkstra Slides",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1y_StavlwHKyquzav9Q4Mq014_DrvrO8l/"
+        },
+        {
+          "row": 100,
+          "scheduledDate": "21/24 April",
+          "title": "Dijkstra Simulation",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1HzBuuRDJnZAmlyzPHe2v4ojS5GxV24dn/"
+        },
+        {
+          "row": 101,
+          "scheduledDate": "21/24 April",
+          "title": "Dijkstra & Bellman Ford from CPBook [Reference]",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1-PA36dCnjSNphIkun0aIGa9IWBYhmb3_/"
+        },
+        {
+          "row": 102,
+          "scheduledDate": "21/24 April",
+          "title": "Negative Cycle",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1J_DkANewD36_Uc_msV1t5mib_22rnUu-/"
+        },
+        {
+          "row": 103,
+          "scheduledDate": "21/24 April",
+          "title": "Negative Cycle",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1_dUK7xEraxkBn_gK3eFeyrdd8S-8ZoFM/"
+        },
+        {
+          "row": 104,
+          "scheduledDate": "21/24 April",
+          "title": "Shortest Paths Algorithm Decision Table",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1OIr4SsRIXEq5KPMeGv1xrvGTG46VKsBG/"
+        },
+        {
+          "row": 106,
+          "scheduledDate": "4/24/2026",
+          "title": "MST Basics / Kruskal's Algo",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1-LXFaNO5l5i6C_WKfGAAweQTZSAq-L0Y/",
+          "notes": "Slide 45"
+        },
+        {
+          "row": 107,
+          "scheduledDate": "4/24/2026",
+          "title": "DSU",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1855JvFb9HEk0yGe8UJxtUTSWfkFPJN9-/"
+        },
+        {
+          "row": 108,
+          "scheduledDate": "4/24/2026",
+          "title": "DSU",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1U7YNQYRBlS3nUZVWpp7J5BdveE7oPfCD/"
+        },
+        {
+          "row": 109,
+          "scheduledDate": "4/24/2026",
+          "title": "DSU",
+          "status": "",
+          "url": "https://cp-algorithms.com/data_structures/disjoint_set_union.html"
+        },
+        {
+          "row": 111,
+          "scheduledDate": "Assignment 02",
+          "title": "Problem Set",
+          "status": "",
+          "url": "https://docs.google.com/document/d/16l93uzbmfRI7VsaDBLAdDrAD0RVpXd_0xui2YKqJaFI/",
+          "notes": "Deadline: 2 May, 11.59 PM"
+        },
+        {
+          "row": 112,
+          "scheduledDate": "Assignment 02",
+          "title": "Form",
+          "status": "",
+          "url": "https://forms.gle/L6MFURzYtDT7Yhgt6",
+          "notes": "Deadline: 2 May, 11.59 PM"
+        },
+        {
+          "row": 114,
+          "scheduledDate": "Assignment 03",
+          "title": "Problem Set",
+          "status": "",
+          "url": "https://docs.google.com/document/d/1vsOCDpVVOY_QjSE_QXvco9OI1e8O6fezU9sBY72wC5E",
+          "notes": "Deadline: 10 May, 11.59 PM"
+        },
+        {
+          "row": 115,
+          "scheduledDate": "Assignment 03",
+          "title": "Form",
+          "status": "",
+          "url": "https://forms.gle/fkMoPLaAZmXoTbQS8",
+          "notes": "Deadline: 10 May, 11.59 PM"
+        },
+        {
+          "row": 117,
+          "scheduledDate": "4/26/2026",
+          "title": "Huffman Coding - Slides",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1eiPn4l0Buc-tTU0yC6KynXkdGEQSjCOs/"
+        },
+        {
+          "row": 118,
+          "scheduledDate": "4/26/2026",
+          "title": "Huffman Coding - Algorithm",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1lf_oqHB9gD3fsbl_mAzuN0dPcvEhqcKx/"
+        },
+        {
+          "row": 119,
+          "scheduledDate": "4/26/2026",
+          "title": "Huffman Coding - Book Chapter",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1PENRy9i_3CpOY_VYxMtWKr8VM9So0J_h/"
+        },
+        {
+          "row": 120,
+          "scheduledDate": "4/26/2026",
+          "title": "Huffman Coding - Simulation",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1AxdfFKCuWbCrH1ica6N0oHgT8pJ04DC_/"
+        },
+        {
+          "row": 122,
+          "scheduledDate": "4/28/2026",
+          "title": "Greedy Basics",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1YkNcGh3xNcji53KnPFBPhAaIfzSuS8OU/"
+        },
+        {
+          "row": 123,
+          "scheduledDate": "4/28/2026",
+          "title": "Greedy vs Bruteforce",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1YkNcGh3xNcji53KnPFBPhAaIfzSuS8OU/"
+        },
+        {
+          "row": 125,
+          "scheduledDate": "28 April, 3, 5 May",
+          "title": "Fractional Knapsack (Greedy)",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1sRTuxjI6yOyc8uBpNUteoDw-DUxEqcsK/"
+        },
+        {
+          "row": 126,
+          "scheduledDate": "28 April, 3, 5 May",
+          "title": "DP Basics / Iterative / Recursive DP",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1a3CrCUoT555tZnLeE3rCUOHNjzFqfZDX/"
+        },
+        {
+          "row": 127,
+          "scheduledDate": "28 April, 3, 5 May",
+          "title": "0/1 Knapsack (DP)",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1e522VkwDBlIhJZmyFbJ5ydZlkMJLQGLY/"
+        },
+        {
+          "row": 128,
+          "scheduledDate": "28 April, 3, 5 May",
+          "title": "0/1 Knapsack Simulation",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/17IXfSdDAZuSNbzvrRrDYTZIJ_cJ1E8JdwmlgZVOUcoE/"
+        },
+        {
+          "row": 130,
+          "scheduledDate": "5/5/2026",
+          "title": "LCS Slides",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1yWC-fMWTFPT6IHdZrSBrN1iyWKjqGmeG/"
+        },
+        {
+          "row": 131,
+          "scheduledDate": "5/5/2026",
+          "title": "LCS Algo",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1XuYPsX93IdX7dH0P4T1grm8jDFGO0DBI/"
+        },
+        {
+          "row": 132,
+          "scheduledDate": "5/5/2026",
+          "title": "LCS Example 02",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1aMiKZxUBoIeVFY_HsWkmIRETNpBbqBde/"
+        },
+        {
+          "row": 133,
+          "scheduledDate": "5/5/2026",
+          "title": "All Possible LCS",
+          "status": "",
+          "url": "https://www.techiedelight.com/longest-common-subsequence-finding-lcs/"
+        },
+        {
+          "row": 134,
+          "scheduledDate": "5/5/2026",
+          "title": "Sheet",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1hR_iPqd8HCavUEa7GxnHKbML_Z2L0vyAumx3hpn6J70/"
+        },
+        {
+          "row": 136,
+          "scheduledDate": "10 May",
+          "title": "Syllabus Review",
+          "status": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "sourceSheet": "CSE422_L",
+      "courseCode": "CSE422",
+      "courseTitle": "CSE422 Lab",
+      "semester": "Spring 2026",
+      "items": [
+        {
+          "row": 3,
+          "scheduledDate": "",
+          "title": "Lab Plan",
+          "status": "",
+          "url": ""
+        },
+        {
+          "row": 5,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "Files",
+          "status": "",
+          "url": "https://drive.google.com/drive/folders/1nEZOuBbrtmjs12Kpf0C8CPYRoBGhws9k"
+        },
+        {
+          "row": 6,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "Slide",
+          "status": "",
+          "url": "https://docs.google.com/presentation/d/1XhJqAuT8p3_0lWbLdEjaphlwA1blipGd"
+        },
+        {
+          "row": 7,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "Lecture Notes - IBU Ma'am",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1d3z_XZpyjLIfQRWtsipT804uW_ZqcHC6/"
+        },
+        {
+          "row": 8,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "Alternative Slide",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1uFGAszQXGkfaKlHo3Hu2dkbQ-PJ1KQ8L/"
+        },
+        {
+          "row": 9,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "Textbook Chapter",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1_kv1_V1beiRCqwTIeGtH4sKLpgmSQpBA/"
+        },
+        {
+          "row": 10,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "Map",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1WHgrumXtb4v6DZ--zTBOKpcpnogr0Nbn/"
+        },
+        {
+          "row": 11,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "Simulation",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1mGKtYRhwiDJid53x1p7r6MVhJtzGRMZg/"
+        },
+        {
+          "row": 12,
+          "scheduledDate": "Lab 01 / A* Search",
+          "title": "File IO",
+          "status": "",
+          "url": "https://colab.research.google.com/drive/16GxXl5foYt2UYSRN-5lVC_NI8OjybEb0"
+        },
+        {
+          "row": 14,
+          "scheduledDate": "Lab 02 / Genetic Algorithm",
+          "title": "Files",
+          "status": "",
+          "url": "https://drive.google.com/drive/folders/1qiTQrLZGgei5EopIUBvrbr6gk9B-WSE9"
+        },
+        {
+          "row": 15,
+          "scheduledDate": "Lab 02 / Genetic Algorithm",
+          "title": "Class Recording (Part 01 & 02)",
+          "status": "",
+          "url": "https://youtu.be/37zYBEmuKzY"
+        },
+        {
+          "row": 16,
+          "scheduledDate": "Lab 02 / Genetic Algorithm",
+          "title": "Class Recording (Part 01 & 02)",
+          "status": "",
+          "url": "https://youtu.be/hwV5zXAGMmA"
+        },
+        {
+          "row": 18,
+          "scheduledDate": "Lab 04 / Intro to ML & Preprocessing",
+          "title": "Colab Notebook",
+          "status": "",
+          "url": "https://colab.research.google.com/drive/1G9veH328WYOt31oRnggwHKhluoi21Rqf"
+        },
+        {
+          "row": 19,
+          "scheduledDate": "Lab 04 / Intro to ML & Preprocessing",
+          "title": "Files",
+          "status": "",
+          "url": "https://drive.google.com/drive/folders/1poSEbCz-dfJvf9vIzdsE46F8o_dQnCSq"
+        },
+        {
+          "row": 21,
+          "scheduledDate": "Books",
+          "title": "Master Machine Learning with scikit-learn",
+          "status": "",
+          "url": "https://mlbook.dataschool.io/"
+        },
+        {
+          "row": 22,
+          "scheduledDate": "Books",
+          "title": "Approaching (Almost) Any ML Problem",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1yVEckUfSOGGPFa3gb2lB7uJEHTqzQgDV"
+        },
+        {
+          "row": 23,
+          "scheduledDate": "Books",
+          "title": "The StatQuest Illustrated Guide to ML",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1DN3MEvVm1yJHlnQd0Guq4vHF9upFJJfg"
+        },
+        {
+          "row": 24,
+          "scheduledDate": "Books",
+          "title": "ML Course Book",
+          "status": "",
+          "url": "https://ml-course.github.io/"
+        },
+        {
+          "row": 25,
+          "scheduledDate": "Books",
+          "title": "Feature Selection",
+          "status": "",
+          "url": "https://machinelearningmastery.com/feature-selection-with-real-and-categorical-data/"
+        },
+        {
+          "row": 27,
+          "scheduledDate": "Lab 05 / Unsupervised Learning",
+          "title": "Colab Notebooks",
+          "status": "",
+          "url": "https://drive.google.com/drive/folders/15sW0a1NupSt9BoMlO6KSKl160PkHExtZ"
+        }
+      ]
+    },
+    {
+      "sourceSheet": "Archive",
+      "courseCode": "PAST-COURSES",
+      "courseTitle": "Past Semester Course Logs",
+      "semester": "Archive",
+      "items": [
+        {
+          "row": 3,
+          "scheduledDate": "",
+          "title": "Summer 2022",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/18pbs1x4M8iXSLc-p-G3nD6C58ddTikaWpJhEWgZfWNg/"
+        },
+        {
+          "row": 5,
+          "scheduledDate": "",
+          "title": "Fall 2022",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/12RmZdViO_Mw9KiCb-8WMBFy9mk_XDWP7Lr4KzpQUml8/"
+        },
+        {
+          "row": 7,
+          "scheduledDate": "",
+          "title": "Spring 2023",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/11f6Sh9cSjGe1oHyjDJCoPB0uP1KS6szAveCxLEAu2A8/"
+        },
+        {
+          "row": 9,
+          "scheduledDate": "",
+          "title": "Summer 2023",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/11bBHO_asU7lM9D_9kIQ_PFUgCPC4HS1FBnz8U2A5S_M"
+        },
+        {
+          "row": 11,
+          "scheduledDate": "",
+          "title": "Fall 2023",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/14EFKa96RjTb65qUFxcN7q5cIkIPy3sbMJTaPVK_7lHY/"
+        },
+        {
+          "row": 13,
+          "scheduledDate": "",
+          "title": "Spring 2024",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/15-VboO0RRssuff4zXZA3srtJYe7pEja78pPKfrKZ8hc/"
+        },
+        {
+          "row": 15,
+          "scheduledDate": "",
+          "title": "Summer 2024",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1Ep7McDM4V1VcE70BkIU7rI_rZ-vHy1N9VMK-dD7QySM/"
+        },
+        {
+          "row": 17,
+          "scheduledDate": "",
+          "title": "Fall 2024",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1GQ7CYsY1U-py3OQW17i7Ag1zCVmS7wcVcZdJ5JFXgYc/"
+        },
+        {
+          "row": 19,
+          "scheduledDate": "",
+          "title": "Spring 2025",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1V4yoEoBGv45DljDTVMPbGbWZNu9gxC3tXVJD53Efyr4/"
+        },
+        {
+          "row": 21,
+          "scheduledDate": "",
+          "title": "Summer 2025",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1q8huC7GK7LYG7-Wft5rLfGIWJqHpdaLD14dkazZG7Rg/"
+        },
+        {
+          "row": 23,
+          "scheduledDate": "",
+          "title": "Fall 2025",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1UJRmQdu4Q8UFgSKzrtHwDnuqQAtc1MyZaOE18_TMWVY/"
+        }
+      ]
+    },
+    {
+      "sourceSheet": "Misc",
+      "courseCode": "ACADEMIC-RESOURCES",
+      "courseTitle": "Academic and Career Resources",
+      "semester": "Reference",
+      "items": [
+        {
+          "row": 3,
+          "scheduledDate": "Thesis",
+          "title": "UG Thesis Lifecycle",
+          "status": "",
+          "url": "https://drive.google.com/file/d/1tMgIr8czAURIiF41qBydUZVhbinrrIzZ/"
+        },
+        {
+          "row": 4,
+          "scheduledDate": "Thesis",
+          "title": "Thesis Registration",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1SkyO77YFde-N4bpxQ5lb07FH24hFINyR4JBgD47Xamk"
+        },
+        {
+          "row": 5,
+          "scheduledDate": "Thesis",
+          "title": "Supervisor List",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1-gibs8iIrqLpHlS3Vi4kBNG5v5l1lNbQKMhKeAiJLok/edit#gid=165489345"
+        },
+        {
+          "row": 6,
+          "scheduledDate": "Thesis",
+          "title": "BracU Thesis Report Requirements",
+          "status": "",
+          "url": "https://docs.google.com/document/d/1cucugAPfmkg_Dsn6ToLTyjVfWBTFeG2JKnFcEFUQx8A/"
+        },
+        {
+          "row": 8,
+          "scheduledDate": "",
+          "title": "CSE Degree Plan",
+          "status": "",
+          "url": "https://docs.google.com/document/d/1BksVbAqjgdVg-IbVJ0i09fVQcjw-_Sm_/"
+        },
+        {
+          "row": 9,
+          "scheduledDate": "",
+          "title": "CS Degree Plan",
+          "status": "",
+          "url": "https://docs.google.com/document/d/1jFtSQLYyIlu1FMRuRAGBWbtUT3FbeCLB/"
+        },
+        {
+          "row": 10,
+          "scheduledDate": "",
+          "title": "Prerequisite Course List",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1Tk3QMCMgRQh3D3KG7k9DOp6b1FYzMdWW5z2Ta58cGAY/"
+        },
+        {
+          "row": 12,
+          "scheduledDate": "Spring 2026",
+          "title": "Faculty & Staff Seat Plan",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1PlgZ5Z6PpRd75Hqp5vbx4UvEXCK_Vhw8TdQLvAYXmjw/edit?gid=1172348562#gid=1172348562"
+        },
+        {
+          "row": 13,
+          "scheduledDate": "Spring 2026",
+          "title": "Advising Dashboard",
+          "status": "",
+          "url": "https://cse.sds.bracu.ac.bd/advising"
+        },
+        {
+          "row": 14,
+          "scheduledDate": "Spring 2026",
+          "title": "Routine",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1aZ_8do2w3aA382MhZyJKG5amXZ6fpthJYoLsdM9x0gU/"
+        },
+        {
+          "row": 16,
+          "scheduledDate": "",
+          "title": "BracU Programmers Community YouTube Channel",
+          "status": "",
+          "url": "https://youtube.com/@bracu.programmers.community",
+          "notes": "Use GSuite to access the full playlist."
+        },
+        {
+          "row": 18,
+          "scheduledDate": "",
+          "title": "Terence Tao - Career Advice",
+          "status": "",
+          "url": "https://terrytao.wordpress.com/career-advice/",
+          "notes": "Professor at UCLA; Fields Medal and Royal Medal winner, as described in the source sheet."
+        },
+        {
+          "row": 19,
+          "scheduledDate": "",
+          "title": "Stanford CS Curriculum",
+          "status": "",
+          "url": "https://docs.google.com/spreadsheets/d/1Mz67v5FTloKvPDPmCeAbnKFpGJdpt-9zgkj7V5qn0q8/"
+        },
+        {
+          "row": 20,
+          "scheduledDate": "",
+          "title": "Industry Resources",
+          "status": "",
+          "url": "https://docs.google.com/document/d/1v2xLEL1pHTFn_VSfzs7enhDgMHd7LX8i9nWVhgdKL2o/"
+        },
+        {
+          "row": 21,
+          "scheduledDate": "",
+          "title": "Job Preparation",
+          "status": "",
+          "url": "https://docs.google.com/document/d/1_H7_ZjU8QXvaAqkGIYSIkxWjvN_e2QNnHTGB4pGPS58/"
+        },
+        {
+          "row": 22,
+          "scheduledDate": "",
+          "title": "Learning Resources for Software Engineers",
+          "status": "",
+          "url": "https://github.com/charlax/professional-programming"
+        },
+        {
+          "row": 23,
+          "scheduledDate": "",
+          "title": "Common Design Patterns (in C#)",
+          "status": "",
+          "url": "https://github.com/milanm/DesignPatternsInUse"
+        },
+        {
+          "row": 24,
+          "scheduledDate": "",
+          "title": "Introduction to Linear Algebra for Applied Machine Learning with Python",
+          "status": "",
+          "url": "https://pabloinsente.github.io/intro-linear-algebra"
+        }
+      ]
+    }
+  ]
+}
