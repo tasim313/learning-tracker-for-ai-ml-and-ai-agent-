@@ -3,18 +3,20 @@ import { applicationDataSchema } from "@/lib/model";
 import { gradeManualQuestions, startExamination, submitExamination } from "@/lib/services/examinations";
 import { updateCompetencyRecords } from "@/lib/services/competency";
 import { recordRewardEvent } from "@/lib/services/rewards";
-import { updateApplicationData } from "@/lib/storage/json-store";
+import { updateUserData } from "@/lib/storage/user-store";
+import { withUser } from "@/lib/auth/http";
+import { StorageError } from "@/lib/storage/file-store";
 
 function error(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export async function POST(request: Request) {
+export const POST = withUser(async ({ request, user }) => {
   try {
     const payload = await request.json() as Record<string, unknown>;
     if (payload.action === "start") {
       if (typeof payload.blueprintId !== "string") return error("An examination blueprint is required.");
-      const result = await updateApplicationData((data) => {
+      const result = await updateUserData(user.id, (data) => {
         const attempt = startExamination(data, payload.blueprintId as string);
         const next = applicationDataSchema.parse({ ...data, examinationAttempts: [...data.examinationAttempts, attempt] });
         return { data: next, result: attempt };
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
     }
     if (payload.action === "submit" || payload.action === "expire") {
       if (typeof payload.attemptId !== "string") return error("Examination attempt id is required.");
-      const result = await updateApplicationData((data) => {
+      const result = await updateUserData(user.id, (data) => {
         const index = data.examinationAttempts.findIndex(({ id }) => id === payload.attemptId);
         if (index < 0) throw new Error("Examination attempt was not found.");
         const current = data.examinationAttempts[index];
@@ -77,7 +79,7 @@ export async function POST(request: Request) {
       if (typeof payload.attemptId !== "string" || typeof payload.grades !== "object" || payload.grades === null) {
         return error("An attempt id and question grades are required.");
       }
-      const result = await updateApplicationData((data) => {
+      const result = await updateUserData(user.id, (data) => {
         const index = data.examinationAttempts.findIndex(({ id }) => id === payload.attemptId);
         if (index < 0) throw new Error("Examination attempt was not found.");
         const updated = gradeManualQuestions(data.examinationAttempts[index], payload.grades as Record<string, { marksEarned: number; feedback: string }>);
@@ -111,18 +113,19 @@ export async function POST(request: Request) {
     }
     return error("Unknown examination action.");
   } catch (cause) {
+    if (cause instanceof StorageError) throw cause;
     console.error("Examination workflow failed.", cause);
     return error(cause instanceof Error ? cause.message : "Examination action failed.");
   }
-}
+});
 
-export async function PATCH(request: Request) {
+export const PATCH = withUser(async ({ request, user }) => {
   try {
     const payload = await request.json() as Record<string, unknown>;
     if (payload.action !== "answer" || typeof payload.attemptId !== "string" || typeof payload.questionId !== "string" || typeof payload.answer !== "string") {
       return error("Attempt id, question id, and answer are required.");
     }
-    const result = await updateApplicationData((data) => {
+    const result = await updateUserData(user.id, (data) => {
       const index = data.examinationAttempts.findIndex(({ id }) => id === payload.attemptId);
       if (index < 0) throw new Error("Examination attempt was not found.");
       const attempt = data.examinationAttempts[index];
@@ -137,7 +140,8 @@ export async function PATCH(request: Request) {
     });
     return NextResponse.json(result);
   } catch (cause) {
+    if (cause instanceof StorageError) throw cause;
     console.error("Unable to save examination answer.", cause);
     return error(cause instanceof Error ? cause.message : "Answer was not saved.");
   }
-}
+});

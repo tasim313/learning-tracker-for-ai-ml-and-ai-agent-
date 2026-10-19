@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, Brain, CheckCircle2, Clock3, Code2, Sparkles } from "lucide-react";
+import { ArrowRight, Brain, CheckCircle2, Clock3, Code2 } from "lucide-react";
 import { type FeaturePageDefinition, type FieldDefinition } from "@/lib/feature-pages";
 import { elapsedSessionSeconds, timeEstimationAccuracy } from "@/lib/calculations/time";
 import type { LearningSession } from "@/lib/model";

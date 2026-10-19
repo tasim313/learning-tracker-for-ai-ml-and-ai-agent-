@@ -1,4 +1,6 @@
-import { loadApplicationData } from "@/lib/storage/json-store";
+import { loadUserData } from "@/lib/storage/user-store";
+import { withUser } from "@/lib/auth/http";
+import { StorageError } from "@/lib/storage/file-store";
 import { timeEstimationAccuracy } from "@/lib/calculations/time";
 import { competencyReadiness } from "@/lib/services/competency";
 
@@ -7,9 +9,9 @@ function csvCell(value: unknown) {
   return `"${text.replaceAll('"', '""')}"`;
 }
 
-export async function GET(request: Request) {
+export const GET = withUser(async ({ request, user }) => {
   try {
-    const data = await loadApplicationData();
+    const data = await loadUserData(user.id);
     const params = new URL(request.url).searchParams;
     const format = params.get("format") ?? "csv";
     if (!["csv", "exams", "json", "print"].includes(format)) return Response.json({ error: "Format must be csv, exams, json, or print." }, { status: 400 });
@@ -114,10 +116,11 @@ export async function GET(request: Request) {
       }
     });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to create report.", error);
     return Response.json({ error: "Report could not be generated from saved data." }, { status: 500 });
   }
-}
+});
 
 function isDate(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;

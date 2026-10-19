@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { applicationDataSchema } from "../src/lib/model";
+import { applicationDataSchema, schemaVersion } from "../src/lib/model";
 import { createSeedData } from "../src/lib/seed";
 
 test("seed data has twelve ordered roadmap phases and no invented activity", () => {
@@ -8,10 +8,10 @@ test("seed data has twelve ordered roadmap phases and no invented activity", () 
   const result = applicationDataSchema.safeParse(data);
 
   assert.equal(result.success, true);
-  assert.equal(data.schemaVersion, 4);
+  assert.equal(data.schemaVersion, schemaVersion);
   assert.equal(data.roadmapPhases.length, 12);
   assert.equal(data.topics.length, 48);
-  assert.equal(data.resources.length, 70);
+  assert.equal(data.resources.length, 77);
   assert.equal(data.resources.filter(({ type }) => type === "video").length >= 3, true);
   assert.equal(data.resources.filter(({ type }) => type === "slide").length, 2);
   assert.deepEqual(data.roadmapPhases.map(({ order }) => order), Array.from({ length: 12 }, (_, index) => index + 1));

@@ -1,19 +1,22 @@
 import { NextResponse } from "next/server";
-import { updateApplicationData, loadApplicationData } from "@/lib/storage/json-store";
+import { loadUserData, updateUserData } from "@/lib/storage/user-store";
+import { withUser } from "@/lib/auth/http";
+import { StorageError } from "@/lib/storage/file-store";
 
 const allowedDays = new Set(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]);
 
-export async function GET() {
+export const GET = withUser(async ({ user }) => {
   try {
-    const data = await loadApplicationData();
+    const data = await loadUserData(user.id);
     return NextResponse.json(data.settings, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to read settings.", error);
     return NextResponse.json({ error: "Saved settings are unavailable." }, { status: 500 });
   }
-}
+});
 
-export async function PATCH(request: Request) {
+export const PATCH = withUser(async ({ request, user }) => {
   try {
     const payload = await request.json() as Record<string, unknown>;
     const timezone = typeof payload.timezone === "string" ? payload.timezone : "";
@@ -38,7 +41,7 @@ export async function PATCH(request: Request) {
     } catch {
       return NextResponse.json({ error: "Timezone must be a valid IANA timezone." }, { status: 400 });
     }
-    const settings = await updateApplicationData((data) => {
+    const settings = await updateUserData(user.id, (data) => {
       const next = {
         timezone,
         weeklyHours,
@@ -51,7 +54,8 @@ export async function PATCH(request: Request) {
     });
     return NextResponse.json(settings);
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to save settings.", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Settings were not saved." }, { status: 400 });
   }
-}
+});

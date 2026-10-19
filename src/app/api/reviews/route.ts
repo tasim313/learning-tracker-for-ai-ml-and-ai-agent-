@@ -1,25 +1,27 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { applicationDataSchema } from "@/lib/model";
-import { updateApplicationData } from "@/lib/storage/json-store";
+import { loadUserData, updateUserData } from "@/lib/storage/user-store";
+import { withUser } from "@/lib/auth/http";
+import { StorageError } from "@/lib/storage/file-store";
 
-export async function GET() {
+export const GET = withUser(async ({ user }) => {
   try {
-    const { loadApplicationData } = await import("@/lib/storage/json-store");
-    const data = await loadApplicationData();
+    const data = await loadUserData(user.id);
     return NextResponse.json({ dailyReviews: data.dailyReviews, weeklyReviews: data.weeklyReviews }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to load reviews.", error);
     return NextResponse.json({ error: "Saved reviews are unavailable." }, { status: 500 });
   }
-}
+});
 
 function between(value: string, start: string, end: string) {
   const day = value.slice(0, 10);
   return day >= start && day <= end;
 }
 
-export async function POST(request: Request) {
+export const POST = withUser(async ({ request, user }) => {
   try {
     const payload = await request.json() as Record<string, unknown>;
     if (payload.type === "weekly") {
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(weekStarting)) {
         return NextResponse.json({ error: "A valid week starting date is required." }, { status: 400 });
       }
-      const result = await updateApplicationData((data) => {
+      const result = await updateUserData(user.id, (data) => {
         const weekEndingDate = new Date(`${weekStarting}T00:00:00Z`);
         weekEndingDate.setUTCDate(weekEndingDate.getUTCDate() + 6);
         const weekEnding = weekEndingDate.toISOString().slice(0, 10);
@@ -72,7 +74,7 @@ export async function POST(request: Request) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || typeof payload.reflection !== "string" || typeof payload.nextAction !== "string") {
         return NextResponse.json({ error: "Date, reflection, and next action are required." }, { status: 400 });
       }
-      const result = await updateApplicationData((data) => {
+      const result = await updateUserData(user.id, (data) => {
         const previous = data.dailyReviews.find((review) => review.date === date);
         const review = { id: previous?.id ?? randomUUID(), date, reflection: payload.reflection as string, nextAction: payload.nextAction as string };
         const dailyReviews = previous
@@ -84,7 +86,8 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ error: "Review type must be daily or weekly." }, { status: 400 });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to save review.", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Review was not saved." }, { status: 400 });
   }
-}
+});

@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, CheckCircle2, Clock3, Play, Sparkles } from "lucide-react";
-import { loadApplicationData } from "@/lib/storage/json-store";
+import { BookOpen, CheckCircle2, Clock3, Play, Sparkles } from "lucide-react";
+import { requireUser } from "@/lib/auth/server";
+import { loadUserData } from "@/lib/storage/user-store";
 
 export const dynamic = "force-dynamic";
 
 export default async function RoadmapPage() {
-  const { roadmapPhases, topics, resources } = await loadApplicationData();
+  const { roadmapPhases, topics, resources } = await loadUserData((await requireUser()).user.id);
   const done = topics.filter((topic) => topic.status === "completed").length;
   return <div className="space-y-8">
     <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950 via-blue-950 to-slate-900 p-6 text-white sm:p-9">

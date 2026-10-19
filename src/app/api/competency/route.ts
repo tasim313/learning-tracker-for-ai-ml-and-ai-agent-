@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { competencyReadiness } from "@/lib/services/competency";
-import { loadApplicationData } from "@/lib/storage/json-store";
+import { loadUserData } from "@/lib/storage/user-store";
+import { withUser } from "@/lib/auth/http";
+import { StorageError } from "@/lib/storage/file-store";
 
-export async function GET() {
+export const GET = withUser(async ({ user }) => {
   try {
-    const data = await loadApplicationData();
+    const data = await loadUserData(user.id);
     return NextResponse.json(data.topics.map((topic) => ({
       topicId: topic.id,
       title: topic.title,
@@ -12,7 +14,8 @@ export async function GET() {
       readiness: competencyReadiness(data, topic.id)
     })), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to calculate competency readiness.", error);
     return NextResponse.json({ error: "Competency information is unavailable." }, { status: 500 });
   }
-}
+});
