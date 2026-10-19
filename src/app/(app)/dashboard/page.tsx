@@ -3,9 +3,11 @@ import { ArrowRight, BookOpenCheck, CheckCircle2, Clock3, Compass, ListChecks, P
 import { getDashboardSummary } from "@/lib/services/dashboard";
 import { requireUser } from "@/lib/auth/server";
 import { loadUserData } from "@/lib/storage/user-store";
-import { completionStreak, studyTimeByDay, timeEstimationAccuracy } from "@/lib/calculations/time";
+import { studyTimeByDay, timeEstimationAccuracy } from "@/lib/calculations/time";
 import type { ApplicationData } from "@/lib/model";
 import { competencyReadiness } from "@/lib/services/competency";
+import { DashboardCharts } from "@/components/analytics/dashboard-charts";
+import { consistency, dashboardSeries } from "@/lib/services/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +33,8 @@ export default async function DashboardPage() {
     .length;
   const timezone = typeof data.settings.timezone === "string" ? data.settings.timezone : "UTC";
   const dailyStudy = studyTimeByDay(data, 7, new Date(), timezone);
-  const streak = completionStreak(data, new Date(), timezone);
+  const routine = consistency(data);
+  const streak = routine.flexibleStreak;
   const firstScored = countFirstAttempts(attempts).filter((attempt) => attempt.scorePercent !== null);
   const firstAverage = firstScored.length
     ? Math.round(firstScored.reduce((sum, attempt) => sum + (attempt.scorePercent ?? 0), 0) / firstScored.length)
@@ -65,7 +68,7 @@ export default async function DashboardPage() {
         </div>
       </section>
       {nextTopic && <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <article className="rounded-2xl border border-blue-100 bg-blue-50/70 p-5 sm:p-6"><div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-800"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white"><CheckCircle2 size={16}/></span>Recommended next lesson</div><p className="mt-4 text-xs text-slate-500">{nextPhase ? `Phase ${nextPhase.order} · ${nextPhase.title}` : "Your learning path"}</p><h2 className="mt-1 text-xl font-semibold text-slate-950">{nextTopic.title}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{nextTopic.description}</p><p className="mt-3 text-xs text-slate-600">About {nextTopic.estimatedMinutes} minutes · {nextTopic.difficulty}</p><Link href="/topics" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-800">Open lesson and mark progress <ArrowRight size={15}/></Link></article>
+        <article className="rounded-2xl border border-blue-100 bg-blue-50/70 p-5 sm:p-6"><div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-800"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white"><CheckCircle2 size={16}/></span>Recommended next lesson</div><p className="mt-4 text-xs text-slate-500">{nextPhase ? `Phase ${nextPhase.order} · ${nextPhase.title}` : "Your learning path"}</p><h2 className="mt-1 text-xl font-semibold text-slate-950">{nextTopic.title}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{nextTopic.description}</p><p className="mt-3 text-xs text-slate-600">About {nextTopic.estimatedMinutes} minutes · {nextTopic.difficulty}</p><Link href={`/topics/${nextTopic.id}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-800">Open topic and readiness <ArrowRight size={15}/></Link></article>
         <article className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"><div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Start with a resource</p><h2 className="mt-1 text-base font-semibold text-slate-900">{nextResource?.title ?? "Your learning materials"}</h2></div><BookOpenCheck className="text-blue-700" size={20}/></div><p className="mt-2 text-sm leading-6 text-slate-600">{nextResource?.notes ?? "Browse videos, courses, slides and guided exercises matched to your roadmap."}</p><div className="mt-4 flex gap-3">{nextResource && <a href={nextResource.url} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-blue-700 px-3 text-sm font-semibold text-white">Open {nextResource.type} <ArrowRight size={14}/></a>}<Link href="/resources" className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-700">All resources</Link></div></article>
       </section>}
 
@@ -75,6 +78,8 @@ export default async function DashboardPage() {
         <MetricCard icon={<Clock3 size={18} />} label="Focused study" value={`${Math.floor(summary.focusedMinutes / 60)}h ${summary.focusedMinutes % 60}m`} detail="Completed learning sessions" />
         <MetricCard icon={<ListChecks size={18} />} label="Examinations" value={String(attempts.length)} detail={`${scoredAttempts.length} scored · ${upcomingRevisions} revisions due`} />
       </section>
+
+      <DashboardCharts series={dashboardSeries(data)} />
 
       <section className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
         <div className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
@@ -119,7 +124,7 @@ export default async function DashboardPage() {
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-start justify-between gap-3">
             <div><h2 className="text-base font-semibold text-slate-900">Focused time · last 7 days</h2><p className="mt-1 text-xs text-slate-500">Completed sessions only; no fabricated activity.</p></div>
-            <p className="text-xs text-slate-500">Streak: {streak} {streak === 1 ? "day" : "days"}</p>
+            <p className="text-xs text-slate-500">Flexible streak: {streak} planned study {streak === 1 ? "day" : "days"} · consistency {routine.score === null ? "N/A" : `${Math.round(routine.score)}%`} (last 28 days; rest days excluded)</p>
           </div>
           <div className="mt-5 flex h-36 items-end gap-2" role="img" aria-label="Completed focused learning minutes by day for the last seven days">
             {dailyStudy.map(({ date, plannedMinutes, focusedMinutes }) => {

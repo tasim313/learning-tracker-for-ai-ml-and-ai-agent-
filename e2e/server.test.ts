@@ -4,54 +4,16 @@
  * real cookies, restarts the server, and verifies data persisted.
  */
 import assert from "node:assert/strict";
-import { spawn, type ChildProcess } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 import { after, before, test } from "node:test";
+import { TestServer } from "./harness";
 
-const port = 3900 + Math.floor(Math.random() * 90);
-const origin = `http://localhost:${port}`;
-let dataDir = "";
-let server: ChildProcess | null = null;
+const server = new TestServer();
+const origin = server.origin;
+const startServer = () => server.start();
+const stopServer = () => server.stop();
 
-async function startServer() {
-  server = spawn(process.execPath, [path.resolve("node_modules/next/dist/bin/next"), "start", "-p", String(port)], {
-    env: { ...process.env, NODE_ENV: "production", DATA_DIR: dataDir, COOKIE_SECURE: "false", ADMIN_EMAILS: "admin@example.test", EMAIL_PROVIDER: "none" },
-    stdio: ["ignore", "pipe", "pipe"]
-  });
-  let log = "";
-  server.stdout?.on("data", (chunk) => { log += String(chunk); });
-  server.stderr?.on("data", (chunk) => { log += String(chunk); });
-  const deadline = Date.now() + 30_000;
-  while (Date.now() < deadline) {
-    try {
-      const response = await fetch(`${origin}/api/health`);
-      if (response.ok) return;
-    } catch {
-      // not listening yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 250));
-  }
-  throw new Error(`Server did not start.\n${log}`);
-}
-
-async function stopServer() {
-  if (!server) return;
-  const exited = new Promise((resolve) => server?.once("exit", resolve));
-  server.kill("SIGTERM");
-  await exited;
-  server = null;
-}
-
-before(async () => {
-  dataDir = await mkdtemp(path.join(os.tmpdir(), "learning-tracker-e2e-"));
-  await startServer();
-});
-after(async () => {
-  await stopServer();
-  await rm(dataDir, { recursive: true, force: true });
-});
+before(async () => { await startServer(); });
+after(async () => { await server.dispose(); });
 
 function request(url: string, init: RequestInit & { cookie?: string } = {}) {
   const headers = new Headers(init.headers);
@@ -134,7 +96,7 @@ test("every application page renders for a signed-in learner, and admin pages fo
     "/courses/ai-engineering-foundations/lessons/vectors-and-dot-products",
     "/courses/ai-engineering-foundations/lessons/vectors-and-dot-products/tutorial",
     "/videos", "/videos/ai-engineering-foundations/vectors-and-dot-products/video",
-    "/roadmap", "/topics", "/resources", "/knowledge", "/math-lab", "/diagrams", "/games", "/flashcards",
+    "/roadmap", "/topics", "/topics/topic-2", "/resources", "/knowledge", "/math-lab", "/diagrams", "/games", "/flashcards",
     "/timer", "/sessions", "/planner", "/revisions", "/exams", "/exam-library", "/questions", "/blueprints",
     "/active-exam", "/practical-exam", "/exam-results", "/answer-review", "/gaps", "/competency", "/exam-history",
     "/exam-analytics", "/assessments", "/projects", "/sales-agent", "/goals", "/discipline", "/rewards", "/reports",

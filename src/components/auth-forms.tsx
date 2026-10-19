@@ -21,15 +21,17 @@ function Field({ label, name, type = "text", autoComplete, required = true, minL
   label: string; name: string; type?: string; autoComplete?: string; required?: boolean; minLength?: number; hint?: string;
 }) {
   return (
-    <label className="block text-sm font-medium text-slate-800">
-      {label}
-      <input
-        name={name} type={type} autoComplete={autoComplete} required={required} minLength={minLength}
-        aria-describedby={hint ? `${name}-hint` : undefined}
-        className="mt-1.5 block min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-2 focus:outline-blue-200"
-      />
-      {hint && <span id={`${name}-hint`} className="mt-1 block text-xs font-normal text-slate-500">{hint}</span>}
-    </label>
+    <div>
+      <label className="block text-sm font-medium text-slate-800">
+        {label}
+        <input
+          name={name} type={type} autoComplete={autoComplete} required={required} minLength={minLength}
+          aria-describedby={hint ? `${name}-hint` : undefined}
+          className="mt-1.5 block min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-2 focus:outline-blue-200"
+        />
+      </label>
+      {hint && <p id={`${name}-hint`} className="mt-1 text-xs text-slate-500">{hint}</p>}
+    </div>
   );
 }
 

@@ -111,7 +111,8 @@ export const POST = withUser<{ collection: string }>(async ({ request, user, par
             achievement: { id: "achievement-first-project", title: "First project milestone completed" }
           })
         : { rewards: next.rewards, achievements: next.achievements };
-      return { data: { ...next, ...award }, result: record };
+      const stored = records(next, collection).find((item) => item.id === record.id) ?? record;
+      return { data: { ...next, ...award }, result: stored };
     });
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
@@ -147,6 +148,12 @@ export const PATCH = withUser<{ collection: string }>(async ({ request, user, pa
         }
         replacement.manuallyAdjusted = true;
       }
+      if (collection === "topics" && replacement.status !== previous.status) {
+        // Learning dates are stamped by the server when status changes; completion is not competency.
+        const now = new Date().toISOString();
+        if (["in-progress", "needs-practice", "needs-revision", "completed"].includes(String(replacement.status)) && !previous.startedAt) replacement.startedAt = now;
+        replacement.completedAt = replacement.status === "completed" ? (previous.completedAt ?? now) : null;
+      }
       if (collection === "examinationQuestions") {
         replacement.version = Number(previous.version ?? 1) + 1;
         replacement.updatedAt = new Date().toISOString();
@@ -164,7 +171,8 @@ export const PATCH = withUser<{ collection: string }>(async ({ request, user, pa
             achievement: { id: "achievement-first-project", title: "First project milestone completed" }
           })
         : { rewards: validated.rewards, achievements: validated.achievements };
-      return { data: { ...validated, ...award }, result: replacement };
+      const stored = records(validated, collection).find((item) => item.id === replacement.id) ?? replacement;
+      return { data: { ...validated, ...award }, result: stored };
     });
     return NextResponse.json(updated);
   } catch (error) {

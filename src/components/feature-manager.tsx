@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowRight, Brain, CheckCircle2, Clock3, Code2 } from "lucide-react";
+import { SettingsForm } from "@/components/settings-form";
+import { ActiveExam } from "@/components/exams/active-exam";
+import { PracticalExam } from "@/components/exams/practical-exam";
+import { Markdown } from "@/components/markdown";
+import { ResourceAvailability } from "@/components/resource-availability";
+import { DisciplinePanel, ExamResultsPanel, GapReport, RewardsPanel } from "@/components/analytics/panels";
 import { type FeaturePageDefinition, type FieldDefinition } from "@/lib/feature-pages";
 import { elapsedSessionSeconds, timeEstimationAccuracy } from "@/lib/calculations/time";
 import type { LearningSession } from "@/lib/model";
@@ -121,7 +127,7 @@ export function FeatureManager({ section, definition }: { section: string; defin
         </section>
       )}
 
-      {section === "resources" ? <ResourceLibrary items={visibleItems} topics={topics} phases={phases} /> : section === "topics" ? <TopicExplorer items={visibleItems} topics={topics} phases={phases} onEdit={setEditing} onStatusChange={updateTopicStatus} /> : !["exam-results", "answer-review", "exam-history", "exam-analytics"].includes(section) && <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
+      {section === "resources" ? <ResourceLibrary items={visibleItems} topics={topics} phases={phases} /> : section === "topics" ? <TopicExplorer items={visibleItems} topics={topics} phases={phases} onEdit={setEditing} onStatusChange={updateTopicStatus} /> : !["exam-results", "answer-review", "exam-history", "exam-analytics", "exams", "active-exam", "practical-exam", "gaps", "competency", "discipline", "settings", "backup", "timer"].includes(section) && <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-semibold text-slate-900">Saved records</h2>
@@ -152,6 +158,12 @@ export function FeatureManager({ section, definition }: { section: string; defin
                     </div>
                   )}
                 </div>
+                {section === "knowledge" && (
+                  <div className="mt-2">
+                    {Array.isArray(item.tags) && item.tags.length > 0 && <ul className="flex flex-wrap gap-1" aria-label="Tags">{(item.tags as string[]).map((tag) => <li key={tag}><button type="button" onClick={() => setQuery(tag)} className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700">#{tag}</button></li>)}</ul>}
+                    <details className="mt-2"><summary className="cursor-pointer text-xs font-semibold text-blue-800">Read note</summary><Markdown className="mt-2">{String(item.body ?? "")}</Markdown></details>
+                  </div>
+                )}
                 {isHistorical(section) && <RecordDetails item={item} />}
               </article>
             ))}
@@ -159,7 +171,7 @@ export function FeatureManager({ section, definition }: { section: string; defin
         )}
       </section>}
       {(message || error) && <div aria-live="polite" className={`xl:col-span-2 rounded-lg p-3 text-sm ${error ? "bg-rose-50 text-rose-800" : "bg-emerald-50 text-emerald-800"}`}>{error || message}</div>}
-      {section === "settings" && <SettingsForm reload={load} />}
+      {section === "settings" && <SettingsForm />}
       {section === "backup" && <BackupPanel />}
       {section === "reports" && <ReportPanel topics={topics} />}
       {section === "exams" && <ExamDashboard blueprints={items} />}
@@ -168,14 +180,14 @@ export function FeatureManager({ section, definition }: { section: string; defin
       {section === "exam-analytics" && <ExamAnalytics attempts={items} topics={topics} />}
       {section === "exam-history" && <ExamHistory attempts={items} />}
       {section === "answer-review" && <AnswerReview attempts={items} />}
-      {section === "discipline" && <DisciplineSummary sessions={items} />}
-      {section === "rewards" && <RewardsSummary rewards={items} />}
+      {section === "discipline" && <DisciplinePanel />}
+      {section === "rewards" && <RewardsPanel />}
       {section === "sales-agent" && <SalesAgentPlan projects={items} />}
       {section === "timer" && <TimerPanel topics={topics} />}
-      {section === "exam-results" && <><ExamResults attempts={items} /><ManualGrader attempts={items} reload={load} /></>}
+      {section === "exam-results" && <><ManualGrader attempts={items} reload={load} /><ExamResultsPanel attempts={items} /></>}
       {section === "planner" && <ReviewPlanner plans={items} />}
       {section === "competency" && <CompetencySummary topics={topics} />}
-      {section === "gaps" && <GapAnalysis attempts={items} />}
+      {section === "gaps" && <GapReport />}
     </div>
   );
 }
@@ -186,7 +198,7 @@ function TopicExplorer({ items, topics, phases, onEdit, onStatusChange }: { item
   const phaseNames = new Map(phases.map((phase) => [String(phase.id), `${String(phase.order)}. ${String(phase.title)}`]));
   const filtered = items.filter((topic) => (phaseFilter === "all" || topic.phaseId === phaseFilter) && (statusFilter === "all" || topic.status === statusFilter));
   const completed = topics.filter((topic) => topic.status === "completed").length;
-  return <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"><div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Your lessons</p><h2 className="mt-1 text-xl font-semibold text-slate-950">Learn one clear step at a time</h2><p className="mt-1 text-sm text-slate-600">Start a topic, try its exercise, then mark it complete when you’re ready.</p></div><div className="flex items-center gap-3"><div className="w-36"><div className="flex justify-between text-[11px] text-slate-500"><span>Path progress</span><span>{completed}/{topics.length}</span></div><div className="mt-1 h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-emerald-500" style={{width:`${topics.length ? completed/topics.length*100 : 0}%`}}/></div></div><select aria-label="Filter by phase" value={phaseFilter} onChange={(event)=>setPhaseFilter(event.target.value)} className="min-h-9 max-w-44 rounded-lg border border-slate-300 px-2 text-xs"><option value="all">All stages</option>{phases.map((phase)=><option key={String(phase.id)} value={String(phase.id)}>{String(phase.order)}. {String(phase.title)}</option>)}</select></div></div><div className="mt-5 flex flex-wrap gap-2">{[["all","All"],["not-started","To learn"],["in-progress","In progress"],["needs-practice","Practice"],["needs-revision","Review"],["completed","Completed"]].map(([value,label])=><button key={value} type="button" onClick={()=>setStatusFilter(value)} className={`rounded-full px-3 py-1.5 text-xs font-medium ${statusFilter===value?"bg-blue-700 text-white":"bg-slate-100 text-slate-600"}`}>{label}</button>)}</div><div className="mt-4 grid gap-3 lg:grid-cols-2">{filtered.map((topic)=>{const status=String(topic.status);return <article key={topic.id} className="rounded-xl border border-slate-200 p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] font-medium text-blue-700">{phaseNames.get(String(topic.phaseId)) ?? "Learning path"}</p><h3 className="mt-1 font-semibold text-slate-950">{String(topic.title)}</h3></div><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${status === "completed" ? "bg-emerald-50 text-emerald-800" : status === "in-progress" ? "bg-blue-50 text-blue-800" : "bg-slate-100 text-slate-600"}`}>{humanize(status)}</span></div><p className="mt-2 text-sm leading-6 text-slate-600">{String(topic.description || "Build a foundation in this topic, then practice what you learned.")}</p><p className="mt-3 text-xs text-slate-500">{String(topic.estimatedMinutes)} min · {humanize(String(topic.difficulty))}</p>{typeof topic.practicalExercise === "string" && topic.practicalExercise && <details className="mt-3 rounded-lg bg-slate-50 p-3"><summary className="cursor-pointer text-xs font-semibold text-slate-700">Practice this lesson</summary><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">{topic.practicalExercise}</p>{typeof topic.deliverable === "string" && topic.deliverable && <p className="mt-2 text-xs text-slate-600"><strong>Make:</strong> {topic.deliverable}</p>}</details>}<div className="mt-4 flex flex-wrap gap-2">{status !== "in-progress" && status !== "completed" && <button type="button" onClick={()=>onStatusChange(topic,"in-progress")} className="min-h-9 rounded-lg bg-blue-700 px-3 text-xs font-semibold text-white">Start learning</button>}{status !== "completed" && <button type="button" onClick={()=>onStatusChange(topic,"completed")} className="min-h-9 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800">Mark complete</button>}{status === "completed" && <button type="button" onClick={()=>onStatusChange(topic,"in-progress")} className="min-h-9 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700">Study again</button>}<button type="button" onClick={()=>onEdit(topic)} className="min-h-9 rounded-lg px-3 text-xs font-semibold text-slate-500">Edit lesson</button></div></article>})}</div>{filtered.length===0&&<p className="mt-6 rounded-xl bg-slate-50 p-5 text-sm text-slate-600">No lessons match this filter. Choose another phase or status.</p>}</section>;
+  return <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"><div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Your lessons</p><h2 className="mt-1 text-xl font-semibold text-slate-950">Learn one clear step at a time</h2><p className="mt-1 text-sm text-slate-600">Start a topic, try its exercise, then mark it complete when you’re ready.</p></div><div className="flex items-center gap-3"><div className="w-36"><div className="flex justify-between text-[11px] text-slate-500"><span>Path progress</span><span>{completed}/{topics.length}</span></div><div className="mt-1 h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-emerald-500" style={{width:`${topics.length ? completed/topics.length*100 : 0}%`}}/></div></div><select aria-label="Filter by phase" value={phaseFilter} onChange={(event)=>setPhaseFilter(event.target.value)} className="min-h-9 max-w-44 rounded-lg border border-slate-300 px-2 text-xs"><option value="all">All stages</option>{phases.map((phase)=><option key={String(phase.id)} value={String(phase.id)}>{String(phase.order)}. {String(phase.title)}</option>)}</select></div></div><div className="mt-5 flex flex-wrap gap-2">{[["all","All"],["not-started","To learn"],["in-progress","In progress"],["needs-practice","Practice"],["needs-revision","Review"],["completed","Completed"]].map(([value,label])=><button key={value} type="button" onClick={()=>setStatusFilter(value)} className={`rounded-full px-3 py-1.5 text-xs font-medium ${statusFilter===value?"bg-blue-700 text-white":"bg-slate-100 text-slate-600"}`}>{label}</button>)}</div><div className="mt-4 grid gap-3 lg:grid-cols-2">{filtered.map((topic)=>{const status=String(topic.status);return <article key={topic.id} className="rounded-xl border border-slate-200 p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[11px] font-medium text-blue-700">{phaseNames.get(String(topic.phaseId)) ?? "Learning path"}</p><h3 className="mt-1 font-semibold text-slate-950"><Link href={`/topics/${encodeURIComponent(String(topic.id))}`} className="underline-offset-2 focus-visible:underline">{String(topic.title)}</Link></h3></div><span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${status === "completed" ? "bg-emerald-50 text-emerald-800" : status === "in-progress" ? "bg-blue-50 text-blue-800" : "bg-slate-100 text-slate-600"}`}>{humanize(status)}</span></div><p className="mt-2 text-sm leading-6 text-slate-600">{String(topic.description || "Build a foundation in this topic, then practice what you learned.")}</p><p className="mt-3 text-xs text-slate-500">{String(topic.estimatedMinutes)} min · {humanize(String(topic.difficulty))}</p>{typeof topic.practicalExercise === "string" && topic.practicalExercise && <details className="mt-3 rounded-lg bg-slate-50 p-3"><summary className="cursor-pointer text-xs font-semibold text-slate-700">Practice this lesson</summary><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">{topic.practicalExercise}</p>{typeof topic.deliverable === "string" && topic.deliverable && <p className="mt-2 text-xs text-slate-600"><strong>Make:</strong> {topic.deliverable}</p>}</details>}<div className="mt-4 flex flex-wrap gap-2">{status !== "in-progress" && status !== "completed" && <button type="button" onClick={()=>onStatusChange(topic,"in-progress")} className="min-h-9 rounded-lg bg-blue-700 px-3 text-xs font-semibold text-white">Start learning</button>}{status !== "completed" && <button type="button" onClick={()=>onStatusChange(topic,"completed")} className="min-h-9 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800">Mark complete</button>}{status === "completed" && <button type="button" onClick={()=>onStatusChange(topic,"in-progress")} className="min-h-9 rounded-lg border border-slate-300 px-3 text-xs font-semibold text-slate-700">Study again</button>}<button type="button" onClick={()=>onEdit(topic)} className="min-h-9 rounded-lg px-3 text-xs font-semibold text-slate-500">Edit lesson</button></div></article>})}</div>{filtered.length===0&&<p className="mt-6 rounded-xl bg-slate-50 p-5 text-sm text-slate-600">No lessons match this filter. Choose another phase or status.</p>}</section>;
 }
 
 function ResourceLibrary({ items, topics, phases }: { items: DataRecord[]; topics: DataRecord[]; phases: DataRecord[] }) {
@@ -202,7 +214,7 @@ function ResourceLibrary({ items, topics, phases }: { items: DataRecord[]; topic
     </div>
     <div className="mt-4 flex gap-2 border-b border-slate-200 pb-3"><button onClick={() => { setView("materials"); setKind("all"); }} className={`rounded-md px-3 py-2 text-sm font-medium ${view === "materials" ? "bg-blue-50 text-blue-800" : "text-slate-600"}`}>Materials</button><button onClick={() => { setView("practice"); setKind("all"); }} className={`rounded-md px-3 py-2 text-sm font-medium ${view === "practice" ? "bg-blue-50 text-blue-800" : "text-slate-600"}`}>Practice</button></div>
     {view === "practice" && <div className="mt-4 grid gap-3 sm:grid-cols-2">{topics.filter((topic) => topic.practicalExercise).map((topic) => <article key={topic.id} className="rounded-lg border border-slate-200 p-4"><p className="text-xs font-semibold text-blue-800">{String(topic.title)}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{String(topic.practicalExercise)}</p><p className="mt-2 text-xs text-slate-500">Deliverable: {String(topic.deliverable || "Complete the exercise and save your work.")}</p></article>)}{filtered.map((item) => <article key={item.id} className="flex flex-col rounded-lg border border-slate-200 p-4"><div className="flex items-start justify-between gap-2"><h3 className="text-sm font-semibold leading-5 text-slate-900">{String(item.title)}</h3><span className="rounded-full bg-violet-50 px-2 py-1 text-[11px] font-medium text-violet-700">Guided practice</span></div><p className="mt-2 text-xs text-slate-500">{phaseNames.get(String(item.phaseId)) ?? "Learning resource"} · {String(item.estimatedMinutes ?? "")} min</p><p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{String(item.notes || "Complete the linked practice material.")}</p><a href={String(item.url)} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-10 items-center justify-center rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white">Open practice</a></article>)}</div>}
-    {view === "materials" && <div className="mt-4 grid gap-3 sm:grid-cols-2">{filtered.map((item) => <article key={item.id} className="flex flex-col rounded-lg border border-slate-200 p-4"><div className="flex items-start justify-between gap-2"><h3 className="text-sm font-semibold leading-5 text-slate-900">{String(item.title)}</h3><span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">{humanize(String(item.type))}</span></div><p className="mt-2 text-xs text-slate-500">{phaseNames.get(String(item.phaseId)) ?? "Learning resource"} · {String(item.estimatedMinutes ?? "") } min · {humanize(String(item.status))}</p><p className="mt-2 flex-1 whitespace-pre-wrap text-sm leading-6 text-slate-600">{String(item.notes || "Open this resource and add your own study notes.")}</p><a href={String(item.url)} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-10 items-center justify-center rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Open {humanize(String(item.type))}</a></article>)}</div>}
+    {view === "materials" && <div className="mt-4 grid gap-3 sm:grid-cols-2">{filtered.map((item) => <article key={item.id} className="flex flex-col rounded-lg border border-slate-200 p-4"><div className="flex items-start justify-between gap-2"><h3 className="text-sm font-semibold leading-5 text-slate-900">{String(item.title)}</h3><span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">{humanize(String(item.type))}</span></div><p className="mt-2 text-xs text-slate-500">{phaseNames.get(String(item.phaseId)) ?? "Learning resource"} · {String(item.estimatedMinutes ?? "") } min · {humanize(String(item.status))}</p><p className="mt-2 flex-1 whitespace-pre-wrap text-sm leading-6 text-slate-600">{String(item.notes || "Open this resource and add your own study notes.")}</p><ResourceAvailability id={String(item.id)} availability={String(item.availability ?? "unchecked")} lastCheckedAt={typeof item.lastCheckedAt === "string" ? item.lastCheckedAt : null} license={String(item.license ?? "Unknown")} publisher={String(item.publisher ?? "")} /><a href={String(item.url)} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-10 items-center justify-center rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Open {humanize(String(item.type))}</a></article>)}</div>}
   </section>;
 }
 
@@ -375,12 +387,11 @@ function ExamDashboard({ blueprints }: { blueprints: DataRecord[] }) {
   const [starting, setStarting] = useState("");
   const [filter, setFilter] = useState("all");
   useEffect(() => { void fetch("/api/collections/examinationAttempts", { cache: "no-store" }).then((response) => response.json()).then((records: DataRecord[]) => setActive(records.filter((item) => item.submittedAt === null))).catch(() => setError("Unable to load attempts.")); }, []);
+  const [reviewing, setReviewing] = useState("");
+  const [acknowledged, setAcknowledged] = useState(false);
   async function start(id: string) {
     setStarting(id); setError("");
     try {
-      const blueprint = blueprints.find((item) => item.id === id);
-      const selfDeclareClosedBook = blueprint?.examType !== "closed-book" || window.confirm("This closed-book result is self-declared and is not proctored. Start?");
-      if (!selfDeclareClosedBook) return;
       const response = await fetch("/api/exams", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "start", blueprintId: id }) });
       if (!response.ok) throw new Error(await responseMessage(response));
       window.location.href = "/active-exam";
@@ -392,72 +403,38 @@ function ExamDashboard({ blueprints }: { blueprints: DataRecord[] }) {
   return <section className="xl:col-span-2 space-y-5">
     <div className="overflow-hidden rounded-3xl border border-blue-100 bg-blue-50 p-6 text-slate-900 sm:p-8"><div className="flex items-start gap-4"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-800"><Brain size={24}/></span><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-800">Practice that shows what you know</p><h2 className="mt-2 text-2xl font-semibold">Check understanding. Find the gaps. Try again.</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-700">Choose a short knowledge check or a hands-on challenge. Your results help guide what to review next; they are a learning signal, not a judgment.</p></div></div><div className="mt-5 grid gap-3 sm:grid-cols-3"><div className="rounded-xl border border-blue-100 bg-white p-3"><CheckCircle2 className="text-emerald-700" size={17}/><p className="mt-2 text-xs font-semibold">Recall</p><p className="mt-1 text-[11px] text-slate-700">Explain core ideas in your own words.</p></div><div className="rounded-xl border border-blue-100 bg-white p-3"><Brain className="text-violet-700" size={17}/><p className="mt-2 text-xs font-semibold">Reasoning</p><p className="mt-1 text-[11px] text-slate-700">Apply concepts to realistic choices.</p></div><div className="rounded-xl border border-blue-100 bg-white p-3"><Code2 className="text-blue-800" size={17}/><p className="mt-2 text-xs font-semibold">Build</p><p className="mt-1 text-[11px] text-slate-700">Show practical evidence and tradeoffs.</p></div></div></div>
     {error && <p role="alert" className="rounded-lg bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
+    {(() => {
+      const blueprint = blueprints.find((item) => item.id === reviewing);
+      if (!blueprint) return null;
+      const closedBook = blueprint.examType === "closed-book";
+      const list = (value: unknown) => Array.isArray(value) && value.length ? value.map(String).join(", ") : "Not specified";
+      return <section aria-labelledby="exam-rules-heading" className="rounded-xl border border-blue-200 bg-white p-5">
+        <h2 id="exam-rules-heading" className="text-lg font-semibold text-slate-900">Before you start: {String(blueprint.title)}</h2>
+        <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+          <div><dt className="text-xs text-slate-500">Examination type</dt><dd>{humanize(String(blueprint.examType))}</dd></div>
+          <div><dt className="text-xs text-slate-500">Questions · time limit</dt><dd>{blueprintQuestionCount(blueprint)} questions · {String(blueprint.timeLimitMinutes)} minutes (the timer keeps running if you leave or refresh)</dd></div>
+          <div><dt className="text-xs text-slate-500">Passing threshold</dt><dd>{String(blueprint.passingPercent)}%; required practical tasks must also pass</dd></div>
+          <div><dt className="text-xs text-slate-500">Retake policy</dt><dd>{blueprint.retakePolicy === "cooldown" ? `Wait ${String(blueprint.retakeCooldownHours)} hours between attempts` : "Retakes allowed; unused questions are preferred"}</dd></div>
+          <div className="sm:col-span-2"><dt className="text-xs text-slate-500">Learning objectives</dt><dd>{list(blueprint.learningObjectives)}</dd></div>
+          <div className="sm:col-span-2"><dt className="text-xs text-slate-500">Allowed reference materials</dt><dd>{String(blueprint.allowedMaterials || (closedBook ? "None" : "Not specified"))}</dd></div>
+          {blueprint.practicalRequirements ? <div className="sm:col-span-2"><dt className="text-xs text-slate-500">Practical requirements</dt><dd>{String(blueprint.practicalRequirements)}</dd></div> : null}
+        </dl>
+        <p className="mt-3 text-sm text-slate-700">Answers are saved as drafts while you work. Unanswered questions are recorded when you submit. Written and practical answers are graded by a person against the rubric.</p>
+        {closedBook && <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Closed-book: notes, resources, and lessons are hidden until you submit. The result is self-declared and not proctored.</p>}
+        <label className="mt-4 flex items-start gap-2 text-sm text-slate-800"><input type="checkbox" className="mt-1" checked={acknowledged} onChange={(event) => setAcknowledged(event.target.checked)} />{closedBook ? "I have read the rules and declare that I will not use notes or other help." : "I have read the objectives and rules."}</label>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" disabled={!acknowledged || starting === blueprint.id} onClick={() => void start(String(blueprint.id))} className="min-h-10 rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white disabled:opacity-50">{starting === blueprint.id ? "Starting…" : "Begin examination"}</button>
+          <button type="button" onClick={() => { setReviewing(""); setAcknowledged(false); }} className="min-h-10 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800">Choose a different examination</button>
+        </div>
+      </section>;
+    })()}
     {active.length > 0 && <Link href="/active-exam" className="flex items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950"><span><strong>Pick up where you left off.</strong> You have {active.length} open {active.length === 1 ? "attempt" : "attempts"}.</span><ArrowRight size={17}/></Link>}
     <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-semibold text-slate-950">Choose a challenge</h2><p className="mt-1 text-sm text-slate-600">{available.length} ready · Review explanations after each attempt.</p></div><div className="flex rounded-xl bg-slate-100 p-1"><button onClick={()=>setFilter("all")} className={`rounded-lg px-3 py-2 text-xs font-semibold ${filter === "all" ? "bg-white text-slate-950 shadow-sm" : "text-slate-600"}`}>All</button><button onClick={()=>setFilter("knowledge")} className={`rounded-lg px-3 py-2 text-xs font-semibold ${filter === "knowledge" ? "bg-white text-slate-950 shadow-sm" : "text-slate-600"}`}>Knowledge checks</button><button onClick={()=>setFilter("practical")} className={`rounded-lg px-3 py-2 text-xs font-semibold ${filter === "practical" ? "bg-white text-slate-950 shadow-sm" : "text-slate-600"}`}>Build challenges</button></div></div>
-    {shown.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center"><p className="font-semibold text-slate-800">No challenges in this view yet</p><p className="mt-2 text-sm text-slate-600">{available.length ? "Try another filter." : "Add a question set in the Question Bank, then activate it in Exam blueprints."}</p></div> : <div className="grid gap-4 md:grid-cols-2">{shown.map((blueprint) => {const practical = blueprint.examType === "practical";return <article key={String(blueprint.id)} className="group rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-start justify-between gap-3"><span className={`flex h-10 w-10 items-center justify-center rounded-xl ${practical ? "bg-violet-50 text-violet-700" : "bg-blue-50 text-blue-700"}`}>{practical ? <Code2 size={19}/> : <Brain size={19}/>}</span><span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">{humanize(String(blueprint.difficulty ?? "beginner"))}</span></div><h3 className="mt-4 text-lg font-semibold text-slate-950">{String(blueprint.title)}</h3><p className="mt-1 text-sm leading-6 text-slate-600">{practical ? "Apply the ideas in a practical task and explain your decisions." : "Check recall and reasoning, then use the feedback to choose what to review."}</p><div className="mt-4 flex flex-wrap gap-3 text-xs text-slate-500"><span>{blueprintQuestionCount(blueprint)} prompts</span><span className="inline-flex items-center gap-1"><Clock3 size={13}/>{String(blueprint.timeLimitMinutes)} min</span><span>Pass guide {String(blueprint.passingPercent)}%</span></div>{Array.isArray(blueprint.learningObjectives) && blueprint.learningObjectives.length > 0 && <p className="mt-3 line-clamp-2 text-xs leading-5 text-slate-500">You’ll practice: {blueprint.learningObjectives.join(" · ")}</p>}{blueprint.examType === "closed-book" && <p className="mt-3 text-xs text-amber-800">Closed-book is self-declared and not proctored.</p>}<button type="button" disabled={starting === blueprint.id} onClick={() => void start(String(blueprint.id))} className="mt-5 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 text-sm font-semibold text-white disabled:opacity-60">{starting === blueprint.id ? "Preparing…" : practical ? "Try the build challenge" : "Start knowledge check"}<ArrowRight size={15}/></button></article>})}</div>}
+    {shown.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center"><p className="font-semibold text-slate-800">No challenges in this view yet</p><p className="mt-2 text-sm text-slate-600">{available.length ? "Try another filter." : "Add a question set in the Question Bank, then activate it in Exam blueprints."}</p></div> : <div className="grid gap-4 md:grid-cols-2">{shown.map((blueprint) => {const practical = blueprint.examType === "practical";return <article key={String(blueprint.id)} className="group rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-start justify-between gap-3"><span className={`flex h-10 w-10 items-center justify-center rounded-xl ${practical ? "bg-violet-50 text-violet-700" : "bg-blue-50 text-blue-700"}`}>{practical ? <Code2 size={19}/> : <Brain size={19}/>}</span><span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">{humanize(String(blueprint.difficulty ?? "beginner"))}</span></div><h3 className="mt-4 text-lg font-semibold text-slate-950">{String(blueprint.title)}</h3><p className="mt-1 text-sm leading-6 text-slate-600">{practical ? "Apply the ideas in a practical task and explain your decisions." : "Check recall and reasoning, then use the feedback to choose what to review."}</p><div className="mt-4 flex flex-wrap gap-3 text-xs text-slate-500"><span>{blueprintQuestionCount(blueprint)} prompts</span><span className="inline-flex items-center gap-1"><Clock3 size={13}/>{String(blueprint.timeLimitMinutes)} min</span><span>Pass guide {String(blueprint.passingPercent)}%</span></div>{Array.isArray(blueprint.learningObjectives) && blueprint.learningObjectives.length > 0 && <p className="mt-3 line-clamp-2 text-xs leading-5 text-slate-500">You’ll practice: {blueprint.learningObjectives.join(" · ")}</p>}{blueprint.examType === "closed-book" && <p className="mt-3 text-xs text-amber-800">Closed-book is self-declared and not proctored.</p>}<button type="button" disabled={starting === blueprint.id} onClick={() => { setReviewing(String(blueprint.id)); setAcknowledged(false); window.setTimeout(() => document.getElementById("exam-rules-heading")?.scrollIntoView({ block: "start" }), 0); }} className="mt-5 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 text-sm font-semibold text-white disabled:opacity-60">{starting === blueprint.id ? "Preparing…" : practical ? "Try the build challenge" : "Start knowledge check"}<ArrowRight size={15}/></button></article>})}</div>}
   </section>;
 }
 
-function ActiveExam() {
-  const [attempts, setAttempts] = useState<DataRecord[]>([]);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [now, setNow] = useState(Date.now());
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [expiredAttempt, setExpiredAttempt] = useState("");
-  const load = useCallback(() => fetch("/api/collections/examinationAttempts", { cache: "no-store" }).then(async (response) => { if (!response.ok) throw new Error(await responseMessage(response)); return response.json() as Promise<DataRecord[]>; }).then((result) => { const active = result.filter((attempt) => attempt.submittedAt === null); setAttempts(active); if (active[0]) setAnswers(active[0].answers as Record<string, string>); }).catch((cause) => setError(cause instanceof Error ? cause.message : "Unable to load attempt.")), []);
-  useEffect(() => { void load(); const interval = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(interval); }, [load]);
-  const attempt = attempts[0];
-  async function saveAnswer(questionId: string, answer: string) {
-    if (!attempt) return;
-    const next = { ...answers, [questionId]: answer };
-    setAnswers(next);
-    try {
-      const response = await fetch("/api/exams", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "answer", attemptId: attempt.id, questionId, answer }) });
-      if (!response.ok) throw new Error(await responseMessage(response));
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to save answer."); }
-  }
-  async function sendSubmission(attemptId: string, confirmSubmission: boolean) {
-    if (confirmSubmission && !window.confirm("Submit this examination? Unanswered questions will be recorded.")) return;
-    setSubmitting(true);
-    try {
-      const response = await fetch("/api/exams", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: confirmSubmission ? "submit" : "expire", attemptId }) });
-      if (!response.ok) throw new Error(await responseMessage(response));
-      window.location.href = "/exam-results";
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to submit examination."); }
-    finally { setSubmitting(false); }
-  }
-  async function submit() {
-    if (!attempt) return;
-    await sendSubmission(attempt.id, true);
-  }
-  const deadline = attempt
-    ? new Date(String(attempt.startedAt)).getTime() + Number(attempt.timeLimitMinutes) * 60000
-    : 0;
-  const remaining = attempt ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0;
-  useEffect(() => {
-    if (!attempt || remaining !== 0 || expiredAttempt === attempt.id) return;
-    setExpiredAttempt(attempt.id);
-    setSubmitting(true);
-    void fetch("/api/exams", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "expire", attemptId: attempt.id })
-    }).then(async (response) => {
-      if (!response.ok) throw new Error(await responseMessage(response));
-      window.location.href = "/exam-results";
-    }).catch((cause: unknown) => {
-      setError(cause instanceof Error ? cause.message : "Unable to submit expired attempt.");
-      setSubmitting(false);
-    });
-  }, [attempt, expiredAttempt, remaining]);
-  if (!attempt) return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5"><h2 className="font-semibold text-slate-900">No active examination</h2><p className="mt-2 text-sm text-slate-600">Start an examination from its dashboard. Saved attempts resume after refresh.</p><a href="/exams" className="mt-3 inline-block text-sm font-semibold text-blue-700 underline">Open examinations</a></section>;
-  return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5 sm:p-6"><div className="flex flex-wrap justify-between gap-3"><div><h2 className="font-semibold text-slate-900">Active examination</h2><p className="mt-1 text-sm text-slate-600">{humanize(String(attempt.examType))} · Started {formatDate(attempt.startedAt)}{attempt.selfDeclaredClosedBook === true ? " · Closed-book, self-declared" : ""}</p></div><p className={`font-mono text-xl font-semibold ${remaining < 300 ? "text-rose-700" : "text-slate-900"}`}>{Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, "0")} remaining</p></div>{attempt.selfDeclaredClosedBook === true && <p className="mt-3 rounded bg-amber-50 p-3 text-sm text-amber-900">This is a self-declared closed-book assessment and is not proctored. Answer explanations remain hidden until submission.</p>}<div className="mt-5 space-y-4">{(attempt.questionSnapshots as DataRecord[]).map((question, index) => <article key={String(question.questionId)} className="rounded-lg border border-slate-200 p-4"><p className="text-xs font-semibold uppercase text-slate-500">Question {index + 1} · {String(question.maxMarks)} marks</p><h3 className="mt-2 whitespace-pre-wrap text-sm font-medium leading-6 text-slate-900">{String(question.prompt)}</h3>{Array.isArray(question.options) && question.options.length > 0 ? <div className="mt-3 grid gap-2">{(question.options as string[]).map((option) => <label key={option} className="flex gap-2 text-sm text-slate-700"><input type={question.questionType === "multiple-select" ? "checkbox" : "radio"} name={`answer-${question.questionId}`} checked={question.questionType === "multiple-select" ? (answers[String(question.questionId)] ?? "").split("\n").includes(option) : answers[String(question.questionId)] === option} onChange={(event) => { const previous = (answers[String(question.questionId)] ?? "").split("\n").filter(Boolean); const values = event.target.type === "checkbox" ? (event.target.checked ? [...previous, option] : previous.filter((value) => value !== option)) : [option]; void saveAnswer(String(question.questionId), values.join("\n")); }} />{option}</label>)}</div> : <textarea aria-label={`Answer for question ${index + 1}`} value={answers[String(question.questionId)] ?? ""} onChange={(event) => void saveAnswer(String(question.questionId), event.target.value)} rows={4} className="mt-3 w-full rounded border border-slate-300 p-3 text-sm" placeholder={question.questionType === "practical" ? "Describe your implementation and link or summarize the evidence. Code is not executed here." : "Your answer"} />}</article>)}</div>{error && <p role="alert" className="mt-4 text-sm text-rose-800">{error}</p>}<button type="button" disabled={submitting} onClick={() => void submit()} className="mt-5 min-h-10 rounded bg-blue-700 px-4 text-sm font-semibold text-white disabled:opacity-60">{submitting ? "Submitting…" : "Submit examination"}</button></section>;
-}
 
-function PracticalExam() {
-  return <div className="xl:col-span-2 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">Practical tasks are saved and reviewed manually against the question rubric. User-submitted code is never executed on the app server. Link to an isolated external test run or describe the reproducible acceptance-test evidence in your answer.</div>;
-}
 
 function ExamAnalytics({ attempts, topics }: { attempts: DataRecord[]; topics: DataRecord[] }) {
   const submitted = attempts.filter((item) => item.submittedAt && typeof item.scorePercent === "number");
@@ -498,33 +475,6 @@ function ExamAnalytics({ attempts, topics }: { attempts: DataRecord[]; topics: D
 
 function Metric({ label, value }: { label: string; value: string }) { return <div className="rounded bg-slate-50 p-3"><p className="text-xs text-slate-500">{label}</p><p className="mt-1 text-lg font-semibold">{value}</p></div>; }
 
-function ExamResults({ attempts }: { attempts: DataRecord[] }) {
-  const results = attempts.filter((attempt) => attempt.submittedAt).sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt)));
-  return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
-    <h2 className="font-semibold text-slate-900">Submitted examination results</h2>
-    {results.length === 0 ? <p className="mt-3 text-sm text-slate-600">No submitted examinations yet. Completed results and saved answers will appear here.</p> : <div className="mt-4 space-y-4">
-      {results.map((attempt) => {
-        const questions = attempt.questionResults as DataRecord[];
-        const snapshots = attempt.questionSnapshots as DataRecord[];
-        const score = typeof attempt.scorePercent === "number" ? `${Number(attempt.scorePercent)}%` : "Pending manual grading";
-        return <article key={attempt.id as string} className="rounded-lg border border-slate-200 p-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div><h3 className="font-medium text-slate-900">{humanize(String(attempt.examType))} · {formatDate(attempt.submittedAt)}</h3><p className="mt-1 text-sm text-slate-600">{String(attempt.marksEarned ?? "—")} / {String(attempt.totalMarks)} marks · {score} · {attempt.result === "pass" ? "Passed" : attempt.result === "not-yet-passed" ? "Not passed" : "Awaiting grade"}{attempt.grading === "manual" ? " · Manual grading" : ""}</p></div>
-            <a className="text-sm font-semibold text-blue-700 underline" href={`/answer-review?attemptId=${encodeURIComponent(String(attempt.id))}`}>Review saved answers</a>
-          </div>
-          <div className="mt-3 space-y-2">{questions.map((result, index) => {
-            const snapshot = snapshots.find((question) => question.questionId === result.questionId);
-            return <div key={String(result.questionId)} className="rounded bg-slate-50 p-3 text-sm">
-              <p className="font-medium text-slate-800">Question {index + 1}: {String(result.status)} · {String(result.marksEarned)}/{String(result.maxMarks)} marks</p>
-              {result.feedback ? <p className="mt-1 text-slate-600">{String(result.feedback)}</p> : null}
-              {snapshot?.prompt ? <p className="mt-1 text-xs text-slate-500">{String(snapshot.prompt)}</p> : null}
-            </div>;
-          })}</div>
-        </article>;
-      })}
-    </div>}
-  </section>;
-}
 
 function ExamHistory({ attempts }: { attempts: DataRecord[] }) {
   const history = attempts.filter((attempt) => attempt.submittedAt).sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt)));
@@ -654,18 +604,6 @@ function CompetencySummary({ topics }: { topics: DataRecord[] }) {
   return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5"><h2 className="font-semibold text-slate-900">Readiness to advance</h2><p className="mt-2 text-sm text-slate-600">Configurable topic, practical, and retention thresholds are applied to persisted examination evidence. Mastery requires two delayed-retention passes. Self-ratings and study hours cannot unlock competency.</p>{error && <p role="alert" className="mt-3 text-sm text-rose-800">{error}</p>}<div className="mt-4 grid gap-3 md:grid-cols-2">{rows.map((row) => { const readiness = row.readiness as { level: string; requirements: string[]; evidence: string[] }; return <article key={String(row.topicId)} className="rounded-lg border border-slate-200 p-4"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{String(topicById.get(String(row.topicId))?.title ?? row.title)}</h3><span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs">{readiness.level}</span></div><p className="mt-2 text-xs text-slate-500">Learning status: {String(row.learningStatus)} · separate from competency</p>{readiness.requirements.length > 0 && <ul className="mt-3 list-disc pl-5 text-xs leading-5 text-slate-700">{readiness.requirements.map((item) => <li key={item}>{item}</li>)}</ul>}{readiness.evidence.length > 0 && <ul className="mt-3 list-disc pl-5 text-xs leading-5 text-emerald-800">{readiness.evidence.map((item) => <li key={item}>{item}</li>)}</ul>}</article>; })}</div></section>;
 }
 
-function GapAnalysis({ attempts }: { attempts: DataRecord[] }) {
-  const gaps = attempts.flatMap((attempt) => {
-    const snapshots = attempt.questionSnapshots as DataRecord[];
-    const results = attempt.questionResults as DataRecord[];
-    return results.filter((result) => ["incorrect", "partial", "unanswered"].includes(String(result.status))).map((result) => ({
-      attempt,
-      result,
-      question: snapshots.find((question) => question.questionId === result.questionId)
-    }));
-  });
-  return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5"><h2 className="font-semibold text-slate-900">Possible knowledge gaps</h2>{gaps.length === 0 ? <p className="mt-3 text-sm text-slate-600">No incorrect, partially correct, or unanswered graded results are recorded yet.</p> : <div className="mt-4 space-y-3">{gaps.map(({ attempt, result, question }) => <article key={`${attempt.id}-${result.questionId}`} className="rounded-lg border border-slate-200 p-4"><p className="text-xs font-semibold uppercase text-amber-800">Possible {String(result.status)} answer · {humanize(String(attempt.examType))}</p><h3 className="mt-1 text-sm font-medium">{String(question?.prompt ?? "Question")}</h3><p className="mt-2 text-sm text-slate-600">Your answer: {String(result.answer || "No answer")}</p><p className="mt-2 text-sm text-slate-600">Expected answer: {String(question?.correctAnswer ?? "Review the rubric and evidence")}</p><p className="mt-2 text-sm text-slate-600">{String(question?.explanation ?? "No explanation was stored.")}</p><p className="mt-2 text-xs text-slate-500">This result identifies a possible gap, not its cause. Review the objective and prerequisite concepts, then practice before retesting.</p></article>)}</div>}</section>;
-}
 
 function TimerPanel({ topics }: { topics: DataRecord[] }) {
   const [sessions, setSessions] = useState<LearningSession[]>([]);
@@ -792,36 +730,7 @@ function ManualGrader({ attempts, reload }: { attempts: DataRecord[]; reload: ()
   return <section className="xl:col-span-2 rounded-xl border border-amber-200 bg-amber-50/50 p-5"><h2 className="font-semibold text-slate-900">Written and practical responses awaiting manual review</h2>{pending.map((attempt) => <article key={attempt.id} className="mt-4 rounded-lg border border-slate-200 bg-white p-4"><h3 className="font-medium">Attempt {String(attempt.id).slice(0, 8)} · {humanize(String(attempt.examType))}</h3>{(attempt.questionResults as DataRecord[]).filter((result) => result.correct === null).map((result) => { const question = (attempt.questionSnapshots as DataRecord[]).find((snapshot) => snapshot.questionId === result.questionId); const existing = grades[String(attempt.id)]?.[String(result.questionId)]; return <div key={String(result.questionId)} className="mt-4 border-t pt-3"><p className="text-sm font-medium">{String(question?.prompt)}</p><p className="mt-2 whitespace-pre-wrap rounded bg-slate-50 p-3 text-sm">Submitted answer: {String(result.answer || "Unanswered")}</p><p className="mt-2 text-xs text-slate-600">Rubric: {String((question?.rubric as string) || "Apply the stated learning objective; record evidence-based feedback.")}</p><div className="mt-3 grid gap-3 sm:grid-cols-[140px_1fr]"><label className="text-xs font-medium">Marks (0–{String(result.maxMarks)})<input type="number" min="0" max={Number(result.maxMarks)} step="0.1" value={existing?.marksEarned ?? ""} onChange={(event) => setGrades((prev) => ({ ...prev, [String(attempt.id)]: { ...prev[String(attempt.id)], [String(result.questionId)]: { marksEarned: Number(event.target.value), feedback: existing?.feedback ?? "" } } }))} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm" /></label><label className="text-xs font-medium">Feedback<textarea value={existing?.feedback ?? ""} onChange={(event) => setGrades((prev) => ({ ...prev, [String(attempt.id)]: { ...prev[String(attempt.id)], [String(result.questionId)]: { marksEarned: existing?.marksEarned ?? 0, feedback: event.target.value } } }))} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 py-2 text-sm" /></label></div></div>; })}<button type="button" onClick={() => void submit(String(attempt.id))} className="mt-4 min-h-10 rounded bg-blue-700 px-4 text-sm font-semibold text-white">Finalize manual grade</button></article>)}{error && <p role="alert" className="mt-3 text-sm text-rose-800">{error}</p>}</section>;
 }
 
-function DisciplineSummary({ sessions }: { sessions: DataRecord[] }) {
-  const completed = sessions.filter((session) => session.state === "completed");
-  const minutes = completed.reduce((total, session) => total + Number(session.focusedSeconds ?? 0), 0) / 60;
-  const days = new Set(completed.map((session) => String(session.endedAt).slice(0, 10))).size;
-  return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5"><h2 className="font-semibold">Learning consistency</h2><p className="mt-2 text-sm text-slate-600">Formula: distinct calendar days with a completed session. This counts recorded consistency, not ability; rest days are not treated as failures.</p><div className="mt-3 grid gap-3 sm:grid-cols-3"><Metric label="Completed sessions" value={String(completed.length)} /><Metric label="Focused hours" value={`${(minutes / 60).toFixed(1)}h`} /><Metric label="Study days recorded" value={String(days)} /></div></section>;
-}
 
-function RewardsSummary({ rewards }: { rewards: DataRecord[] }) {
-  const [achievements, setAchievements] = useState<DataRecord[]>([]);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    void fetch("/api/collections/achievements", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(await responseMessage(response));
-        return response.json() as Promise<DataRecord[]>;
-      })
-      .then(setAchievements)
-      .catch((cause) => setError(cause instanceof Error ? cause.message : "Unable to load achievements."));
-  }, []);
-  const points = rewards.reduce((sum, reward) => sum + (typeof reward.points === "number" ? reward.points : 0), 0);
-  const level = Math.floor(points / 100) + 1;
-  return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5">
-    <h2 className="font-semibold text-slate-900">Earned rewards and achievements</h2>
-    <p className="mt-1 text-sm text-slate-600">Points are awarded once per recorded completion: focused session (2), passed assessment (10), and completed project milestone (20). Points reflect logged actions, not ability.</p>
-    <div className="mt-4 grid gap-3 sm:grid-cols-3"><Metric label="Experience points" value={String(points)} /><Metric label="Learning level" value={String(level)} /><Metric label="Badges unlocked" value={String(achievements.length)} /></div>
-    <p className="mt-3 text-xs text-slate-500">{Math.max(0, level * 100 - points)} more points to the next level.</p>
-    {error && <p role="alert" className="mt-3 text-sm text-rose-800">{error}</p>}
-    {achievements.length > 0 && <ul className="mt-3 flex flex-wrap gap-2">{achievements.map((achievement) => <li key={achievement.id} className="rounded-full bg-emerald-50 px-3 py-1 text-xs text-emerald-900">{String(achievement.title)}</li>)}</ul>}
-  </section>;
-}
 
 function SalesAgentPlan({ projects }: { projects: DataRecord[] }) {
   const capabilities = ["Lead discovery", "Lead qualification", "Customer research", "Grounded product knowledge", "Conversation management", "Email and chat integration", "WhatsApp and voice integration", "CRM and ERP integration", "Tool calling and orchestration", "Memory and state", "Quotation and order preparation", "Human approval and safeguards", "Evaluation and monitoring", "Deployment and operating costs", "Customer feedback"];
@@ -866,25 +775,3 @@ function BackupPanel() {
   return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5"><h2 className="font-semibold text-slate-900">Backup and recovery</h2><p className="mt-2 text-sm leading-6 text-slate-600">Export contains all records. Restore validates the complete versioned backup before atomically replacing data. Keep off-disk copies; this application has one local JSON store.</p><div className="mt-4 flex flex-wrap gap-3"><a href="/api/backup" className="rounded border border-slate-300 px-3 py-2 text-sm font-medium">Download complete JSON backup</a><button onClick={() => void snapshot()} className="rounded border border-slate-300 px-3 py-2 text-sm font-medium">Create retained snapshot</button><label className="rounded border border-slate-300 px-3 py-2 text-sm font-medium">Choose backup JSON<input type="file" accept="application/json,.json" className="ml-2 text-xs" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { const parsed = JSON.parse(await file.text()) as unknown; setBackup(parsed); setMessage("File parsed locally. Restore will validate the complete schema."); setError(""); } catch { setError("Selected file is not valid JSON."); } }} /></label><button disabled={!backup} onClick={() => void restore()} className="rounded bg-rose-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">Confirm restore</button></div>{message && <p aria-live="polite" className="mt-3 text-sm text-emerald-800">{message}</p>}{error && <p role="alert" className="mt-3 text-sm text-rose-800">{error}</p>}</section>;
 }
 
-function SettingsForm({ reload }: { reload: () => Promise<void> }) {
-  const [settings, setSettings] = useState<Record<string, unknown>>({});
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  useEffect(() => { void fetch("/api/settings", { cache: "no-store" }).then((response) => response.json()).then((value: Record<string, unknown>) => setSettings(value)); }, []);
-  async function save(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const weeklyHours = Number(form.get("weeklyHours"));
-    const studyDays = String(form.get("studyDays")).split(",").map((day) => day.trim()).filter(Boolean);
-    const timezone = String(form.get("timezone"));
-    const topicPassingPercent = Number(form.get("topicPassingPercent"));
-    const practicalPassingPercent = Number(form.get("practicalPassingPercent"));
-    const retentionPassingPercent = Number(form.get("retentionPassingPercent"));
-    try {
-      const response = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ timezone, weeklyHours, studyDays, topicPassingPercent, practicalPassingPercent, retentionPassingPercent }) });
-      if (!response.ok) throw new Error(await responseMessage(response));
-      setMessage("Settings saved."); setError(""); await reload();
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to save settings."); }
-  }
-  return <section className="xl:col-span-2 rounded-xl border border-slate-200 bg-white p-5"><h2 className="font-semibold">Learning preferences</h2><form onSubmit={save} className="mt-4 grid gap-3 sm:max-w-xl"><label className="text-xs font-medium">IANA timezone<input name="timezone" required defaultValue={String(settings.timezone ?? "UTC")} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm" placeholder="Asia/Dhaka" /></label><label className="text-xs font-medium">Weekly target hours<input name="weeklyHours" type="number" min="0" max="168" step="0.5" defaultValue={Number(settings.weeklyHours ?? 10)} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm" /></label><label className="text-xs font-medium">Study days (comma-separated)<input name="studyDays" defaultValue={Array.isArray(settings.studyDays) ? settings.studyDays.join(", ") : "Monday, Tuesday, Wednesday, Thursday, Friday"} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm" /></label><fieldset className="grid gap-3 rounded-lg border border-slate-200 p-3 sm:grid-cols-3"><legend className="px-1 text-xs font-semibold">Competency score thresholds (%)</legend>{[["topicPassingPercent", "Topic"], ["practicalPassingPercent", "Practical"], ["retentionPassingPercent", "Retention"]].map(([name, label]) => <label key={name} className="text-xs font-medium">{label}<input name={name} type="number" min="0" max="100" defaultValue={Number(settings[name] ?? (name === "retentionPassingPercent" ? 70 : 80))} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm" /></label>)}</fieldset><button className="min-h-10 rounded bg-blue-700 px-4 text-sm font-semibold text-white">Save settings</button>{message && <p className="text-sm text-emerald-800">{message}</p>}{error && <p role="alert" className="text-sm text-rose-800">{error}</p>}</form></section>;
-}

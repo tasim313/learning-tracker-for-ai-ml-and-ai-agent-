@@ -184,7 +184,7 @@ function evidenceAttempt(id: string, examType: ExaminationAttempt["examType"], c
       topicId: "topic-1",
       critical: true
     }],
-    answers: {},
+    answers: {}, confidenceRatings: {},
     startedAt: "2026-10-01T10:00:00.000Z",
     submittedAt: "2026-10-01T10:10:00.000Z",
     timeLimitMinutes: 20,

@@ -113,7 +113,7 @@ test("lesson progress and notes are private to each learner", async () => {
 test("lessons are hidden during a self-declared closed-book examination", async () => {
   const learner = await register();
   await updateUserData(learner.id, (data) => ({
-    data: { ...data, examinationAttempts: [{ id: "closed", blueprintId: "sample-diagnostic-blueprint", examType: "closed-book", questionSnapshots: [], answers: {}, startedAt: new Date().toISOString(), submittedAt: null, timeLimitMinutes: 30, passingPercent: 80, scorePercent: null, marksEarned: null, totalMarks: 0, grading: null, selfDeclaredClosedBook: true, manualGraded: false, result: null, questionResults: [] }] },
+    data: { ...data, examinationAttempts: [{ id: "closed", blueprintId: "sample-diagnostic-blueprint", examType: "closed-book", questionSnapshots: [], answers: {}, confidenceRatings: {}, startedAt: new Date().toISOString(), submittedAt: null, timeLimitMinutes: 30, passingPercent: 80, scorePercent: null, marksEarned: null, totalMarks: 0, grading: null, selfDeclaredClosedBook: true, manualGraded: false, result: null, questionResults: [] }] },
     result: null
   }));
   assert.equal((await call(courseRoute.GET, "GET", `/api/courses/${courseId}`, { cookie: learner.cookie, params: { courseId } })).status, 423);

@@ -26,11 +26,11 @@ export default async function LandingPage() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <span className="flex items-center gap-2 text-sm font-semibold text-slate-900">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700"><Sparkles size={18} aria-hidden="true" /></span>
-            Learning Tracker
+            <span className="hidden sm:inline">Learning Tracker</span>
           </span>
           <nav aria-label="Account" className="flex items-center gap-2">
-            <Link href="/login" className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-semibold text-slate-700 focus-visible:outline-2 focus-visible:outline-blue-700">Sign in</Link>
-            <Link href="/register" className="inline-flex min-h-10 items-center rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Create account</Link>
+            <Link href="/login" className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg px-3 text-sm font-semibold text-slate-700 focus-visible:outline-2 focus-visible:outline-blue-700">Sign in</Link>
+            <Link href="/register" className="inline-flex min-h-10 items-center whitespace-nowrap rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Create account</Link>
           </nav>
         </div>
       </header>

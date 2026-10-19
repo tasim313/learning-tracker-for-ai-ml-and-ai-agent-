@@ -4,6 +4,38 @@ A multi-user learning platform for progressing from Python and mathematics found
 
 The application never fabricates learner activity, scores, competencies, or achievements. Seeded examination questions are labelled as samples and are not independently verified. Closed-book results are self-declared, not proctored. Written and practical answers are graded by a person against a rubric. **No AI grading or AI tutoring service is connected**, and submitted code is never executed.
 
+## Features
+
+**Learn**
+- *Course platform:* Courses are organised into modules and lessons. Lessons are built from typed sections: explanations, callouts, code, images, videos, interactive diagrams, worked examples, guided and independent exercises, pause-and-practise checkpoints, knowledge checks before and after the lesson, practical assignments, reflections, further reading, and downloadable material.
+- *Lesson tools:* Each lesson has a glossary, prerequisites, related roadmap topics, previous/next navigation, bookmarks, notes, highlights and questions, and progress checkpoints. Knowledge checks are graded on the server, and answer keys are never sent to the browser before an attempt.
+- *Learning modes:* read and study, watch and take notes, visualize, practise step by step, challenge, exam mode, review mistakes, and build a project. Switching modes keeps your progress and the last mode is remembered. An *interactive tutorial player* steps through a lesson one section at a time and resumes where you stopped.
+- *Video lessons:* YouTube embeds use the privacy-enhanced domain with no autoplay, and only where embedding is marked as permitted; otherwise a link is shown. You can jump to chapters, take notes at timestamps, and record your own watch progress. The platform does not read the video provider's history and does not extract transcripts.
+- *Seed course:* "AI Engineering Foundations (introductory)" has 8 platform-authored lessons, from vectors to tool-calling agents. It is clearly labelled as introductory seed material, not a comprehensive curriculum. External links are attributed and have not been availability-checked by the platform.
+- *Roadmap:* 12 editable phases and 48 topics. Phases and topics can be reordered and reprioritized. Each topic has its own page with learning status, competency, a **Readiness to Advance** panel, estimated vs. revised vs. actual time, assessment history, linked lessons, resources, notes, and revisions.
+- *Resource library:* Records publisher, licence, attribution, and language. A **link check** performs a real, SSRF-protected HTTP request and stores the result with a timestamp; links are marked "not checked" until one runs. The library also has a searchable Markdown **knowledge base**.
+
+**Practise**
+- *Mathematics Learning Lab:* interactive explorers for vectors and similarity, derivatives and tangents, gradient descent (including divergence), Bayes with natural frequencies, the normal distribution, descriptive statistics, and evaluation metrics. 13 generated problem types at three levels come with hints, a "show your work" field, server-checked answers, step-by-step solutions, and common mistakes. Numerical approximations are labelled.
+- *Diagram Learning Studio:* diagrams are stored as structured nodes and edges (`@xyflow/react`). You can reveal them step by step, inspect nodes, read a text alternative, export JSON, answer questions generated from the diagram's structure, and copy or draw your own diagrams as exercises.
+- *Game and Challenge Centre:* concept matching, workflow reconstruction, code-output puzzles, bug hunts, AI-sales safety decisions, and an optionally timed maths sprint. Answers are graded on the server and you can revisit your mistakes. Game scores are kept separate from examinations, and rewards are granted once per game.
+- *Flashcards:* spaced repetition with configurable intervals (default 1/3/7/14/30 days). Cards can be generated from lesson glossaries.
+- *Timer and planning:* a timer, session history, daily and weekly planners, revision planner, and self-assessment, as described below.
+
+**Assess**
+- *Examination engine:* 8 examination types and 18 question types. The seed includes a sample bank of 27 questions and 8 blueprints, all labelled as unverified samples. Before starting, you review the rules (objectives, time limit, threshold, allowed materials, practical requirements, retake policy) and must acknowledge them. The active examination has a timer computed from saved timestamps, debounced and strictly ordered draft saving, a question navigator, unanswered-question warnings, and confidence ratings kept separate from grading.
+- *Results:* marks, percentage, threshold, outcome, time taken, correct/partial/incorrect/unanswered counts, and breakdowns by topic, difficulty, and question type. Practical status, improvement since the previous attempt, and first/best/latest scores are reported separately.
+- *Learning gap analysis:* gaps are grouped into fundamental knowledge, conceptual understanding, recall, application, debugging, practical implementation, and time management. Each shows the tested concept, your answer, the expected answer, why it was marked that way, *possible* misconceptions, prerequisites, recommended exercises, and a revision date.
+- *Competency:* topic, practical, and retention gates (configurable), as described below.
+
+**Personalize**
+- *What to learn next:* explainable recommendations from diagnostics, examinations, practical evidence, retention, revisions, flashcards, lesson progress, and practice. Each one states its reason and evidence. You can pin, snooze, or dismiss any recommendation.
+- *Dashboard charts (Recharts):* daily planned vs. actual time, weekly time and study days, examination scores over time, retention, proficiency by subject, completion by phase, and project progress. Every chart has a data-table alternative, date and subject filters, and empty states.
+- *Rewards and discipline:* XP, levels, badges, optional weekly challenges, and monthly goals. The consistency score excludes rest days and has its formula shown on the page.
+
+**Administer**
+- Course authoring with draft editing, live preview (quizzes graded locally), validation, publish and unpublish, and versioned history (every published version is kept). A shared diagram library, account roles, and an audit log are also included.
+
 ## Contents
 
 - [Run locally](#run-locally)
@@ -172,12 +204,18 @@ npm test               # unit and integration (route handlers called directly)
 npm run build && npm run test:e2e   # production server, real cookies, restart persistence
 ```
 
+Current results: **98 unit and integration tests** and **11 end-to-end tests** (5 HTTP-level tests against `next start`, plus 6 browser tests driving the locally installed Google Chrome through `playwright-core`; the browser tests are skipped automatically if Chrome is not installed). See `docs/IMPLEMENTATION_REPORT.md` for the latest recorded run.
+
 These suites cover: registration and login validation; Argon2id storage; session expiry, logout, and revocation; rate limiting and lockout; the password-reset and verification flows; anonymous, forged-cookie, and cross-site rejection; cross-user read, update, delete, timer, examination, export, and restore attempts; role enforcement and auditing; concurrent writes from several users, from one user, and from a second process; corruption handling; path traversal; snapshot retention; restore validation; legacy import; and persistence across a server restart.
 
 ## Formulas
 
 - **Time-estimation accuracy** = `100 × (1 − |actual − estimated| / estimated)`, clamped to 0–100. It is N/A when the estimate is zero or missing. It measures planning accuracy, not ability.
 - **Examination score** = `marks earned / total marks × 100`. It is N/A when the total is zero. A failed critical (practical) question blocks a pass whatever the percentage.
+- **Consistency** = `planned study days with ≥ 1 completed session ÷ planned study days × 100` over 28 days. Planned study days are the weekdays chosen in Settings, minus planner rest days, so breaks never lower the score. The **flexible streak** counts consecutive planned study days.
+- **Level** = `floor(XP ÷ 100) + 1`. XP sums recorded reward events, each awarded once: session 2, lesson 3, first fully correct game 5, passed assessment 10, project milestone 20.
+- **Revision schedule:** not yet passed → first interval; first pass → second interval; each further pass → next interval (capped). Intervals are configurable, with a default of 1, 3, 7, 14, and 30 days.
+- **Competency:** a topic exam at ≥ 80% gives *Competent* (*Developing* while required practical evidence is missing). A practical pass at ≥ 80% is required for programming and engineering topics. One retention pass at ≥ 70% gives *Proficient*; two retention passes give *Mastered*. Thresholds are configurable. Time spent, lesson completion, and self-ratings never raise competency.
 
 ## Known limitations
 
@@ -185,4 +223,9 @@ These suites cover: registration and login validation; Argon2id storage; session
 - Closed-book examinations are self-declared and not tamper-proof.
 - Submitted code is not executed. Programming answers are reviewed manually against recorded test cases.
 - Email delivery depends on an external provider you configure.
+- **No AI tutoring or AI grading is integrated**; the platform works entirely without a paid AI API.
+- The interface text is English. Course and lesson content has Bangla title fields, and Bangla is shown only where a translation has actually been written.
+- Diagrams export as JSON definitions, not images. Highlights are saved as quoted passages, not inline marks in the text.
+- Video watch progress is self-reported, and transcripts are linked only when the content author provides a link.
+- Link checks can report "needs checking" for sites that block automated requests. A short DNS-rebinding window between the address check and the request is mitigated by rate limiting and by returning only reachability, never page content.
 - The Excel workbooks and Python `builder_*.py` scripts in the repository root are an independent companion workbook and are not used by the web app.

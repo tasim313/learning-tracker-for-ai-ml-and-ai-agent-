@@ -3,6 +3,7 @@ import { applicationDataSchema } from "@/lib/model";
 import { gradeManualQuestions, startExamination, submitExamination } from "@/lib/services/examinations";
 import { updateCompetencyRecords } from "@/lib/services/competency";
 import { recordRewardEvent } from "@/lib/services/rewards";
+import { scheduleRevisions } from "@/lib/services/revisions";
 import { updateUserData } from "@/lib/storage/user-store";
 import { withUser } from "@/lib/auth/http";
 import { StorageError } from "@/lib/storage/file-store";
@@ -49,25 +50,7 @@ export const POST = withUser(async ({ request, user }) => {
             achievement: { id: "achievement-first-pass", title: "First assessment passed" }
           })
           : { rewards: data.rewards, achievements: data.achievements };
-        const scheduleIntervals = [1, 3, 7, 14, 30];
-        let revisionSchedules = [...data.revisionSchedules];
-        for (const topicId of topicIds) {
-          const previous = revisionSchedules.find((schedule) => schedule.topicId === topicId);
-          const passed = updated.result === "pass";
-          const intervalDays = passed && previous ? scheduleIntervals[Math.min(scheduleIntervals.length - 1, scheduleIntervals.indexOf(previous.intervalDays) + 1)] ?? 3 : passed ? 3 : 1;
-          const dueAt = new Date(new Date(updated.submittedAt ?? Date.now()).getTime() + intervalDays * 86400000).toISOString();
-          const entry = {
-            id: previous?.id ?? `${updated.id}-${topicId}-revision`,
-            topicId,
-            dueAt,
-            intervalDays,
-            lastScorePercent: updated.scorePercent,
-            sourceAttemptId: updated.id
-          };
-          revisionSchedules = previous
-            ? revisionSchedules.map((schedule) => schedule.id === previous.id ? entry : schedule)
-            : [...revisionSchedules, entry];
-        }
+        const revisionSchedules = scheduleRevisions(data, updated);
         const interim = { ...data, examinationAttempts: attempts, revisionSchedules };
         const competencies = updateCompetencyRecords(interim, topicIds, updated.submittedAt ?? new Date().toISOString());
         const next = applicationDataSchema.parse({ ...interim, competencies, ...award });
@@ -85,14 +68,7 @@ export const POST = withUser(async ({ request, user }) => {
         const updated = gradeManualQuestions(data.examinationAttempts[index], payload.grades as Record<string, { marksEarned: number; feedback: string }>);
         const attempts = [...data.examinationAttempts];
         attempts[index] = updated;
-        const revisionSchedules = [...data.revisionSchedules];
-        for (const scheduleIndex in revisionSchedules) {
-          const schedule = revisionSchedules[scheduleIndex];
-          if (schedule.sourceAttemptId !== updated.id) continue;
-          const intervalDays = updated.result === "pass" ? 3 : 1;
-          const dueAt = new Date(new Date(updated.submittedAt ?? Date.now()).getTime() + intervalDays * 86400000).toISOString();
-          revisionSchedules[scheduleIndex] = { ...schedule, intervalDays, dueAt, lastScorePercent: updated.scorePercent };
-        }
+        const revisionSchedules = scheduleRevisions(data, updated);
         const interim = { ...data, examinationAttempts: attempts, revisionSchedules };
         const topicIds = [...new Set(updated.questionSnapshots.map(({ topicId }) => topicId))];
         const competencies = updateCompetencyRecords(interim, topicIds, updated.submittedAt ?? new Date().toISOString());
@@ -122,9 +98,12 @@ export const POST = withUser(async ({ request, user }) => {
 export const PATCH = withUser(async ({ request, user }) => {
   try {
     const payload = await request.json() as Record<string, unknown>;
-    if (payload.action !== "answer" || typeof payload.attemptId !== "string" || typeof payload.questionId !== "string" || typeof payload.answer !== "string") {
-      return error("Attempt id, question id, and answer are required.");
+    const isConfidence = payload.action === "confidence";
+    if (!["answer", "confidence"].includes(String(payload.action)) || typeof payload.attemptId !== "string" || typeof payload.questionId !== "string"
+      || (isConfidence ? !(typeof payload.confidence === "number" && Number.isInteger(payload.confidence) && payload.confidence >= 1 && payload.confidence <= 5) : typeof payload.answer !== "string")) {
+      return error(isConfidence ? "Confidence must be a whole number from 1 to 5." : "Attempt id, question id, and answer are required.");
     }
+    if (!isConfidence && (payload.answer as string).length > 50_000) return error("Answer is too long.");
     const result = await updateUserData(user.id, (data) => {
       const index = data.examinationAttempts.findIndex(({ id }) => id === payload.attemptId);
       if (index < 0) throw new Error("Examination attempt was not found.");
@@ -133,7 +112,9 @@ export const PATCH = withUser(async ({ request, user }) => {
       if (!attempt.questionSnapshots.some(({ questionId }) => questionId === payload.questionId)) throw new Error("Question does not belong to this attempt.");
       const elapsed = Date.now() - Date.parse(attempt.startedAt);
       if (elapsed > attempt.timeLimitMinutes * 60000) throw new Error("Examination time expired; submit the attempt.");
-      const updated = { ...attempt, answers: { ...attempt.answers, [payload.questionId as string]: payload.answer as string } };
+      const updated = isConfidence
+        ? { ...attempt, confidenceRatings: { ...attempt.confidenceRatings, [payload.questionId as string]: payload.confidence as number } }
+        : { ...attempt, answers: { ...attempt.answers, [payload.questionId as string]: payload.answer as string } };
       const attempts = [...data.examinationAttempts];
       attempts[index] = updated;
       return { data: applicationDataSchema.parse({ ...data, examinationAttempts: attempts }), result: updated };

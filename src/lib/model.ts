@@ -31,7 +31,11 @@ export const topicSchema = z.object({
   completionCriteria: z.string().default(""),
   practicalRequired: z.boolean().default(false),
   status: z.enum(["backlog", "not-started", "ready-to-learn", "in-progress", "needs-practice", "needs-revision", "blocked", "completed"]),
-  confidence: z.number().int().min(1).max(5).nullable()
+  confidence: z.number().int().min(1).max(5).nullable(),
+  revisedEstimatedMinutes: z.number().int().nonnegative().nullable().default(null),
+  startedAt: timestamp.nullable().default(null),
+  completedAt: timestamp.nullable().default(null),
+  completionEvidence: z.string().max(5000).default("")
 });
 
 export const resourceSchema = z.object({
@@ -43,10 +47,18 @@ export const resourceSchema = z.object({
   topicIds: z.array(id).default([]),
   difficulty: z.enum(["fundamental", "beginner", "intermediate", "advanced"]).default("beginner"),
   estimatedMinutes: z.number().int().nonnegative().default(0),
-  status: z.enum(["to-study", "in-progress", "completed", "reference"]).default("to-study"),
+  status: z.enum(["to-study", "in-progress", "completed", "needs-review", "reference"]).default("to-study"),
   rating: z.number().int().min(1).max(5).nullable().default(null),
   notes: z.string().default(""),
-  takeaways: z.string().default("")
+  takeaways: z.string().default(""),
+  publisher: z.string().max(200).default(""),
+  language: z.string().max(20).default("en"),
+  /** Licence and attribution as known; "Unknown" unless verified. Third-party content is linked, not copied. */
+  license: z.string().max(200).default("Unknown"),
+  attribution: z.string().max(500).default(""),
+  availability: z.enum(["unchecked", "available", "unavailable", "needs-check"]).default("unchecked"),
+  lastCheckedAt: timestamp.nullable().default(null),
+  checkStatusCode: z.number().int().nullable().default(null)
 });
 
 export const learningSessionSchema = z.object({
@@ -103,12 +115,21 @@ export const assessmentSchema = z.object({
   recommendation: z.string().default("")
 });
 
+export const questionTypes = [
+  "single-choice", "multiple-select", "true-false", "fill-blank", "short-answer", "long-answer", "practical",
+  "code-reading", "debugging", "calculation", "case-study",
+  "predict-output", "concept-comparison", "algorithm-design", "data-interpretation", "explanation",
+  "correct-flawed-solution", "code-writing"
+] as const;
+/** Question types that need a person to grade them against the rubric. */
+export const manuallyGradedTypes = new Set<string>(["long-answer", "practical", "debugging", "case-study", "concept-comparison", "algorithm-design", "explanation", "correct-flawed-solution", "code-writing"]);
+
 export const examinationQuestionSchema = z.object({
   id,
   version: z.number().int().positive(),
   topicId: id,
   prompt: z.string().min(1),
-  questionType: z.enum(["single-choice", "multiple-select", "true-false", "fill-blank", "short-answer", "long-answer", "practical", "code-reading", "debugging", "calculation", "case-study"]),
+  questionType: z.enum(questionTypes),
   difficulty: z.enum(["fundamental", "beginner", "intermediate", "advanced"]),
   critical: z.boolean().default(false),
   objective: z.string().default(""),
@@ -168,6 +189,8 @@ export const examinationAttemptSchema = z.object({
     critical: z.boolean().default(false)
   })),
   answers: z.record(z.string(), z.string()),
+  /** Self-rated confidence (1–5) per question, kept separate from verified grading. */
+  confidenceRatings: z.record(z.string(), z.number().int().min(1).max(5)).default({}),
   startedAt: timestamp,
   submittedAt: timestamp.nullable(),
   timeLimitMinutes: z.number().int().positive(),
@@ -233,7 +256,16 @@ export const projectSchema = z.object({
   documentationUrl: z.string().url().or(z.literal("")).default(""),
   knownLimitations: z.string().default(""),
   portfolioReady: z.boolean().default(false),
-  tasks: z.array(z.object({ id, title: z.string(), completed: z.boolean() })).default([])
+  tasks: z.array(z.object({ id, title: z.string(), completed: z.boolean() })).default([]),
+  problemStatement: z.string().default(""),
+  learningObjectives: z.array(z.string()).default([]),
+  plannedStartDate: z.string().date().nullable().default(null),
+  plannedEndDate: z.string().date().nullable().default(null),
+  actualStartDate: z.string().date().nullable().default(null),
+  actualEndDate: z.string().date().nullable().default(null),
+  personalAssessment: z.string().default(""),
+  /** Product readiness is tracked separately from learning progress. */
+  productReadiness: z.enum(["idea", "prototype", "tested-prototype", "pilot-ready", "production-ready"]).default("idea")
 });
 
 export const goalSchema = z.object({

@@ -36,6 +36,11 @@ export const PATCH = withUser(async ({ request, user }) => {
     if (Object.values(thresholds).some((value) => value !== undefined && (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 100))) {
       return NextResponse.json({ error: "Competency thresholds must be percentages from 0 to 100." }, { status: 400 });
     }
+    const intervals = payload.revisionIntervalsDays;
+    if (intervals !== undefined && (!Array.isArray(intervals) || intervals.length < 1 || intervals.length > 10
+      || intervals.some((value, index) => typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 365 || (index > 0 && value <= Number(intervals[index - 1]))))) {
+      return NextResponse.json({ error: "Revision intervals must be 1 to 10 increasing whole numbers of days between 1 and 365." }, { status: 400 });
+    }
     try {
       new Intl.DateTimeFormat("en", { timeZone: timezone });
     } catch {
@@ -48,7 +53,8 @@ export const PATCH = withUser(async ({ request, user }) => {
         studyDays: [...new Set(studyDays)],
         topicPassingPercent: thresholds.topicPassingPercent ?? data.settings.topicPassingPercent ?? 80,
         practicalPassingPercent: thresholds.practicalPassingPercent ?? data.settings.practicalPassingPercent ?? 80,
-        retentionPassingPercent: thresholds.retentionPassingPercent ?? data.settings.retentionPassingPercent ?? 70
+        retentionPassingPercent: thresholds.retentionPassingPercent ?? data.settings.retentionPassingPercent ?? 70,
+        revisionIntervalsDays: intervals ?? data.settings.revisionIntervalsDays ?? [1, 3, 7, 14, 30]
       };
       return { data: { ...data, settings: { ...data.settings, ...next } }, result: next };
     });

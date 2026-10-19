@@ -12,7 +12,7 @@ function attempt(id: string, examType: ExaminationAttempt["examType"], topicId: 
   return {
     id, blueprintId: "sample-diagnostic-blueprint", examType,
     questionSnapshots: [{ questionId: `q-${topicId}`, version: 1, prompt: "?", questionType, options: [], correctAnswer: "a", acceptedAnswers: [], numericTolerance: 0, explanation: "", rubric: "", maxMarks: 1, topicId, critical: false }],
-    answers: {}, startedAt: submittedAt, submittedAt, timeLimitMinutes: 10, passingPercent: 80,
+    answers: {}, confidenceRatings: {}, startedAt: submittedAt, submittedAt, timeLimitMinutes: 10, passingPercent: 80,
     scorePercent: correct ? 100 : 0, marksEarned: correct ? 1 : 0, totalMarks: 1, grading: questionType === "practical" ? "manual" : "automatic",
     selfDeclaredClosedBook: false, manualGraded: questionType === "practical", result: correct ? "pass" : "not-yet-passed",
     questionResults: [{ questionId: `q-${topicId}`, answer: "x", marksEarned: correct ? 1 : 0, maxMarks: 1, correct, status: correct ? "correct" : "incorrect", feedback: "" }]

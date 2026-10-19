@@ -61,7 +61,7 @@ export function buildRecommendations({ data, courses, now = new Date() }: Input)
         key: `practical:${topic.id}`, kind: "practical", priority: 75, title: `Build it: practical work for ${topic.title}`,
         reason: "Your theory result is strong, but practical implementation has not yet been demonstrated at the required level.",
         evidence: [`Best theory score ${bestTheory.toFixed(0)}% (threshold ${thresholds.topic}%)`, bestPractical === null ? "No graded practical assessment yet" : `Best practical score ${bestPractical.toFixed(0)}% (threshold ${thresholds.practical}%)`, topic.practicalExercise ? `Suggested exercise: ${topic.practicalExercise}` : ""].filter(Boolean),
-        href: `/topics?topic=${encodeURIComponent(topic.id)}`
+        href: `/topics/${encodeURIComponent(topic.id)}`
       });
     }
     // 4. Strong immediately, weak after a delay.
@@ -96,7 +96,7 @@ export function buildRecommendations({ data, courses, now = new Date() }: Input)
       title: `Possible knowledge gap: ${topic?.title ?? "a repeated question"}`,
       reason: "The same question was answered incorrectly more than once. This may point to a misconception, so review the underlying concept with a different explanation before retrying.",
       evidence: [`Question ${questionId} missed ${count} times`, prerequisites.length ? `Prerequisites to review: ${prerequisites.join(", ")}` : "No prerequisites recorded for this topic"],
-      href: lesson ? `/courses/${lesson.course.id}/lessons/${lesson.lesson.id}` : `/topics?topic=${encodeURIComponent(topicId)}`
+      href: lesson ? `/courses/${lesson.course.id}/lessons/${lesson.lesson.id}` : `/topics/${encodeURIComponent(topicId)}`
     });
   }
 
@@ -116,7 +116,7 @@ export function buildRecommendations({ data, courses, now = new Date() }: Input)
   for (const topic of data.topics) {
     const scores = diagnostics.map((attempt) => topicScore(data, attempt.id, topic.id)).filter((score): score is number => score !== null);
     if (scores.length && Math.max(...scores) >= thresholds.topic && topic.status !== "completed") {
-      items.push({ key: `skip:${topic.id}`, kind: "skip", priority: 40, title: `You may be able to skip: ${topic.title}`, reason: "Your diagnostic result for this topic meets the passing threshold. Confirm with a topic examination (and practical work, if required) instead of re-studying it.", evidence: [`Diagnostic score ${Math.max(...scores).toFixed(0)}% (threshold ${thresholds.topic}%)`], href: `/topics?topic=${encodeURIComponent(topic.id)}` });
+      items.push({ key: `skip:${topic.id}`, kind: "skip", priority: 40, title: `You may be able to skip: ${topic.title}`, reason: "Your diagnostic result for this topic meets the passing threshold. Confirm with a topic examination (and practical work, if required) instead of re-studying it.", evidence: [`Diagnostic score ${Math.max(...scores).toFixed(0)}% (threshold ${thresholds.topic}%)`], href: `/topics/${encodeURIComponent(topic.id)}` });
     }
   }
 
@@ -157,7 +157,7 @@ export function buildRecommendations({ data, courses, now = new Date() }: Input)
   // 11. Next roadmap topic whose prerequisites are complete.
   const doneTopics = new Set(data.topics.filter((topic) => topic.status === "completed").map((topic) => topic.id));
   const nextTopic = data.topics.find((topic) => !["completed", "blocked", "backlog"].includes(topic.status) && topic.prerequisites.every((id) => doneTopics.has(id)));
-  if (nextTopic) items.push({ key: `topic:${nextTopic.id}`, kind: "next-topic", priority: 35, title: `Study next: ${nextTopic.title}`, reason: "This is the next roadmap topic whose prerequisites are complete.", evidence: [`Status: ${nextTopic.status}`, `Priority: ${nextTopic.priority}`], href: `/topics?topic=${encodeURIComponent(nextTopic.id)}` });
+  if (nextTopic) items.push({ key: `topic:${nextTopic.id}`, kind: "next-topic", priority: 35, title: `Study next: ${nextTopic.title}`, reason: "This is the next roadmap topic whose prerequisites are complete.", evidence: [`Status: ${nextTopic.status}`, `Priority: ${nextTopic.priority}`], href: `/topics/${encodeURIComponent(nextTopic.id)}` });
 
   // Apply learner overrides.
   const overrides = new Map(data.recommendationOverrides.map((item) => [item.recommendationKey, item]));

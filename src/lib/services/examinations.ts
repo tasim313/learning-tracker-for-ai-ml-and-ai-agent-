@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { ApplicationData, ExaminationAttempt } from "@/lib/model";
+import { manuallyGradedTypes, type ApplicationData, type ExaminationAttempt } from "@/lib/model";
 
 function shuffled<T>(items: T[], random: () => number): T[] {
   const result = [...items];
@@ -76,6 +76,7 @@ export function startExamination(data: ApplicationData, blueprintId: string, now
     examType: blueprint.examType,
     questionSnapshots,
     answers: {},
+    confidenceRatings: {},
     startedAt: now,
     submittedAt: null,
     timeLimitMinutes: blueprint.timeLimitMinutes,
@@ -98,15 +99,14 @@ function normalize(answer: string) {
 type AutoMark = Pick<ExaminationAttempt["questionResults"][number], "correct" | "status" | "marksEarned">;
 
 function isManual(question: ExaminationAttempt["questionSnapshots"][number]) {
-  return ["long-answer", "practical", "debugging", "case-study"].includes(question.questionType)
-    || question.correctAnswer === null;
+  return manuallyGradedTypes.has(question.questionType) || question.correctAnswer === null;
 }
 
 function autoMark(question: ExaminationAttempt["questionSnapshots"][number], answer: string): AutoMark {
   if (isManual(question)) return { correct: null, status: "manual" as const, marksEarned: 0 };
   if (!answer.trim()) return { correct: false, status: "unanswered" as const, marksEarned: 0 };
-  if (question.questionType === "calculation" && typeof question.correctAnswer === "number") {
-    const actualNumber = Number(answer);
+  if (typeof question.correctAnswer === "number") {
+    const actualNumber = Number(answer.trim());
     const correct = Number.isFinite(actualNumber) && Math.abs(actualNumber - question.correctAnswer) <= question.numericTolerance;
     return { correct, status: correct ? "correct" as const : "incorrect" as const, marksEarned: correct ? question.maxMarks : 0 };
   }
