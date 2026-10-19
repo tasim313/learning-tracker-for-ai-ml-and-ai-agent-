@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const schemaVersion = 5;
+export const schemaVersion = 6;
 
 const id = z.string().min(1);
 const timestamp = z.string().datetime();
@@ -31,7 +31,11 @@ export const topicSchema = z.object({
   completionCriteria: z.string().default(""),
   practicalRequired: z.boolean().default(false),
   status: z.enum(["backlog", "not-started", "ready-to-learn", "in-progress", "needs-practice", "needs-revision", "blocked", "completed"]),
-  confidence: z.number().int().min(1).max(5).nullable()
+  confidence: z.number().int().min(1).max(5).nullable(),
+  revisedEstimatedMinutes: z.number().int().nonnegative().nullable().default(null),
+  startedAt: timestamp.nullable().default(null),
+  completedAt: timestamp.nullable().default(null),
+  completionEvidence: z.string().max(5000).default("")
 });
 
 export const resourceSchema = z.object({
@@ -43,10 +47,18 @@ export const resourceSchema = z.object({
   topicIds: z.array(id).default([]),
   difficulty: z.enum(["fundamental", "beginner", "intermediate", "advanced"]).default("beginner"),
   estimatedMinutes: z.number().int().nonnegative().default(0),
-  status: z.enum(["to-study", "in-progress", "completed", "reference"]).default("to-study"),
+  status: z.enum(["to-study", "in-progress", "completed", "needs-review", "reference"]).default("to-study"),
   rating: z.number().int().min(1).max(5).nullable().default(null),
   notes: z.string().default(""),
-  takeaways: z.string().default("")
+  takeaways: z.string().default(""),
+  publisher: z.string().max(200).default(""),
+  language: z.string().max(20).default("en"),
+  /** Licence and attribution as known; "Unknown" unless verified. Third-party content is linked, not copied. */
+  license: z.string().max(200).default("Unknown"),
+  attribution: z.string().max(500).default(""),
+  availability: z.enum(["unchecked", "available", "unavailable", "needs-check"]).default("unchecked"),
+  lastCheckedAt: timestamp.nullable().default(null),
+  checkStatusCode: z.number().int().nullable().default(null)
 });
 
 export const learningSessionSchema = z.object({
@@ -103,12 +115,21 @@ export const assessmentSchema = z.object({
   recommendation: z.string().default("")
 });
 
+export const questionTypes = [
+  "single-choice", "multiple-select", "true-false", "fill-blank", "short-answer", "long-answer", "practical",
+  "code-reading", "debugging", "calculation", "case-study",
+  "predict-output", "concept-comparison", "algorithm-design", "data-interpretation", "explanation",
+  "correct-flawed-solution", "code-writing"
+] as const;
+/** Question types that need a person to grade them against the rubric. */
+export const manuallyGradedTypes = new Set<string>(["long-answer", "practical", "debugging", "case-study", "concept-comparison", "algorithm-design", "explanation", "correct-flawed-solution", "code-writing"]);
+
 export const examinationQuestionSchema = z.object({
   id,
   version: z.number().int().positive(),
   topicId: id,
   prompt: z.string().min(1),
-  questionType: z.enum(["single-choice", "multiple-select", "true-false", "fill-blank", "short-answer", "long-answer", "practical", "code-reading", "debugging", "calculation", "case-study"]),
+  questionType: z.enum(questionTypes),
   difficulty: z.enum(["fundamental", "beginner", "intermediate", "advanced"]),
   critical: z.boolean().default(false),
   objective: z.string().default(""),
@@ -168,6 +189,8 @@ export const examinationAttemptSchema = z.object({
     critical: z.boolean().default(false)
   })),
   answers: z.record(z.string(), z.string()),
+  /** Self-rated confidence (1–5) per question, kept separate from verified grading. */
+  confidenceRatings: z.record(z.string(), z.number().int().min(1).max(5)).default({}),
   startedAt: timestamp,
   submittedAt: timestamp.nullable(),
   timeLimitMinutes: z.number().int().positive(),
@@ -233,7 +256,16 @@ export const projectSchema = z.object({
   documentationUrl: z.string().url().or(z.literal("")).default(""),
   knownLimitations: z.string().default(""),
   portfolioReady: z.boolean().default(false),
-  tasks: z.array(z.object({ id, title: z.string(), completed: z.boolean() })).default([])
+  tasks: z.array(z.object({ id, title: z.string(), completed: z.boolean() })).default([]),
+  problemStatement: z.string().default(""),
+  learningObjectives: z.array(z.string()).default([]),
+  plannedStartDate: z.string().date().nullable().default(null),
+  plannedEndDate: z.string().date().nullable().default(null),
+  actualStartDate: z.string().date().nullable().default(null),
+  actualEndDate: z.string().date().nullable().default(null),
+  personalAssessment: z.string().default(""),
+  /** Product readiness is tracked separately from learning progress. */
+  productReadiness: z.enum(["idea", "prototype", "tested-prototype", "pilot-ready", "production-ready"]).default("idea")
 });
 
 export const goalSchema = z.object({
@@ -306,6 +338,154 @@ export const opportunitySchema = z.object({
   nextAction: z.string().default("")
 });
 
+// ---- Learner-owned records for courses, practice, and personalization (schema v6) ----
+
+export const courseEnrollmentSchema = z.object({
+  id,
+  courseId: id,
+  enrolledAt: timestamp,
+  status: z.enum(["active", "completed", "withdrawn"]).default("active")
+});
+
+export const learningModes = ["read", "watch", "visualize", "practice", "challenge", "exam", "review", "build"] as const;
+
+export const lessonProgressSchema = z.object({
+  id,
+  courseId: id,
+  lessonId: id,
+  /** Version of the lesson content the learner was studying. */
+  lessonVersion: z.number().int().positive(),
+  startedAt: timestamp,
+  completedAt: timestamp.nullable().default(null),
+  completedBlockIds: z.array(z.string()).default([]),
+  quizResults: z.array(z.object({
+    blockId: z.string(),
+    phase: z.enum(["before", "after", "check"]).default("check"),
+    correct: z.number().int().nonnegative(),
+    total: z.number().int().positive(),
+    attemptedAt: timestamp
+  })).default([]),
+  bookmarked: z.boolean().default(false),
+  lastMode: z.enum(learningModes).default("read"),
+  updatedAt: timestamp
+});
+
+export const lessonNoteSchema = z.object({
+  id,
+  courseId: id,
+  lessonId: id,
+  blockId: z.string().nullable().default(null),
+  /** Position in a video, in seconds, when the note is about a moment in a video. */
+  videoSeconds: z.number().int().nonnegative().nullable().default(null),
+  kind: z.enum(["note", "highlight", "question"]).default("note"),
+  quote: z.string().max(2000).default(""),
+  body: z.string().max(20000),
+  createdAt: timestamp,
+  updatedAt: timestamp
+});
+
+export const videoProgressSchema = z.object({
+  id,
+  courseId: id,
+  lessonId: id,
+  blockId: z.string(),
+  /** Self-reported by the learner; external providers' watch history is not available. */
+  watchedSeconds: z.number().int().nonnegative(),
+  completed: z.boolean(),
+  updatedAt: timestamp
+});
+
+export const flashcardSchema = z.object({
+  id,
+  front: z.string().min(1).max(2000),
+  back: z.string().min(1).max(5000),
+  topicId: id.nullable().default(null),
+  source: z.string().max(200).default("Created by learner"),
+  /** Spaced-repetition stage; each stage maps to a configured interval in days. */
+  stage: z.number().int().nonnegative().default(0),
+  dueAt: timestamp,
+  createdAt: timestamp,
+  suspended: z.boolean().default(false),
+  reviews: z.array(z.object({
+    reviewedAt: timestamp,
+    grade: z.enum(["again", "hard", "good", "easy"]),
+    intervalDays: z.number().nonnegative()
+  })).default([])
+});
+
+export const practiceAttemptSchema = z.object({
+  id,
+  kind: z.enum(["math", "game", "diagram", "lesson-quiz"]),
+  itemId: z.string().min(1).max(200),
+  /** Seed for generated problems so the exact problem can be reproduced and re-checked. */
+  variant: z.number().int().nonnegative().default(0),
+  answer: z.string().max(20000),
+  work: z.string().max(20000).default(""),
+  score: z.number().nonnegative(),
+  maxScore: z.number().positive(),
+  correct: z.boolean(),
+  mistakes: z.array(z.string()).default([]),
+  timed: z.boolean().default(false),
+  durationSeconds: z.number().int().nonnegative().nullable().default(null),
+  topicId: id.nullable().default(null),
+  attemptedAt: timestamp
+});
+
+export const diagramNodeSchema = z.object({
+  id: z.string().min(1).max(80),
+  label: z.string().min(1).max(300),
+  detail: z.string().max(2000).default(""),
+  x: z.number().finite(),
+  y: z.number().finite(),
+  shape: z.enum(["process", "decision", "start", "data", "actor", "note"]).default("process"),
+  step: z.number().int().nonnegative().default(0)
+});
+
+export const diagramEdgeSchema = z.object({
+  id: z.string().min(1).max(80),
+  source: z.string().min(1).max(80),
+  target: z.string().min(1).max(80),
+  label: z.string().max(200).default(""),
+  step: z.number().int().nonnegative().default(0)
+});
+
+export const diagramKinds = [
+  "flowchart", "workflow", "activity", "sequence", "state", "decision-tree", "mind-map", "concept-map",
+  "data-flow", "architecture", "uml-class", "entity-relationship", "network", "neural-network",
+  "transformer", "ml-pipeline", "evaluation-workflow"
+] as const;
+
+export const diagramDefinitionSchema = z.object({
+  id,
+  title: z.string().min(1).max(200),
+  kind: z.enum(diagramKinds),
+  purpose: z.string().max(2000).default(""),
+  altText: z.string().min(1).max(4000),
+  explanationSteps: z.array(z.string().max(2000)).default([]),
+  nodes: z.array(diagramNodeSchema).max(200),
+  edges: z.array(diagramEdgeSchema).max(400),
+  updatedAt: timestamp
+}).superRefine((diagram, context) => {
+  const nodeIds = new Set<string>();
+  diagram.nodes.forEach((node, index) => {
+    if (nodeIds.has(node.id)) context.addIssue({ code: "custom", path: ["nodes", index, "id"], message: `Duplicate node id: ${node.id}` });
+    nodeIds.add(node.id);
+  });
+  diagram.edges.forEach((edge, index) => {
+    if (!nodeIds.has(edge.source)) context.addIssue({ code: "custom", path: ["edges", index, "source"], message: `Edge source "${edge.source}" is not a node.` });
+    if (!nodeIds.has(edge.target)) context.addIssue({ code: "custom", path: ["edges", index, "target"], message: `Edge target "${edge.target}" is not a node.` });
+  });
+});
+
+export const recommendationOverrideSchema = z.object({
+  id,
+  recommendationKey: z.string().min(1).max(200),
+  action: z.enum(["dismissed", "snoozed", "pinned"]),
+  until: timestamp.nullable().default(null),
+  reason: z.string().max(1000).default(""),
+  createdAt: timestamp
+});
+
 export const applicationDataSchema = z.object({
   schemaVersion: z.literal(schemaVersion),
   roadmapPhases: z.array(roadmapPhaseSchema),
@@ -328,6 +508,14 @@ export const applicationDataSchema = z.object({
   weeklyReviews: z.array(weeklyReviewSchema),
   experiments: z.array(experimentSchema).default([]),
   opportunities: z.array(opportunitySchema).default([]),
+  courseEnrollments: z.array(courseEnrollmentSchema).default([]),
+  lessonProgress: z.array(lessonProgressSchema).default([]),
+  lessonNotes: z.array(lessonNoteSchema).default([]),
+  videoProgress: z.array(videoProgressSchema).default([]),
+  flashcards: z.array(flashcardSchema).default([]),
+  practiceAttempts: z.array(practiceAttemptSchema).default([]),
+  userDiagrams: z.array(diagramDefinitionSchema).default([]),
+  recommendationOverrides: z.array(recommendationOverrideSchema).default([]),
   settings: z.record(z.string(), z.unknown())
 }).superRefine((data, context) => {
   if (typeof data.settings.timezone === "string") {
@@ -370,6 +558,11 @@ export const applicationDataSchema = z.object({
   checkUnique(data.examinationBlueprints.map(({ id: value }) => value), "examinationBlueprints");
   checkUnique(data.experiments.map(({ id: value }) => value), "experiments");
   checkUnique(data.opportunities.map(({ id: value }) => value), "opportunities");
+  for (const field of ["courseEnrollments", "lessonProgress", "lessonNotes", "videoProgress", "flashcards", "practiceAttempts", "userDiagrams", "recommendationOverrides"] as const) {
+    checkUnique(data[field].map(({ id: value }) => value), field);
+  }
+  data.flashcards.forEach((record, index) => { if (record.topicId) checkTopic(record.topicId, ["flashcards", index, "topicId"]); });
+  data.practiceAttempts.forEach((record, index) => { if (record.topicId) checkTopic(record.topicId, ["practiceAttempts", index, "topicId"]); });
 
   data.topics.forEach((topic, index) => {
     if (!phaseIds.has(topic.phaseId)) context.addIssue({ code: "custom", path: ["topics", index, "phaseId"], message: `Unknown phase id: ${topic.phaseId}` });
@@ -408,3 +601,8 @@ export type ApplicationData = z.infer<typeof applicationDataSchema>;
 export type RoadmapPhase = z.infer<typeof roadmapPhaseSchema>;
 export type LearningSession = z.infer<typeof learningSessionSchema>;
 export type ExaminationAttempt = z.infer<typeof examinationAttemptSchema>;
+export type LessonProgress = z.infer<typeof lessonProgressSchema>;
+export type Flashcard = z.infer<typeof flashcardSchema>;
+export type PracticeAttempt = z.infer<typeof practiceAttemptSchema>;
+export type DiagramDefinition = z.infer<typeof diagramDefinitionSchema>;
+export type LearningMode = (typeof learningModes)[number];

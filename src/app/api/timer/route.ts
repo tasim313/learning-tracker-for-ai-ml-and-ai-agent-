@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
-import { updateApplicationData } from "@/lib/storage/json-store";
+import { updateUserData } from "@/lib/storage/user-store";
+import { withUser } from "@/lib/auth/http";
+import { StorageError } from "@/lib/storage/file-store";
 import { createSession, transitionSession, type TimerAction } from "@/lib/services/timer";
 import { recordRewardEvent } from "@/lib/services/rewards";
 
 const actions = ["pause", "resume", "break", "resume-break", "finish", "cancel", "recover"] as const;
 
-export async function POST(request: Request) {
+export const POST = withUser(async ({ request, user }) => {
   try {
     const payload = await request.json() as Record<string, unknown>;
     if (payload.action === "start") {
       const topicId = typeof payload.topicId === "string" ? payload.topicId : "";
       const plannedSeconds = typeof payload.plannedSeconds === "number" ? payload.plannedSeconds : 0;
-      const session = await updateApplicationData((data) => {
+      const session = await updateUserData(user.id, (data) => {
         const created = createSession(data, topicId, plannedSeconds);
         return {
           data: { ...data, learningSessions: [...data.learningSessions, created] },
@@ -24,7 +26,7 @@ export async function POST(request: Request) {
     if (!actions.includes(payload.action as (typeof actions)[number]) || typeof payload.sessionId !== "string") {
       return NextResponse.json({ error: "A valid timer action and session id are required." }, { status: 400 });
     }
-    const updated = await updateApplicationData((data) => {
+    const updated = await updateUserData(user.id, (data) => {
       const index = data.learningSessions.findIndex(({ id }) => id === payload.sessionId);
       if (index < 0) throw new Error("Session was not found.");
       const session = transitionSession(data.learningSessions[index], payload.action as TimerAction);
@@ -45,9 +47,10 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(updated);
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Timer action failed." },
       { status: 400 }
     );
   }
-}
+});

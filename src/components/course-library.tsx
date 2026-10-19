@@ -55,7 +55,7 @@ export function CourseLibrary() {
     <section className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
       <h2 className="text-base font-semibold text-slate-900">Courses and resource collections</h2>
       <div className="mt-4 flex flex-wrap gap-2">
-        {courses.map((course) => <button key={course.courseCode} type="button" aria-pressed={selectedCourse.courseCode === course.courseCode} onClick={() => { setSelectedCourseId(course.courseCode); setFilter("All content"); setQuery(""); }} className={`min-h-10 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${selectedCourse.courseCode === course.courseCode ? "border-blue-700 bg-blue-700 text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}>{course.courseCode === "PAST-COURSES" ? "Past semesters" : course.courseCode === "ACADEMIC-RESOURCES" ? "Academic resources" : course.courseCode}</button>)}
+        {courses.map((course) => <button key={course.courseCode} type="button" aria-pressed={selectedCourse.courseCode === course.courseCode} onClick={() => { setSelectedCourseId(course.courseCode); setFilter("All content"); setQuery(""); }} className={`min-h-10 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${selectedCourse.courseCode === course.courseCode ? "border-blue-700 bg-blue-700 text-white" : "border-slate-300 bg-white text-slate-700"}`}>{course.courseCode === "PAST-COURSES" ? "Past semesters" : course.courseCode === "ACADEMIC-RESOURCES" ? "Academic resources" : course.courseCode}</button>)}
       </div>
       <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -68,7 +68,7 @@ export function CourseLibrary() {
         </label>
       </div>
       <div className="mt-4 flex flex-wrap gap-2" aria-label="Filter materials">
-        {filters.map((option) => <button key={option} type="button" aria-pressed={filter === option} onClick={() => setFilter(option)} className={`min-h-9 rounded-full px-3 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${filter === option ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>{option}</button>)}
+        {filters.map((option) => <button key={option} type="button" aria-pressed={filter === option} onClick={() => setFilter(option)} className={`min-h-9 rounded-full px-3 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${filter === option ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-700"}`}>{option}</button>)}
       </div>
     </section>
 
@@ -84,7 +84,7 @@ export function CourseLibrary() {
           <h4 className="mt-3 break-words text-sm font-semibold leading-5 text-slate-900">{item.title || "Untitled reference"}</h4>
           {item.scheduledDate && <p className="mt-1 whitespace-pre-line text-xs text-slate-500">{item.scheduledDate}</p>}
           {item.notes && <p className="mt-2 whitespace-pre-line text-sm leading-5 text-slate-600">{item.notes}</p>}
-          {item.url ? <a href={item.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-9 max-w-full items-center gap-2 rounded-lg border border-blue-200 px-3 py-1.5 text-sm font-semibold text-blue-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
+          {item.url ? <a href={item.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-9 max-w-full items-center gap-2 rounded-lg border border-blue-200 px-3 py-1.5 text-sm font-semibold text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
             <span>{kind === "Video" ? "Open video" : kind === "Slides" ? "Open slides" : "Open resource"}</span>
             <span aria-hidden="true">↗</span>
           </a> : <p className="mt-3 text-xs text-slate-500">Schedule item; the sheet did not include a resource link.</p>}

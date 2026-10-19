@@ -2,7 +2,7 @@ import type { ApplicationData } from "@/lib/model";
 
 const defaultThresholds = { topic: 80, practical: 80, retention: 70 };
 
-function topicScore(data: ApplicationData, attemptId: string, topicId: string): number | null {
+export function topicScore(data: ApplicationData, attemptId: string, topicId: string): number | null {
   const attempt = data.examinationAttempts.find(({ id }) => id === attemptId);
   if (!attempt?.submittedAt || attempt.scorePercent === null) return null;
   const questionIds = new Set(attempt.questionSnapshots.filter((question) => question.topicId === topicId).map(({ questionId }) => questionId));
@@ -19,6 +19,14 @@ function hasCriticalFailure(data: ApplicationData, attemptId: string, topicId: s
   return attempt.questionSnapshots
     .filter((question) => question.topicId === topicId && question.critical)
     .some((question) => attempt.questionResults.find((result) => result.questionId === question.questionId)?.correct !== true);
+}
+
+export function competencyThresholds(data: ApplicationData) {
+  return {
+    topic: typeof data.settings.topicPassingPercent === "number" ? data.settings.topicPassingPercent : defaultThresholds.topic,
+    practical: typeof data.settings.practicalPassingPercent === "number" ? data.settings.practicalPassingPercent : defaultThresholds.practical,
+    retention: typeof data.settings.retentionPassingPercent === "number" ? data.settings.retentionPassingPercent : defaultThresholds.retention
+  };
 }
 
 export function competencyReadiness(data: ApplicationData, topicId: string) {

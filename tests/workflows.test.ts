@@ -184,7 +184,7 @@ function evidenceAttempt(id: string, examType: ExaminationAttempt["examType"], c
       topicId: "topic-1",
       critical: true
     }],
-    answers: {},
+    answers: {}, confidenceRatings: {},
     startedAt: "2026-10-01T10:00:00.000Z",
     submittedAt: "2026-10-01T10:10:00.000Z",
     timeLimitMinutes: 20,
@@ -310,7 +310,7 @@ test("empty version one workspace receives the workbook catalog during migration
   const legacy = { ...seed, schemaVersion: 1, topics: [], resources: [] };
   const migrated = migrateApplicationData(legacy);
   assert.equal(migrated.data.topics.length, 48);
-  assert.equal(migrated.data.resources.length, 70);
+  assert.equal(migrated.data.resources.length, seed.resources.length);
   assert.deepEqual(migrated.data.learningSessions, []);
   assert.deepEqual(migrated.data.experiments, []);
 });
@@ -321,7 +321,7 @@ test("version three migration adds missing curated resources without overwriting
   const legacy = { ...seed, schemaVersion: 3, resources: savedResources };
   const migrated = migrateApplicationData(legacy);
   assert.equal(migrated.migrated, true);
-  assert.equal(migrated.data.resources.length, 70);
+  assert.equal(migrated.data.resources.length, seed.resources.length);
   assert.equal(migrated.data.resources.find(({ id }) => id === savedResources[0].id)?.notes, "My saved annotation");
   assert.equal(migrated.data.resources.filter(({ type }) => type === "slide").length, 2);
 });

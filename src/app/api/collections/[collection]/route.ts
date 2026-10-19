@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { applicationDataSchema, type ApplicationData } from "@/lib/model";
-import { updateApplicationData } from "@/lib/storage/json-store";
+import { loadUserData, updateUserData } from "@/lib/storage/user-store";
+import { withUser } from "@/lib/auth/http";
+import { StorageError } from "@/lib/storage/file-store";
 import { recordRewardEvent } from "@/lib/services/rewards";
 
 const collectionNames = [
@@ -33,11 +35,11 @@ function errorResponse(error: unknown, status = 400) {
   return NextResponse.json({ error: error instanceof Error ? error.message : "The request could not be completed." }, { status });
 }
 
-export async function GET(_request: Request, context: { params: Promise<{ collection: string }> }) {
-  const { collection } = await context.params;
+export const GET = withUser<{ collection: string }>(async ({ user, params }) => {
+  const { collection } = params;
   if (!isCollection(collection)) return errorResponse(new Error("Unknown data collection."), 404);
   try {
-    const data = await import("@/lib/storage/json-store").then(({ loadApplicationData }) => loadApplicationData());
+    const data = await loadUserData(user.id);
     const closedBookAttemptActive = data.examinationAttempts.some((attempt) =>
       attempt.submittedAt === null && attempt.selfDeclaredClosedBook
     );
@@ -68,13 +70,14 @@ export async function GET(_request: Request, context: { params: Promise<{ collec
     }
     return NextResponse.json(records(data, collection), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to read collection.", error);
     return errorResponse(new Error("Saved records are currently unavailable."), 500);
   }
-}
+});
 
-export async function POST(request: Request, context: { params: Promise<{ collection: string }> }) {
-  const { collection } = await context.params;
+export const POST = withUser<{ collection: string }>(async ({ request, user, params }) => {
+  const { collection } = params;
   if (!isCollection(collection)) return errorResponse(new Error("Unknown data collection."), 404);
   try {
     const payload = await request.json() as unknown;
@@ -96,7 +99,7 @@ export async function POST(request: Request, context: { params: Promise<{ collec
     if (collection === "notes" || collection === "projects") Object.assign(record, { updatedAt: now });
     if (collection === "competencies") Object.assign(record, { updatedAt: now });
     if (collection === "rewards") Object.assign(record, { earnedAt: now, eventId: randomUUID() });
-    const created = await updateApplicationData((data) => {
+    const created = await updateUserData(user.id, (data) => {
       const next = withRecords(data, collection, [...records(data, collection), record]);
       const award = collection === "projects" && record.status === "completed"
         ? recordRewardEvent(next, {
@@ -108,17 +111,19 @@ export async function POST(request: Request, context: { params: Promise<{ collec
             achievement: { id: "achievement-first-project", title: "First project milestone completed" }
           })
         : { rewards: next.rewards, achievements: next.achievements };
-      return { data: { ...next, ...award }, result: record };
+      const stored = records(next, collection).find((item) => item.id === record.id) ?? record;
+      return { data: { ...next, ...award }, result: stored };
     });
     return NextResponse.json(created, { status: 201 });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to create record.", error);
     return errorResponse(error);
   }
-}
+});
 
-export async function PATCH(request: Request, context: { params: Promise<{ collection: string }> }) {
-  const { collection } = await context.params;
+export const PATCH = withUser<{ collection: string }>(async ({ request, user, params }) => {
+  const { collection } = params;
   if (!isCollection(collection)) return errorResponse(new Error("Unknown data collection."), 404);
   try {
     const payload = await request.json() as unknown;
@@ -127,7 +132,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ colle
     }
     const body = payload as Record<string, unknown>;
     if (typeof body.id !== "string") return errorResponse(new Error("Record id is required."));
-    const updated = await updateApplicationData((data) => {
+    const updated = await updateUserData(user.id, (data) => {
       const items = records(data, collection);
       const index = items.findIndex((item) => item.id === body.id);
       if (index < 0) throw new Error("Record was not found.");
@@ -142,6 +147,12 @@ export async function PATCH(request: Request, context: { params: Promise<{ colle
           throw new Error("Provide a reason before correcting historical focused time.");
         }
         replacement.manuallyAdjusted = true;
+      }
+      if (collection === "topics" && replacement.status !== previous.status) {
+        // Learning dates are stamped by the server when status changes; completion is not competency.
+        const now = new Date().toISOString();
+        if (["in-progress", "needs-practice", "needs-revision", "completed"].includes(String(replacement.status)) && !previous.startedAt) replacement.startedAt = now;
+        replacement.completedAt = replacement.status === "completed" ? (previous.completedAt ?? now) : null;
       }
       if (collection === "examinationQuestions") {
         replacement.version = Number(previous.version ?? 1) + 1;
@@ -160,22 +171,24 @@ export async function PATCH(request: Request, context: { params: Promise<{ colle
             achievement: { id: "achievement-first-project", title: "First project milestone completed" }
           })
         : { rewards: validated.rewards, achievements: validated.achievements };
-      return { data: { ...validated, ...award }, result: replacement };
+      const stored = records(validated, collection).find((item) => item.id === replacement.id) ?? replacement;
+      return { data: { ...validated, ...award }, result: stored };
     });
     return NextResponse.json(updated);
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to update record.", error);
     return errorResponse(error);
   }
-}
+});
 
-export async function DELETE(request: Request, context: { params: Promise<{ collection: string }> }) {
-  const { collection } = await context.params;
+export const DELETE = withUser<{ collection: string }>(async ({ request, user, params }) => {
+  const { collection } = params;
   if (!isCollection(collection)) return errorResponse(new Error("Unknown data collection."), 404);
   const id = new URL(request.url).searchParams.get("id");
   if (!id) return errorResponse(new Error("Record id is required."));
   try {
-    await updateApplicationData((data) => {
+    await updateUserData(user.id, (data) => {
       if (collection === "assessments") throw new Error("Historical assessment results cannot be deleted.");
       if (collection === "examinationAttempts" || collection === "achievements" || collection === "rewards") {
         throw new Error("Historical examination, achievement, and reward records cannot be deleted.");
@@ -187,7 +200,8 @@ export async function DELETE(request: Request, context: { params: Promise<{ coll
     });
     return NextResponse.json({ deleted: true });
   } catch (error) {
+    if (error instanceof StorageError) throw error;
     console.error("Unable to delete record.", error);
     return errorResponse(error);
   }
-}
+});

@@ -1,50 +1,47 @@
 import { NextResponse } from "next/server";
-import { createAutomaticBackup, exportApplicationData, restoreApplicationData } from "@/lib/storage/json-store";
+import { jsonError, readJsonObject, withUser } from "@/lib/auth/http";
+import type { ApplicationData } from "@/lib/model";
+import {
+  createUserSnapshot, exportUserData, listUserSnapshots, loadUserData, restoreUserData, restoreUserSnapshot
+} from "@/lib/storage/user-store";
 
-export async function GET() {
-  try {
-    const data = await exportApplicationData();
-    if (data.examinationAttempts.some((attempt) => attempt.submittedAt === null && attempt.selfDeclaredClosedBook)) {
-      return NextResponse.json({ error: "Backup export is unavailable during a self-declared closed-book examination." }, { status: 423 });
-    }
-    return new Response(`${JSON.stringify(data, null, 2)}\n`, {
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Content-Disposition": `attachment; filename="learning-tracker-backup-${new Date().toISOString().slice(0, 10)}.json"`,
-        "Cache-Control": "no-store"
-      }
-    });
-  } catch (error) {
-    console.error("Unable to export backup.", error);
-    return NextResponse.json({ error: "Backup export failed." }, { status: 500 });
-  }
+function closedBookActive(data: ApplicationData) {
+  return data.examinationAttempts.some((attempt) => attempt.submittedAt === null && attempt.selfDeclaredClosedBook);
 }
 
-export async function POST() {
-  try {
-    await createAutomaticBackup();
-    return NextResponse.json({ created: true });
-  } catch (error) {
-    console.error("Unable to create snapshot.", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Snapshot could not be created." }, { status: 400 });
+/** GET            → download the caller's complete data export (JSON).
+ *  GET ?list=1    → list the caller's automatic snapshots. */
+export const GET = withUser(async ({ request, user }) => {
+  if (new URL(request.url).searchParams.get("list") === "1") {
+    return NextResponse.json(await listUserSnapshots(user.id));
   }
-}
+  const exported = await exportUserData(user.id);
+  if (closedBookActive(exported.data)) return jsonError("Backup export is unavailable during a self-declared closed-book examination.", 423);
+  return new Response(`${JSON.stringify(exported, null, 2)}\n`, {
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Disposition": `attachment; filename="learning-tracker-export-${new Date().toISOString().slice(0, 10)}.json"`
+    }
+  });
+});
 
-export async function PUT(request: Request) {
-  try {
-    const { loadApplicationData } = await import("@/lib/storage/json-store");
-    const current = await loadApplicationData();
-    if (current.examinationAttempts.some((attempt) => attempt.submittedAt === null && attempt.selfDeclaredClosedBook)) {
-      return NextResponse.json({ error: "Backup restore is unavailable during a self-declared closed-book examination." }, { status: 423 });
-    }
-    const payload = await request.json() as Record<string, unknown>;
-    if (payload.confirm !== true) {
-      return NextResponse.json({ error: "Explicit confirmation is required before replacing application data." }, { status: 400 });
-    }
-    const restored = await restoreApplicationData(payload.data);
-    return NextResponse.json({ restored: true, schemaVersion: restored.schemaVersion });
-  } catch (error) {
-    console.error("Unable to restore backup.", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Backup validation failed; existing data was not replaced." }, { status: 400 });
-  }
-}
+/** Create a manual snapshot of the caller's data. */
+export const POST = withUser(async ({ user }) => {
+  const name = await createUserSnapshot(user.id);
+  return NextResponse.json({ created: true, name }, { status: 201 });
+});
+
+/**
+ * Restore from an uploaded export ({ confirm: true, data }) or one of the caller's
+ * snapshots ({ confirm: true, snapshot }). Backups belonging to another account are rejected.
+ */
+export const PUT = withUser(async ({ request, user }) => {
+  const current = await loadUserData(user.id);
+  if (closedBookActive(current)) return jsonError("Backup restore is unavailable during a self-declared closed-book examination.", 423);
+  const payload = await readJsonObject(request);
+  if (payload.confirm !== true) return jsonError("Explicit confirmation is required before replacing your data.");
+  const restored = typeof payload.snapshot === "string"
+    ? await restoreUserSnapshot(user.id, payload.snapshot)
+    : await restoreUserData(user.id, payload.data);
+  return NextResponse.json({ restored: true, schemaVersion: restored.schemaVersion });
+});

@@ -2,8 +2,13 @@ services:
   - type: web
     name: learning-tracker
     runtime: node
+    plan: starter # persistent disks require a paid instance type
     buildCommand: npm ci && npm run build
     startCommand: npm start
+    healthCheckPath: /api/health
+    # JSON-file storage is safe only with exactly one instance writing to one disk.
+    # Render disks cannot be shared between instances; do not enable scaling.
+    numInstances: 1
     envVars:
       - key: NODE_VERSION
         value: 22
@@ -11,6 +16,18 @@ services:
         value: /var/data/learning-tracker
       - key: BACKUP_RETENTION
         value: 7
+      - key: SESSION_TTL_DAYS
+        value: 14
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: none
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
     disk:
       name: learning-tracker-data
       mountPath: /var/data/learning-tracker

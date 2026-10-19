@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { applicationDataSchema, schemaVersion, type ApplicationData } from "@/lib/model";
 import { createSeedData } from "@/lib/seed";
+import { appendMissingSamples } from "@/lib/seed-questions";
 
 const objectSchema = z.record(z.string(), z.unknown());
 
@@ -31,13 +32,31 @@ function appendCatalogResources(existing: unknown, catalog: ApplicationData["res
   return [...existing, ...catalog.filter((resource) => !ids.has(resource.id))];
 }
 
+/**
+ * Migrate any supported schema version to the current one. Migrated data also gains
+ * sample questions and blueprints it does not have yet; saved records are never changed.
+ */
 export function migrateApplicationData(input: unknown): { data: ApplicationData; migrated: boolean } {
+  const result = migrateToCurrent(input);
+  if (!result.migrated) return result;
+  const parsed = applicationDataSchema.safeParse({ ...result.data, ...appendMissingSamples(result.data) });
+  if (!parsed.success) throw new Error(`Migration failed validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
+  return { data: parsed.data, migrated: true };
+}
+
+function migrateToCurrent(input: unknown): { data: ApplicationData; migrated: boolean } {
   const root = objectSchema.safeParse(input);
   if (!root.success) throw new Error("Application data must be a JSON object.");
   if (root.data.schemaVersion === schemaVersion) {
     const parsed = applicationDataSchema.safeParse(root.data);
     if (!parsed.success) throw new Error(`Application data failed schema validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
     return { data: parsed.data, migrated: false };
+  }
+  if (root.data.schemaVersion === 5) {
+    // v6 adds learner-owned course, practice, and personalization collections; existing records are unchanged.
+    const parsed = applicationDataSchema.safeParse({ ...root.data, schemaVersion });
+    if (!parsed.success) throw new Error(`Version 5 migration failed validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
+    return { data: parsed.data, migrated: true };
   }
   if (root.data.schemaVersion === 3) {
     const seed = createSeedData();

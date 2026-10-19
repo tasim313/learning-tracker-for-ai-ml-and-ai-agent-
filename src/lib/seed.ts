@@ -1,7 +1,8 @@
 import type { ApplicationData } from "@/lib/model";
-import { schemaVersion } from "@/lib/model";
+import { projectSchema, schemaVersion } from "@/lib/model";
 import catalog from "@/data/workbook-catalog.json";
 import curatedResources from "@/data/learning-resource-catalog.json";
+import { sampleBlueprints, sampleQuestionBank } from "@/lib/seed-questions";
 
 const phases = [
   {
@@ -187,15 +188,18 @@ export function createSeedData(): ApplicationData {
         priority: index < 3 ? "high" as const : "medium" as const, estimatedMinutes: Number(estimatedMinutes),
         practicalExercise: String(exercise), deliverable: String(exercise),
         completionCriteria: "Explain the key concepts unaided and demonstrate the practical exercise with working evidence.",
-        practicalRequired: index !== 11, status: "not-started" as const, confidence: null
+        practicalRequired: index !== 11, status: "not-started" as const, confidence: null,
+        revisedEstimatedMinutes: null, startedAt: null, completedAt: null, completionEvidence: ""
       })),
-      ...(catalog.topics as ApplicationData["topics"])
+      ...(catalog.topics as Omit<ApplicationData["topics"][number], "revisedEstimatedMinutes" | "startedAt" | "completedAt" | "completionEvidence">[]).map((topic) => ({
+        revisedEstimatedMinutes: null, startedAt: null, completedAt: null, completionEvidence: "", ...topic
+      }))
     ],
     resources: [...catalog.resources, ...curatedResources] as ApplicationData["resources"],
     learningSessions: [],
     studyPlans: [],
     assessments: [],
-    examinationQuestions: sampleQuestions,
+    examinationQuestions: [...sampleQuestions, ...sampleQuestionBank],
     examinationBlueprints: [{
       id: "sample-diagnostic-blueprint",
       title: "Foundation diagnostic (sample questions)",
@@ -214,12 +218,20 @@ export function createSeedData(): ApplicationData {
       allowedMaterials: "No notes for a meaningful diagnostic; self-declared.",
       practicalRequirements: "Describe independently executed evidence for the practical prompt.",
       active: true
-    }],
+    }, ...sampleBlueprints],
     examinationAttempts: [],
+    courseEnrollments: [],
+    lessonProgress: [],
+    lessonNotes: [],
+    videoProgress: [],
+    flashcards: [],
+    practiceAttempts: [],
+    userDiagrams: [],
+    recommendationOverrides: [],
     competencies: [],
     revisionSchedules: [],
     notes: [],
-    projects: [...catalog.projects, ...capabilityMilestones.map((title, index) => ({
+    projects: projectSchema.array().parse([...catalog.projects, ...capabilityMilestones.map((title, index) => ({
       id: `sales-capability-${index + 1}`,
       title,
       description: "Planned AI Sales Employee capability milestone. Progress remains planned until personally demonstrated and evidenced.",
@@ -237,7 +249,7 @@ export function createSeedData(): ApplicationData {
       knownLimitations: "Prototype only. No autonomous external outreach, pricing commitment, or transaction without explicit human approval.",
       portfolioReady: false,
       tasks: []
-    }))] as ApplicationData["projects"],
+    }))]),
     goals: [],
     achievements: [],
     rewards: [],
