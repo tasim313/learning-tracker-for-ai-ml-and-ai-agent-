@@ -1,0 +1,834 @@
+[
+  {
+    "id": "curated-resource-001",
+    "title": "Python Tutorial",
+    "url": "https://docs.python.org/3/tutorial/",
+    "type": "course",
+    "phaseId": "phase-1",
+    "topicIds": [
+      "topic-1"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Official Python tutorial; use as a structured refresher for functions, data structures, errors, classes and files.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-002",
+    "title": "NumPy: absolute beginners",
+    "url": "https://numpy.org/doc/stable/user/absolute_beginners.html",
+    "type": "tutorial",
+    "phaseId": "phase-1",
+    "topicIds": [
+      "topic-1"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 60,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Hands-on arrays, shapes, indexing, operations and basic data analysis.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-003",
+    "title": "Essence of Linear Algebra: vectors (YouTube)",
+    "url": "https://www.youtube.com/watch?v=fNk_zzaMoSs",
+    "type": "video",
+    "phaseId": "phase-1",
+    "topicIds": [
+      "topic-1"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 20,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Visual introduction to vectors and linear combinations from 3Blue1Brown.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-004",
+    "title": "MIT OpenCourseWare: Linear Algebra",
+    "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/",
+    "type": "course",
+    "phaseId": "phase-1",
+    "topicIds": [
+      "topic-1"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 900,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Full open course for vectors, matrices, spaces, orthogonality and eigenvalues.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-005",
+    "title": "Google Machine Learning Crash Course",
+    "url": "https://developers.google.com/machine-learning/crash-course",
+    "type": "course",
+    "phaseId": "phase-2",
+    "topicIds": [
+      "topic-2"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 900,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Interactive ML lessons, videos, visualizations and exercises. Modules can be taken selectively.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-006",
+    "title": "Google foundational ML courses",
+    "url": "https://developers.google.com/machine-learning/foundational-courses",
+    "type": "course",
+    "phaseId": "phase-2",
+    "topicIds": [
+      "topic-2"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 600,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Sequence of ML foundations including problem framing and project management.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-007",
+    "title": "Scikit-learn MOOC",
+    "url": "https://inria.github.io/scikit-learn-mooc/",
+    "type": "course",
+    "phaseId": "phase-2",
+    "topicIds": [
+      "topic-2"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 900,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Practical, maintainers-led course on predictive modeling with scikit-learn.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-008",
+    "title": "Pandas: getting started tutorials",
+    "url": "https://pandas.pydata.org/docs/getting_started/intro_tutorials/",
+    "type": "tutorial",
+    "phaseId": "phase-2",
+    "topicIds": [
+      "topic-2"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Official tutorials for tabular data input, selection, plotting, summaries and combining data.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-009",
+    "title": "Linear transformations and matrices (YouTube)",
+    "url": "https://www.youtube.com/watch?v=kYB8IZa5AuE",
+    "type": "video",
+    "phaseId": "phase-2",
+    "topicIds": [
+      "topic-2"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 30,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Visual explanation of linear maps and matrices from 3Blue1Brown.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-010",
+    "title": "PyTorch: Learn the Basics",
+    "url": "https://docs.pytorch.org/tutorials/beginner/basics/intro.html",
+    "type": "course",
+    "phaseId": "phase-3",
+    "topicIds": [
+      "topic-3"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 240,
+    "status": "to-study",
+    "rating": null,
+    "notes": "End-to-end workflow covering tensors, data loaders, models, autograd, optimization and saving.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-011",
+    "title": "PyTorch beginner video tutorials",
+    "url": "https://docs.pytorch.org/tutorials/beginner/introyt/introyt1_tutorial.html",
+    "type": "video",
+    "phaseId": "phase-3",
+    "topicIds": [
+      "topic-3"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 60,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Video walkthrough of building and training an image classifier with PyTorch.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-012",
+    "title": "But what is a neural network? (YouTube)",
+    "url": "https://www.youtube.com/watch?v=aircAruvnKk",
+    "type": "video",
+    "phaseId": "phase-3",
+    "topicIds": [
+      "topic-3"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 20,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Visual explanation of neural network layers and gradient learning by 3Blue1Brown.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-013",
+    "title": "fast.ai: Practical Deep Learning for Coders",
+    "url": "https://course.fast.ai/",
+    "type": "course",
+    "phaseId": "phase-3",
+    "topicIds": [
+      "topic-3"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 1800,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Code-first deep learning course with notebooks and practical projects.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-014",
+    "title": "Hugging Face LLM Course",
+    "url": "https://huggingface.co/learn/llm-course/",
+    "type": "course",
+    "phaseId": "phase-4",
+    "topicIds": [
+      "topic-4"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 1200,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Free course for Transformers, tokenizers, datasets, fine-tuning and sharing models.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-015",
+    "title": "Attention Is All You Need",
+    "url": "https://arxiv.org/abs/1706.03762",
+    "type": "paper",
+    "phaseId": "phase-4",
+    "topicIds": [
+      "topic-4"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 120,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Original Transformer paper; focus on attention, positional encodings and encoder/decoder structure.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-016",
+    "title": "Stanford CS224N 2025: Word vectors lecture slides",
+    "url": "https://cs224n.stanford.edu/slides_w25/cs224n-2025-lecture01-wordvecs1.pdf",
+    "type": "slide",
+    "phaseId": "phase-4",
+    "topicIds": [
+      "topic-4"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Lecture slides on vector representations, word meaning and optimization.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-017",
+    "title": "Stanford CS224N 2025: Pretraining lecture slides",
+    "url": "https://cs224n.stanford.edu/slides_w25/cs224n-2025-lecture09-pretraining.pdf",
+    "type": "slide",
+    "phaseId": "phase-4",
+    "topicIds": [
+      "topic-4"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Lecture slides on subword modeling, pretraining objectives and language model families.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-018",
+    "title": "The Illustrated Transformer",
+    "url": "https://jalammar.github.io/illustrated-transformer/",
+    "type": "article",
+    "phaseId": "phase-4",
+    "topicIds": [
+      "topic-4"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 45,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Visual walkthrough of Transformer components; use alongside the original paper.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-019",
+    "title": "OpenAI: Prompt engineering",
+    "url": "https://platform.openai.com/docs/guides/prompt-engineering",
+    "type": "documentation",
+    "phaseId": "phase-5",
+    "topicIds": [
+      "topic-5"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Current API prompt guidance; verify patterns against the model and endpoint you use.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-020",
+    "title": "OpenAI: Structured Outputs",
+    "url": "https://platform.openai.com/docs/guides/structured-outputs",
+    "type": "documentation",
+    "phaseId": "phase-5",
+    "topicIds": [
+      "topic-5"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 60,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Constrain model responses to schemas and validate application behavior.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-021",
+    "title": "Google Gemini: Prompt design strategies",
+    "url": "https://ai.google.dev/gemini-api/docs/prompting-strategies",
+    "type": "documentation",
+    "phaseId": "phase-5",
+    "topicIds": [
+      "topic-5"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 60,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Prompt design guidance for Gemini API applications.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-022",
+    "title": "Anthropic: Prompt engineering overview",
+    "url": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",
+    "type": "documentation",
+    "phaseId": "phase-5",
+    "topicIds": [
+      "topic-5"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 60,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Model-specific and general prompt design practices; compare across providers.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-023",
+    "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    "url": "https://arxiv.org/abs/2005.11401",
+    "type": "paper",
+    "phaseId": "phase-6",
+    "topicIds": [
+      "topic-6"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 120,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Foundational RAG paper; study retrieval-augmented generation and its evaluation setup.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-024",
+    "title": "OpenAI: Embeddings guide",
+    "url": "https://platform.openai.com/docs/guides/embeddings",
+    "type": "documentation",
+    "phaseId": "phase-6",
+    "topicIds": [
+      "topic-6"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 60,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Embedding use cases, vector representations and retrieval patterns.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-025",
+    "title": "Chroma: documentation and tutorials",
+    "url": "https://docs.trychroma.com/",
+    "type": "documentation",
+    "phaseId": "phase-6",
+    "topicIds": [
+      "topic-6"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 120,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Hands-on vector database setup, collections, embeddings, querying and filtering.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-026",
+    "title": "pgvector: getting started",
+    "url": "https://github.com/pgvector/pgvector",
+    "type": "repository",
+    "phaseId": "phase-6",
+    "topicIds": [
+      "topic-6"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "PostgreSQL vector similarity extension; inspect indexing and distance operator examples.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-027",
+    "title": "OpenAI: Function calling",
+    "url": "https://platform.openai.com/docs/guides/function-calling",
+    "type": "documentation",
+    "phaseId": "phase-7",
+    "topicIds": [
+      "topic-7"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Define tools, validate arguments and handle model-requested function calls.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-028",
+    "title": "OpenAI Agents SDK",
+    "url": "https://openai.github.io/openai-agents-python/",
+    "type": "documentation",
+    "phaseId": "phase-7",
+    "topicIds": [
+      "topic-7"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Practical agent SDK covering tools, handoffs, guardrails, tracing and orchestration.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-029",
+    "title": "Anthropic: Tool use",
+    "url": "https://docs.anthropic.com/en/docs/build-with-claude/tool-use/overview",
+    "type": "documentation",
+    "phaseId": "phase-7",
+    "topicIds": [
+      "topic-7"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Tool schemas and tool-use loops; implement permission checks in application code.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-030",
+    "title": "Model Context Protocol",
+    "url": "https://modelcontextprotocol.io/introduction",
+    "type": "documentation",
+    "phaseId": "phase-7",
+    "topicIds": [
+      "topic-7"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 120,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Protocol concepts for connecting model applications with tools and context servers.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-031",
+    "title": "Thinking in LangGraph",
+    "url": "https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph",
+    "type": "tutorial",
+    "phaseId": "phase-8",
+    "topicIds": [
+      "topic-8"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Plan workflows as state, nodes and transitions, with explicit error and human-input steps.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-032",
+    "title": "LangChain and LangGraph: multi-agent tutorials",
+    "url": "https://docs.langchain.com/oss/python/learn",
+    "type": "tutorial",
+    "phaseId": "phase-8",
+    "topicIds": [
+      "topic-8"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Examples for subagents, handoffs, routers and shared workflow state.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-033",
+    "title": "Google Agent Development Kit",
+    "url": "https://google.github.io/adk-docs/",
+    "type": "documentation",
+    "phaseId": "phase-8",
+    "topicIds": [
+      "topic-8"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Agent development toolkit documentation; compare design and orchestration tradeoffs.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-034",
+    "title": "WhatsApp Business Platform Cloud API",
+    "url": "https://developers.facebook.com/docs/whatsapp/cloud-api/",
+    "type": "api",
+    "phaseId": "phase-9",
+    "topicIds": [
+      "topic-9"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Official API reference for consent-based messaging integrations and webhooks.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-035",
+    "title": "HubSpot CRM API documentation",
+    "url": "https://developers.hubspot.com/docs/api/overview",
+    "type": "api",
+    "phaseId": "phase-9",
+    "topicIds": [
+      "topic-9"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "CRM objects, authentication and API concepts for sandboxed sales workflows.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-036",
+    "title": "Twilio Conversations documentation",
+    "url": "https://www.twilio.com/docs/conversations",
+    "type": "api",
+    "phaseId": "phase-9",
+    "topicIds": [
+      "topic-9"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Messaging conversation APIs; use test environments and explicit consent.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-037",
+    "title": "Hugging Face PEFT",
+    "url": "https://huggingface.co/docs/peft/index",
+    "type": "documentation",
+    "phaseId": "phase-10",
+    "topicIds": [
+      "topic-10"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Parameter-efficient fine-tuning methods and practical library guides.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-038",
+    "title": "Hugging Face TRL",
+    "url": "https://huggingface.co/docs/trl/index",
+    "type": "documentation",
+    "phaseId": "phase-10",
+    "topicIds": [
+      "topic-10"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Training library documentation for supervised fine-tuning and preference optimization.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-039",
+    "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+    "url": "https://arxiv.org/abs/2106.09685",
+    "type": "paper",
+    "phaseId": "phase-10",
+    "topicIds": [
+      "topic-10"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Original LoRA paper; understand low-rank updates and parameter efficiency.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-040",
+    "title": "OWASP Top 10 for LLM Applications 2025",
+    "url": "https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/",
+    "type": "article",
+    "phaseId": "phase-11",
+    "topicIds": [
+      "topic-11"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 120,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Security risks for LLM applications including prompt injection, data exposure and excessive agency.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-041",
+    "title": "NIST AI Risk Management Framework",
+    "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+    "type": "documentation",
+    "phaseId": "phase-11",
+    "topicIds": [
+      "topic-11"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Risk-based framework for governing, mapping, measuring and managing AI risks.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-042",
+    "title": "FastAPI deployment concepts",
+    "url": "https://fastapi.tiangolo.com/deployment/",
+    "type": "documentation",
+    "phaseId": "phase-11",
+    "topicIds": [
+      "topic-11"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Deployment options and operational considerations for API services.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-043",
+    "title": "Docker: Get started",
+    "url": "https://docs.docker.com/get-started/",
+    "type": "tutorial",
+    "phaseId": "phase-11",
+    "topicIds": [
+      "topic-11"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Container fundamentals for packaging and running services.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-044",
+    "title": "People + AI Guidebook",
+    "url": "https://pair.withgoogle.com/guidebook/",
+    "type": "book",
+    "phaseId": "phase-12",
+    "topicIds": [
+      "topic-12"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 240,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Google PAIR guidebook on human-centered AI design and product decisions.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-resource-045",
+    "title": "NIST AI RMF Generative AI Profile",
+    "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+    "type": "paper",
+    "phaseId": "phase-12",
+    "topicIds": [
+      "topic-12"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 180,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Generative AI risk profile with considerations across development and deployment.",
+    "takeaways": "Add your notes after studying this material."
+  },
+  {
+    "id": "curated-audio-001",
+    "title": "The Google DeepMind Podcast",
+    "url": "https://deepmind.google/the-podcast/",
+    "type": "audio",
+    "phaseId": "phase-4",
+    "topicIds": [
+      "topic-4"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 45,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Listen to an episode about modern AI research. Write down the problem, method, evidence, and one open question.",
+    "takeaways": "Add your listening notes after the episode."
+  },
+  {
+    "id": "curated-audio-002",
+    "title": "The TWIML AI Podcast",
+    "url": "https://twimlai.com/podcast/twimlai/",
+    "type": "audio",
+    "phaseId": "phase-11",
+    "topicIds": [
+      "topic-11"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 45,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Choose an episode on applied machine learning or generative AI and summarize the engineering tradeoffs discussed.",
+    "takeaways": "Add your listening notes after the episode."
+  },
+  {
+    "id": "curated-practice-001",
+    "title": "Google ML Crash Course: Exercises",
+    "url": "https://developers.google.com/machine-learning/crash-course/exercises",
+    "type": "practice",
+    "phaseId": "phase-2",
+    "topicIds": [
+      "topic-2"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 60,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Complete interactive exercises alongside the ML Crash Course; save explanations for any missed questions.",
+    "takeaways": "Record the exercise results and concepts to revisit."
+  },
+  {
+    "id": "curated-practice-002",
+    "title": "scikit-learn MOOC: Hands-on exercises",
+    "url": "https://inria.github.io/scikit-learn-mooc/",
+    "type": "practice",
+    "phaseId": "phase-2",
+    "topicIds": [
+      "topic-2"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Work through the notebooks on model fitting, evaluation, preprocessing, and feature engineering.",
+    "takeaways": "Keep completed notebooks and a short note about each model choice."
+  },
+  {
+    "id": "curated-practice-003",
+    "title": "PyTorch: Learn the Basics",
+    "url": "https://docs.pytorch.org/tutorials/beginner/basics/intro.html",
+    "type": "practice",
+    "phaseId": "phase-3",
+    "topicIds": [
+      "topic-3"
+    ],
+    "difficulty": "beginner",
+    "estimatedMinutes": 120,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Build and train a small neural network by completing the guided tensor, dataset, model, optimization, and save/load tutorials.",
+    "takeaways": "Save the runnable notebook or script and note the training behavior."
+  },
+  {
+    "id": "curated-practice-004",
+    "title": "Hugging Face LLM Course",
+    "url": "https://huggingface.co/learn/llm-course/chapter1/1",
+    "type": "practice",
+    "phaseId": "phase-4",
+    "topicIds": [
+      "topic-4"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 120,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Follow the course chapters and run the code exercises to load, inspect, and use pretrained models.",
+    "takeaways": "Keep a working example and note model and tokenizer settings."
+  },
+  {
+    "id": "curated-practice-005",
+    "title": "LangChain: Learn LangChain",
+    "url": "https://docs.langchain.com/oss/python/learn",
+    "type": "practice",
+    "phaseId": "phase-8",
+    "topicIds": [
+      "topic-8"
+    ],
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "status": "to-study",
+    "rating": null,
+    "notes": "Build a small Python workflow from the guides and test it with representative inputs and failure cases.",
+    "takeaways": "Save the workflow and a few meaningful evaluation cases."
+  }
+]
