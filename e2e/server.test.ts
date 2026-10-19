@@ -126,3 +126,34 @@ test("sign-out ends the session", async () => {
   assert.equal((await request("/api/settings", { cookie })).status, 401);
   assert.equal((await request("/dashboard", { cookie })).status, 307);
 });
+
+test("every application page renders for a signed-in learner, and admin pages for an administrator", async () => {
+  const cookie = await register("sweep-e2e@example.test");
+  const learnerPages = [
+    "/dashboard", "/recommendations", "/courses", "/courses/ai-engineering-foundations",
+    "/courses/ai-engineering-foundations/lessons/vectors-and-dot-products",
+    "/courses/ai-engineering-foundations/lessons/vectors-and-dot-products/tutorial",
+    "/videos", "/videos/ai-engineering-foundations/vectors-and-dot-products/video",
+    "/roadmap", "/topics", "/resources", "/knowledge", "/math-lab", "/diagrams", "/games", "/flashcards",
+    "/timer", "/sessions", "/planner", "/revisions", "/exams", "/exam-library", "/questions", "/blueprints",
+    "/active-exam", "/practical-exam", "/exam-results", "/answer-review", "/gaps", "/competency", "/exam-history",
+    "/exam-analytics", "/assessments", "/projects", "/sales-agent", "/goals", "/discipline", "/rewards", "/reports",
+    "/experiments", "/opportunities", "/settings", "/backup", "/account"
+  ];
+  const failures: string[] = [];
+  for (const page of learnerPages) {
+    const response = await request(page, { cookie });
+    const html = await response.text();
+    if (response.status !== 200 || /Application error|Internal Server Error/.test(html)) failures.push(`${page}: ${response.status}`);
+  }
+  assert.deepEqual(failures, []);
+  assert.equal((await request("/courses/not-a-course", { cookie })).status, 404);
+  assert.equal((await request("/admin/content", { cookie })).status, 404, "admin pages are hidden from learners");
+
+  const admin = await request("/api/auth/login", { method: "POST", body: JSON.stringify({ email: "admin@example.test", password: "e2e passphrase value" }) });
+  const adminCookie = /lt_session=[^;]+/.exec(admin.headers.get("set-cookie") ?? "")?.[0];
+  assert.ok(adminCookie);
+  for (const page of ["/admin/content", "/admin/content/ai-engineering-foundations", "/admin/content/diagrams", "/admin/users", "/admin/audit"]) {
+    assert.equal((await request(page, { cookie: adminCookie })).status, 200, page);
+  }
+});

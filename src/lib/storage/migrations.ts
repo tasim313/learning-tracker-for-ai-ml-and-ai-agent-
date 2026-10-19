@@ -39,6 +39,12 @@ export function migrateApplicationData(input: unknown): { data: ApplicationData;
     if (!parsed.success) throw new Error(`Application data failed schema validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
     return { data: parsed.data, migrated: false };
   }
+  if (root.data.schemaVersion === 5) {
+    // v6 adds learner-owned course, practice, and personalization collections; existing records are unchanged.
+    const parsed = applicationDataSchema.safeParse({ ...root.data, schemaVersion });
+    if (!parsed.success) throw new Error(`Version 5 migration failed validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
+    return { data: parsed.data, migrated: true };
+  }
   if (root.data.schemaVersion === 3) {
     const seed = createSeedData();
     const candidate = { ...root.data, schemaVersion, resources: appendCatalogResources(root.data.resources, seed.resources) };

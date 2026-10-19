@@ -111,7 +111,14 @@ export const featurePages: Record<string, FeaturePageDefinition> = {
   },
   "exam-library": {
     title: "Examination library",
-    description: "Create reusable examination blueprints from your question bank and topic objectives.",
+    description: "Every configured examination with its type, question count, time limit, and passing threshold. Start one from the Examination dashboard, or edit it in the Blueprint editor.",
+    collection: "examinationBlueprints",
+    fields: [],
+    readOnly: true
+  },
+  blueprints: {
+    title: "Examination blueprint editor",
+    description: "Create and edit reusable examination blueprints: topics, question pool, difficulty distribution, time limit, passing threshold, allowed materials, practical requirements, and retake policy. Completed attempts keep the exact rules and question versions they were taken under.",
     collection: "examinationBlueprints",
     fields: [fields.text("title", "Examination name"), fields.select("examType", "Examination type", ["diagnostic", "topic", "practical", "closed-book", "open-book", "cumulative", "retention", "comprehensive"]), fields.topics(), fields.textarea("questionIds", "Question pool IDs (comma-separated; create questions first)"), fields.number("questionCount", "Number of questions"), fields.textarea("learningObjectives", "Learning objectives covered (one per line)", false), fields.textarea("questionTypes", "Included question types (comma-separated)", false), fields.textarea("difficultyDistribution", "Difficulty distribution (one difficulty=count per line; overrides default difficulty)", false), fields.number("timeLimitMinutes", "Time limit (minutes)"), fields.number("passingPercent", "Passing threshold (%)"), fields.select("difficulty", "Default difficulty", ["fundamental", "beginner", "intermediate", "advanced"]), fields.select("retakePolicy", "Retake policy", ["unrestricted", "cooldown"]), fields.number("retakeCooldownHours", "Retake cooldown (hours)"), fields.textarea("allowedMaterials", "Allowed reference materials", false), fields.textarea("practicalRequirements", "Required practical evidence / acceptance tests", false), { name: "active", label: "Available to take", type: "checkbox" }]
   },
