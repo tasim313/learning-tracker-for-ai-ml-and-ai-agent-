@@ -7,7 +7,8 @@ export const metadata: Metadata = { title: "Create an account" };
 export const dynamic = "force-dynamic";
 
 export default async function RegisterPage() {
-  if (await getCurrentSession()) redirect("/dashboard");
+  const session = await getCurrentSession();
+  if (session) redirect(session.user.role === "admin" || session.user.role === "superuser" ? "/admin" : "/dashboard");
   return (
     <>
       <h1 className="text-2xl font-semibold text-slate-900">Create your account</h1>

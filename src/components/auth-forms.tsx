@@ -60,14 +60,16 @@ export function LoginForm({ next }: { next?: string }) {
     const values = formValues(event);
     setStatus({ kind: "pending" });
     try {
-      await postJson("/api/auth/login", { email: values.email, password: values.password });
-      window.location.assign(safeNextPath(next));
+      const result = await postJson("/api/auth/login", { email: values.email, password: values.password });
+      const user = result.user as { role?: string } | undefined;
+      const defaultPath = user?.role === "admin" || user?.role === "superuser" ? "/admin" : "/dashboard";
+      window.location.assign(next ? safeNextPath(next) : defaultPath);
     } catch (error) {
       setStatus({ kind: "error", message: error instanceof Error ? error.message : "Sign-in failed." });
     }
   }
   return (
-    <form onSubmit={submit} className="space-y-4" noValidate={false}>
+    <form method="post" onSubmit={submit} className="space-y-4" noValidate={false}>
       <Field label="Email" name="email" type="email" autoComplete="email" />
       <Field label="Password" name="password" type="password" autoComplete="current-password" />
       <StatusMessage status={status} />
@@ -91,14 +93,15 @@ export function RegisterForm() {
     }
     setStatus({ kind: "pending" });
     try {
-      await postJson("/api/auth/register", { email: values.email, password: values.password, displayName: values.displayName });
-      window.location.assign("/dashboard");
+      const result = await postJson("/api/auth/register", { email: values.email, password: values.password, displayName: values.displayName });
+      const user = result.user as { role?: string } | undefined;
+      window.location.assign(user?.role === "admin" || user?.role === "superuser" ? "/admin" : "/dashboard");
     } catch (error) {
       setStatus({ kind: "error", message: error instanceof Error ? error.message : "Registration failed." });
     }
   }
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form method="post" onSubmit={submit} className="space-y-4">
       <Field label="Display name (optional)" name="displayName" autoComplete="nickname" required={false} />
       <Field label="Email" name="email" type="email" autoComplete="email" />
       <Field label="Password" name="password" type="password" autoComplete="new-password" minLength={12} hint="At least 12 characters. A passphrase of several words works well." />
@@ -127,7 +130,7 @@ export function ForgotPasswordForm() {
     }
   }
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form method="post" onSubmit={submit} className="space-y-4">
       <Field label="Account email" name="email" type="email" autoComplete="email" />
       <StatusMessage status={status} />
       <Submit pending={status.kind === "pending"}>Send reset link</Submit>
@@ -156,7 +159,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   if (!token) return <p role="alert" className="text-sm text-red-800">This reset link is incomplete. Request a new one from the <Link href="/forgot-password" className="underline">password recovery page</Link>.</p>;
   if (status.kind === "success") return <div className="space-y-4"><StatusMessage status={status} /><Link href="/login" className="inline-flex min-h-11 items-center rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white">Sign in</Link></div>;
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form method="post" onSubmit={submit} className="space-y-4">
       <Field label="New password" name="password" type="password" autoComplete="new-password" minLength={12} hint="At least 12 characters." />
       <Field label="Confirm new password" name="confirmPassword" type="password" autoComplete="new-password" minLength={12} />
       <StatusMessage status={status} />

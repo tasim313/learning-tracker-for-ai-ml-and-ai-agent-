@@ -56,11 +56,13 @@ Requirements: Node.js 22 or later, npm.
 
 ```bash
 npm ci
-cp .env.example .env.local      # adjust ADMIN_EMAILS to your email to become an administrator
+cp .env.example .env.local      # configure ADMIN_EMAILS or the optional superuser
 npm run dev
 ```
 
 Open <http://localhost:3000>, create an account, and you are taken to your dashboard. In development, emails (verification, password reset) are printed to the server console.
+
+To initialize a superuser at startup, set both `SUPERUSER_EMAIL` and `SUPERUSER_PASSWORD` in `.env.local` or the deployment's secret settings. Use a unique, strong password; do not commit it. The app creates the account with a password hash if it does not exist. If the account already exists, startup promotes and enables that account without changing its existing password. Leave both variables unset to disable this bootstrap.
 
 | Command | Purpose |
 | --- | --- |
@@ -143,7 +145,8 @@ If the platform outgrows these limits, the storage layer (`lib/storage`) is the 
 - **Email verification:** links are single-use and expire after 48 hours. Verifying requires a button press (POST), so link-scanning email filters can't consume the token.
 - **Roles:**
   - `learner` can access only their own data.
-  - `administrator` can manage accounts' roles and shared content. Administrators have no feature for reading learners' notes, answers, or history. The last administrator can't be demoted or deleted. Role changes, content publishing, and account deletions are recorded in the audit log.
+  - `administrator` and `superuser` can manage accounts and inspect platform analytics. Authorized administrators can also view a learner's learning history and session/activity summaries from the account profile; this is private learner data and should be accessed only for a legitimate operational purpose. The configured superuser cannot be demoted or disabled through account management. Role changes, status changes, content publishing, and account deletions are recorded in the audit log.
+- **Presence:** authenticated pages send periodic heartbeats. Online status uses the last heartbeat within `PRESENCE_TIMEOUT_SECONDS` (default 120, configurable from 30 to 900). Active-learning time is credited only during valid heartbeat intervals while a learner is on a visible, focused learning page and has interacted recently. It is a usage estimate, not proof of attention.
 - **Account data:** learners can download a complete export and permanently delete their account (password and typed confirmation required).
 - **Headers:** `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy, and a permissions policy.
 - **Markdown and user text** are rendered safely, without raw HTML.
@@ -158,6 +161,8 @@ See `.env.example`.
 | `BACKUP_RETENTION` | `7` | Automatic snapshots kept per learner (1–100). |
 | `APP_URL` | — | Public base URL for emailed links. Falls back to Render's `RENDER_EXTERNAL_URL`. In production, links are never built from request headers. |
 | `ADMIN_EMAILS` | — | Comma-separated emails that receive the administrator role when they register. |
+| `SUPERUSER_EMAIL`, `SUPERUSER_PASSWORD` | — | Optional startup bootstrap for a superuser. Set both as secrets. Existing account passwords are never replaced. |
+| `PRESENCE_TIMEOUT_SECONDS` | `120` | Online / active heartbeat timeout (30–900 seconds). |
 | `SESSION_TTL_DAYS` | `14` | Session idle lifetime (1–90 days). |
 | `COOKIE_SECURE` | production: `true` | Set `false` only for plain-HTTP testing of a production build. |
 | `EMAIL_PROVIDER` | dev: `console`, prod: `none` | `resend`, `console`, or `none`. |

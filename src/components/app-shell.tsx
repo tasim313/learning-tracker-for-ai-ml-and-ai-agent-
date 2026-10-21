@@ -6,7 +6,7 @@ import { LanguageToggle } from "@/components/language-toggle";
 import { translate, type Language } from "@/lib/i18n";
 import { LanguageProvider } from "@/components/language-provider";
 
-export type ShellUser = { email: string; displayName: string; role: "learner" | "admin"; emailVerified: boolean; preferredLanguage: Language };
+export type ShellUser = { email: string; displayName: string; role: "learner" | "admin" | "superuser"; emailVerified: boolean; preferredLanguage: Language };
 
 const learnerGroups: NavGroup[] = [
   { label: "Learn", links: [
@@ -64,6 +64,7 @@ const learnerGroups: NavGroup[] = [
 ];
 
 const adminGroup: NavGroup = { label: "Administration", links: [
+  { href: "/admin", label: "Overview" },
   { href: "/admin/content", label: "Content and publishing" },
   { href: "/admin/content/diagrams", label: "Diagram library" },
   { href: "/admin/users", label: "Accounts" },
@@ -73,8 +74,11 @@ const adminGroup: NavGroup = { label: "Administration", links: [
 export function AppShell({ children, user }: { children: React.ReactNode; user: ShellUser }) {
   const language = user.preferredLanguage;
   const t = (text: string) => translate(language, text);
-  const sourceGroups = user.role === "admin" ? [...learnerGroups, adminGroup] : learnerGroups;
-  const groups = sourceGroups.map((group) => ({ label: t(group.label), links: group.links.map((link) => ({ ...link, label: t(link.label) })) }));
+  const hasAdminAccess = user.role === "admin" || user.role === "superuser";
+  const sourceGroups = hasAdminAccess
+    ? [adminGroup, { label: "Learning workspace", links: learnerGroups.flatMap((group) => group.links), collapsible: true }]
+    : learnerGroups;
+  const groups = sourceGroups.map((group) => ({ label: t(group.label), collapsible: group.collapsible, links: group.links.map((link) => ({ ...link, label: t(link.label) })) }));
   const brand = (
     <Link href="/dashboard" className="flex h-16 items-center gap-3 border-b border-slate-100 px-5">
       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700"><Sparkles size={19} aria-hidden="true" /></span>
@@ -102,7 +106,7 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
           <p className="truncate text-sm font-medium text-slate-600">{user.displayName ? (language === "bn" ? `${user.displayName}${t("’s learning workspace")}` : `${user.displayName}’s learning workspace`) : t("Your learning workspace")}</p>
           <div className="flex items-center gap-3">
             <LanguageToggle language={language} />
-            {user.role === "admin" && <span className="hidden items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800 sm:inline-flex"><ShieldCheck size={13} aria-hidden="true" />{t("Administrator")}</span>}
+            {hasAdminAccess && <span className="hidden items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800 sm:inline-flex"><ShieldCheck size={13} aria-hidden="true" />{user.role === "superuser" ? "Superuser" : t("Administrator")}</span>}
             <Link href="/account" className="hidden items-center gap-1 text-xs text-slate-600 focus-visible:underline sm:inline-flex"><UserRound size={14} aria-hidden="true" />{user.email}</Link>
             <SignOutButton language={language} />
           </div>
