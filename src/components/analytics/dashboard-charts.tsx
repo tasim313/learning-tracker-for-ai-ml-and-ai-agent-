@@ -71,6 +71,11 @@ export function DashboardCharts({ series }: { series: Series }) {
           table={{ headers: ["Week starting", "Focused hours", "Study days"], rows: series.weekly.map((week) => [week.week, week.focusedHours, week.studyDays]) }}>
           <ResponsiveContainer><BarChart data={series.weekly}><CartesianGrid stroke="#f1f5f9" vertical={false} /><XAxis dataKey="week" tick={axis} tickFormatter={(value: string) => value.slice(5)} /><YAxis tick={axis} width={32} /><Tooltip /><Legend wrapperStyle={{ fontSize: 11 }} /><Bar dataKey="focusedHours" name="Focused hours" fill={colors.blue} /><Bar dataKey="studyDays" name="Study days" fill={colors.teal} /></BarChart></ResponsiveContainer>
         </ChartCard>
+        <ChartCard title="Focused time by activity" description="Completed timer-session focus time, classified when each session starts. Pauses and breaks are excluded."
+          empty={series.activityBreakdown.some((item) => item.focusedMinutes > 0) ? null : "No completed timer sessions yet."}
+          table={{ headers: ["Activity", "Focused minutes"], rows: series.activityBreakdown.map((item) => [item.label, item.focusedMinutes]) }}>
+          <ResponsiveContainer><BarChart data={series.activityBreakdown}><CartesianGrid stroke="#f1f5f9" vertical={false} /><XAxis dataKey="label" tick={axis} /><YAxis tick={axis} width={32} /><Tooltip /><Bar dataKey="focusedMinutes" name="Focused minutes" fill={colors.violet} /></BarChart></ResponsiveContainer>
+        </ChartCard>
         <ChartCard title="Examination scores over time" description="Every graded attempt in submission order. Retention examinations are shown separately below."
           empty={series.scores.length ? null : "No graded examinations yet."}
           table={{ headers: ["Date", "Type", "Score %"], rows: series.scores.map((item) => [item.date, item.examType, item.score]) }}>

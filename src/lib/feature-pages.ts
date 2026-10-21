@@ -1,4 +1,4 @@
-export type FieldType = "text" | "textarea" | "number" | "date" | "url" | "select" | "checkbox" | "topic" | "phase" | "topics";
+export type FieldType = "text" | "textarea" | "number" | "date" | "url" | "select" | "checkbox" | "topic" | "phase" | "topics" | "subtopic";
 export type FieldDefinition = {
   name: string;
   label: string;
@@ -22,6 +22,7 @@ const fields = {
   number: (name: string, label: string, required = true): FieldDefinition => ({ name, label, type: "number", required }),
   select: (name: string, label: string, options: string[], required = true): FieldDefinition => ({ name, label, type: "select", options, required }),
   topic: (name = "topicId", label = "Topic", required = true): FieldDefinition => ({ name, label, type: "topic", required }),
+  subtopic: (name = "subtopicId", label = "Subtopic", required = true): FieldDefinition => ({ name, label, type: "subtopic", required }),
   topics: (name = "topicIds", label = "Related topics"): FieldDefinition => ({ name, label, type: "topics" })
 };
 
@@ -46,11 +47,23 @@ export const featurePages: Record<string, FeaturePageDefinition> = {
       fields.select("confidence", "Self-rated confidence (1–5)", ["1", "2", "3", "4", "5"], false)
     ]
   },
+  subtopics: {
+    title: "Subtopics",
+    description: "Break each topic into smaller concepts and practice areas. These are curriculum records, separate from your personal competency results.",
+    collection: "subtopics",
+    fields: [fields.topic(), fields.text("title", "Subtopic title"), fields.textarea("description", "Description"), fields.textarea("objectives", "Learning objectives (one per line)", false), fields.number("order", "Position within topic", false), fields.number("estimatedMinutes", "Estimated minutes", false)]
+  },
+  "learning-tasks": {
+    title: "Learning tasks",
+    description: "Track concrete learning, practice, and practical exercise steps under each subtopic. Completion is learning progress, not proof of competency.",
+    collection: "learningTasks",
+    fields: [fields.subtopic(), fields.text("title", "Task title"), fields.textarea("description", "Instructions"), fields.select("taskType", "Task type", ["learn", "practice", "practical"]), fields.number("estimatedMinutes", "Estimated minutes", false), fields.select("status", "Status", ["not-started", "in-progress", "completed"]), fields.textarea("completionCriteria", "Measurable completion criteria"), fields.textarea("evidence", "Evidence or notes", false)]
+  },
   sessions: {
     title: "Session history",
     description: "Review completed and interrupted sessions, focused time, breaks, and your notes. Historical duration corrections are marked.",
     collection: "learningSessions",
-    fields: [fields.textarea("notes", "Session notes", false), fields.textarea("accomplishments", "Accomplishments", false), fields.textarea("problems", "Problems encountered", false), fields.textarea("distractions", "Distractions", false), fields.number("focusedSeconds", "Manually corrected focused seconds", false), fields.textarea("manualAdjustmentNote", "Required reason for a time correction", false), fields.select("rating", "Session rating", ["1", "2", "3", "4", "5"], false)]
+    fields: [fields.select("activityType", "Activity", ["learning", "review", "debugging", "practical"]), fields.textarea("notes", "Session notes", false), fields.textarea("accomplishments", "Accomplishments", false), fields.textarea("problems", "Problems encountered", false), fields.textarea("distractions", "Distractions", false), fields.number("focusedSeconds", "Manually corrected focused seconds", false), fields.textarea("manualAdjustmentNote", "Required reason for a time correction", false), fields.select("rating", "Session rating", ["1", "2", "3", "4", "5"], false)]
   },
   timer: {
     title: "Learning timer",

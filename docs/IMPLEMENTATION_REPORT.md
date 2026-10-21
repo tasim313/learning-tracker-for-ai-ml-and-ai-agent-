@@ -13,8 +13,8 @@ At that baseline, 4 of 19 tests failed (stale assertions on schema version and r
 | Stage | Status | Main changes |
 | --- | --- | --- |
 | 1. Foundation and security | Done | Argon2id accounts; hashed server-side sessions (HttpOnly, SameSite=Lax, `__Host-` + Secure in production); rate limiting with persistent lockout; password reset and email verification; roles; audit log; account export and deletion; per-user JSON documents with ownership checks; cross-process file locks; landing, auth, account, and admin pages; Render single-instance configuration. |
-| 2. Learning management and course content | Done | Versioned course → module → lesson content with 12 typed section kinds; admin authoring, preview, publishing, and history; catalogue, details and enrolment, lesson viewer with 8 learning modes, tutorial player, video player with timestamped notes; roadmap reordering and priorities; topic pages; resource licence and availability fields; Markdown knowledge base. |
-| 3. Time tracking | Already present; verified | Timer survives refresh and restart (browser test); interruption recovery; manual corrections are flagged. |
+| 2. Learning management and course content | Done | Versioned course → module → lesson content with 12 typed section kinds; admin authoring, preview, publishing, and history; catalogue, details and enrolment, lesson viewer with 8 learning modes, tutorial player, video player with timestamped notes; 12-month suggested roadmap grouped by subject, with 48 topics, 96 editable subtopics, and 144 persisted learning, recall, and practical tasks; schema v8 migrations, task progress, roadmap reordering, topic pages, licensed resource fields, and Markdown knowledge base. |
+| 3. Time tracking | Extended | Timer survives refresh and restart; interruption recovery; manual corrections are flagged; sessions classify focused time as learning, review, debugging, or practical work. |
 | 4. Examination engine | Extended | 18 question types; sample bank of 27 questions and 8 blueprints; rules review with acknowledgement; ordered draft saving; question navigator; confidence ratings; detailed results; configurable revision intervals. |
 | 5. Learning intelligence | Done | Categorised gap analysis; explainable recommendations with pin, snooze, and dismiss; readiness-to-advance panels. |
 | 6. Visual, mathematical, and game-based learning | Done | Diagram studio (`@xyflow/react`); maths lab with 7 explorers and 13 problem generators; 10 games; spaced-repetition flashcards. |
@@ -77,16 +77,16 @@ An end-to-end test signs in and loads every learner page and every admin page ag
 
 ## Verification
 
-Commands run on macOS with Node 26 (Render uses Node 22):
+Latest verification run in the workspace on Ubuntu with Node 22.23.2:
 
 | Check | Result |
 | --- | --- |
 | `npm run typecheck` | Passed with no errors |
 | `npm run lint` | Passed with no errors or warnings |
-| `npm test` | **98 / 98 passed** (13 files) |
+| `NODE_ENV=test node --import tsx --test tests/*.test.ts` | **101 / 101 passed** (12 files) |
 | `npm run build` | Succeeded |
-| `npm run test:e2e` | **11 / 11 passed**: 5 HTTP tests against `next start`, 6 browser tests in Google Chrome via `playwright-core` |
-| `npm audit --omit=dev` | 0 vulnerabilities |
+| `npm run test:e2e` | **5 passed, 6 skipped**: all HTTP tests against `next start` passed, including all learner/admin pages; browser tests skipped because Google Chrome is not installed |
+| `npm ci` audit | 0 vulnerabilities |
 
 Bugs found and fixed through testing and review:
 

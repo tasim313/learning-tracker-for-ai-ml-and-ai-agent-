@@ -2,6 +2,7 @@ import { z } from "zod";
 import { applicationDataSchema, schemaVersion, type ApplicationData } from "@/lib/model";
 import { createSeedData } from "@/lib/seed";
 import { appendMissingSamples } from "@/lib/seed-questions";
+import { addInitialCurriculum } from "@/lib/curriculum";
 
 const objectSchema = z.record(z.string(), z.unknown());
 
@@ -33,13 +34,17 @@ function appendCatalogResources(existing: unknown, catalog: ApplicationData["res
 }
 
 /**
- * Migrate any supported schema version to the current one. Migrated data also gains
- * sample questions and blueprints it does not have yet; saved records are never changed.
+ * Migrate any supported schema version to the current one. Migrations may add
+ * curriculum seed content, but never change a learner's recorded progress or evidence.
  */
 export function migrateApplicationData(input: unknown): { data: ApplicationData; migrated: boolean } {
   const result = migrateToCurrent(input);
   if (!result.migrated) return result;
-  const parsed = applicationDataSchema.safeParse({ ...result.data, ...appendMissingSamples(result.data) });
+  const parsed = applicationDataSchema.safeParse({
+    ...result.data,
+    ...appendMissingSamples(result.data),
+    ...addInitialCurriculum(result.data)
+  });
   if (!parsed.success) throw new Error(`Migration failed validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
   return { data: parsed.data, migrated: true };
 }
@@ -53,9 +58,21 @@ function migrateToCurrent(input: unknown): { data: ApplicationData; migrated: bo
     return { data: parsed.data, migrated: false };
   }
   if (root.data.schemaVersion === 5) {
-    // v6 adds learner-owned course, practice, and personalization collections; existing records are unchanged.
+    // v6 added course, practice, and personalization collections; the v7 schema defaults missing curriculum arrays.
     const parsed = applicationDataSchema.safeParse({ ...root.data, schemaVersion });
     if (!parsed.success) throw new Error(`Version 5 migration failed validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
+    return { data: parsed.data, migrated: true };
+  }
+  if (root.data.schemaVersion === 6) {
+    // v7 adds editable subtopics and learning tasks; v8 adds session activity categories.
+    const parsed = applicationDataSchema.safeParse({ ...root.data, schemaVersion });
+    if (!parsed.success) throw new Error(`Version 6 migration failed validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
+    return { data: parsed.data, migrated: true };
+  }
+  if (root.data.schemaVersion === 7) {
+    // v8 classifies focused time by learning, review, debugging, or practical work.
+    const parsed = applicationDataSchema.safeParse({ ...root.data, schemaVersion });
+    if (!parsed.success) throw new Error(`Version 7 migration failed validation: ${parsed.error.issues.map((issue) => issue.message).join("; ")}`);
     return { data: parsed.data, migrated: true };
   }
   if (root.data.schemaVersion === 3) {

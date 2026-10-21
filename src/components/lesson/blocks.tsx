@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, ExternalLink, Info, Lightbulb, XCircle } from "lucide-react";
 import { Markdown } from "@/components/markdown";
+import { useLanguage } from "@/components/language-provider";
+import { translate } from "@/lib/i18n";
 import { DiagramViewer } from "@/components/diagram-viewer";
 import { formatSeconds, learningAction, parseTimestamp } from "@/components/lesson/api";
 import type { LessonBlock } from "@/lib/content/schema";
@@ -30,11 +32,12 @@ const primary = "inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-blue-700
 const input = "mt-1 block min-h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm";
 
 function Card({ label, children, done }: { label: string; children: ReactNode; done?: boolean }) {
+  const language = useLanguage();
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5" aria-label={label}>
+    <section className="rounded-xl border border-slate-200 bg-white p-5" aria-label={translate(language, label)}>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-        {done && <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700"><CheckCircle2 size={14} aria-hidden="true" />Done</span>}
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{translate(language, label)}</p>
+        {done && <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700"><CheckCircle2 size={14} aria-hidden="true" />{translate(language, "Done")}</span>}
       </div>
       {children}
     </section>

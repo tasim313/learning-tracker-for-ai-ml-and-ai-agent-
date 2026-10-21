@@ -18,6 +18,7 @@ type DataRecord = Record<string, unknown> & { id: string };
 export function FeatureManager({ section, definition }: { section: string; definition: FeaturePageDefinition }) {
   const [items, setItems] = useState<DataRecord[]>([]);
   const [topics, setTopics] = useState<DataRecord[]>([]);
+  const [subtopics, setSubtopics] = useState<DataRecord[]>([]);
   const [phases, setPhases] = useState<DataRecord[]>([]);
   const [editing, setEditing] = useState<DataRecord | null>(null);
   const [query, setQuery] = useState("");
@@ -41,12 +42,14 @@ export function FeatureManager({ section, definition }: { section: string; defin
         const result = await response.json() as DataRecord[];
         setItems(result);
       }
-      const [topicResponse, phaseResponse] = await Promise.all([
+      const [topicResponse, phaseResponse, subtopicResponse] = await Promise.all([
         fetch("/api/collections/topics", { cache: "no-store" }),
-        fetch("/api/collections/roadmapPhases", { cache: "no-store" })
+        fetch("/api/collections/roadmapPhases", { cache: "no-store" }),
+        fetch("/api/collections/subtopics", { cache: "no-store" })
       ]);
       if (topicResponse.ok) setTopics(await topicResponse.json() as DataRecord[]);
       if (phaseResponse.ok) setPhases(await phaseResponse.json() as DataRecord[]);
+      if (subtopicResponse.ok) setSubtopics(await subtopicResponse.json() as DataRecord[]);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to load saved records.");
     } finally {
@@ -115,7 +118,7 @@ export function FeatureManager({ section, definition }: { section: string; defin
           <h2 className="text-base font-semibold text-slate-900">{editing ? "Edit record" : "Add a record"}</h2>
           <form action={submit} className="mt-4 grid gap-4">
             {definition.fields.map((field) => (
-              <FieldInput key={field.name} field={field} value={editing?.[field.name]} topics={topics} phases={phases} />
+              <FieldInput key={field.name} field={field} value={editing?.[field.name]} topics={topics} phases={phases} subtopics={subtopics} />
             ))}
             <div className="flex flex-wrap gap-2 pt-1">
               <button type="submit" disabled={saving} className="min-h-10 rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
@@ -218,7 +221,7 @@ function ResourceLibrary({ items, topics, phases }: { items: DataRecord[]; topic
   </section>;
 }
 
-function FieldInput({ field, value, topics, phases }: { field: FieldDefinition; value: unknown; topics: DataRecord[]; phases: DataRecord[] }) {
+function FieldInput({ field, value, topics, phases, subtopics }: { field: FieldDefinition; value: unknown; topics: DataRecord[]; phases: DataRecord[]; subtopics: DataRecord[] }) {
   const base = "mt-1 block min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-700 focus:outline-2 focus:outline-blue-700";
   if (field.type === "checkbox") {
     return <label className="flex items-center gap-2 text-sm text-slate-700"><input name={field.name} type="checkbox" defaultChecked={value === true} className="h-4 w-4 accent-blue-700" />{field.label}</label>;
@@ -236,6 +239,10 @@ function FieldInput({ field, value, topics, phases }: { field: FieldDefinition; 
   }
   if (field.type === "topic") {
     return <label className="block text-xs font-medium text-slate-700">{field.label}<select name={field.name} required={field.required} defaultValue={typeof value === "string" ? value : ""} className={base}><option value="">Select a topic</option>{topics.map((topic) => <option key={String(topic.id)} value={String(topic.id)}>{String(topic.title)}</option>)}</select></label>;
+  }
+  if (field.type === "subtopic") {
+    const topicNames = new Map(topics.map((topic) => [String(topic.id), String(topic.title)]));
+    return <label className="block text-xs font-medium text-slate-700">{field.label}<select name={field.name} required={field.required} defaultValue={typeof value === "string" ? value : ""} className={base}><option value="">Select a subtopic</option>{subtopics.map((subtopic) => <option key={String(subtopic.id)} value={String(subtopic.id)}>{topicNames.get(String(subtopic.topicId)) ?? "Topic"} — {String(subtopic.title)}</option>)}</select></label>;
   }
   if (field.type === "topics") {
     const selected = field.name === "prerequisites" ? (Array.isArray(value) ? value.map(String).join(", ") : "") : (Array.isArray(value) ? value.map(String).join(", ") : "");
@@ -608,6 +615,7 @@ function CompetencySummary({ topics }: { topics: DataRecord[] }) {
 function TimerPanel({ topics }: { topics: DataRecord[] }) {
   const [sessions, setSessions] = useState<LearningSession[]>([]);
   const [topicId, setTopicId] = useState("");
+  const [activityType, setActivityType] = useState<"learning" | "review" | "debugging" | "practical">("learning");
   const [plannedMinutes, setPlannedMinutes] = useState(60);
   const [now, setNow] = useState(new Date().toISOString());
   const [timezone, setTimezone] = useState("UTC");
@@ -681,10 +689,11 @@ function TimerPanel({ topics }: { topics: DataRecord[] }) {
         {active && time && <div className="text-right"><p className="font-mono text-3xl font-semibold tabular-nums text-slate-900">{displayTime(time.focusedSeconds)}</p><p className="text-xs text-slate-500">focused · break {displayTime(time.breakSeconds)}</p></div>}
       </div>
       {!active ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-[1fr_180px_auto] sm:items-end">
+        <div className="mt-5 grid gap-4 sm:grid-cols-[1fr_180px_180px_auto] sm:items-end">
           <label className="text-xs font-medium text-slate-700">Learning topic<select value={topicId} onChange={(event) => setTopicId(event.target.value)} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm"><option value="">Choose a topic</option>{topics.map((item) => <option key={String(item.id)} value={String(item.id)}>{String(item.title)}</option>)}</select></label>
           <label className="text-xs font-medium text-slate-700">Planned minutes<input type="number" min="0" max="1440" value={plannedMinutes} onChange={(event) => setPlannedMinutes(Number(event.target.value))} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm" /></label>
-          <button type="button" disabled={busy || !topicId} onClick={() => void action({ action: "start", topicId, plannedSeconds: plannedMinutes * 60 })} className="min-h-10 rounded bg-blue-700 px-4 text-sm font-semibold text-white disabled:opacity-50">Start learning</button>
+          <label className="text-xs font-medium text-slate-700">Activity<select value={activityType} onChange={(event) => setActivityType(event.target.value as typeof activityType)} className="mt-1 block min-h-10 w-full rounded border border-slate-300 px-3 text-sm"><option value="learning">Learning</option><option value="review">Review</option><option value="debugging">Debugging</option><option value="practical">Practical exercise</option></select></label>
+          <button type="button" disabled={busy || !topicId} onClick={() => void action({ action: "start", topicId, plannedSeconds: plannedMinutes * 60, activityType })} className="min-h-10 rounded bg-blue-700 px-4 text-sm font-semibold text-white disabled:opacity-50">Start session</button>
         </div>
       ) : (
         <>

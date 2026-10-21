@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { ApplicationData, LearningSession } from "@/lib/model";
+import { learningActivityTypes, type ApplicationData, type LearningSession } from "@/lib/model";
 import { elapsedSessionSeconds, secondsBetween } from "@/lib/calculations/time";
 
 export type TimerAction = "pause" | "resume" | "break" | "resume-break" | "finish" | "cancel" | "recover";
@@ -8,18 +8,21 @@ export function createSession(
   data: ApplicationData,
   topicId: string,
   plannedSeconds: number,
-  now = new Date().toISOString()
+  now = new Date().toISOString(),
+  activityType: string = "learning"
 ): LearningSession {
   if (!data.topics.some((topic) => topic.id === topicId)) throw new Error("Select a valid learning topic.");
   if (!Number.isInteger(plannedSeconds) || plannedSeconds < 0 || plannedSeconds > 86400) {
     throw new Error("Planned duration must be between 0 and 24 hours.");
   }
+  if (!learningActivityTypes.includes(activityType as (typeof learningActivityTypes)[number])) throw new Error("Choose a valid learning activity type.");
   if (data.learningSessions.some((session) => ["running", "paused", "break"].includes(session.state))) {
     throw new Error("Finish or cancel the active session before starting another.");
   }
   return {
     id: randomUUID(),
     topicId,
+    activityType: activityType as (typeof learningActivityTypes)[number],
     plannedStartAt: null,
     startedAt: now,
     endedAt: null,

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { CourseLibrary } from "@/components/course-library";
 import { FeatureManager } from "@/components/feature-manager";
 import { getFeaturePage } from "@/lib/feature-pages";
+import { translate, type Language } from "@/lib/i18n";
+import { requireUser } from "@/lib/auth/server";
 
 export const dynamic = "force-dynamic";
 
@@ -9,12 +11,14 @@ export default async function FeaturePage({ params }: { params: Promise<{ sectio
   const { section } = await params;
   const definition = getFeaturePage(section);
   if (!definition) notFound();
+  const { user } = await requireUser();
+  const language = (user.profile.preferredLanguage ?? "en") as Language;
   return (
     <div className="space-y-7">
       <div>
-        <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-700">LEARNING WORKSPACE</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{definition.title}</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{definition.description}</p>
+        <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-700">{translate(language, "LEARNING WORKSPACE")}</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{translate(language, definition.title)}</h1>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{translate(language, definition.description)}</p>
       </div>
       {section === "course-materials" ? <CourseLibrary /> : <FeatureManager section={section} definition={definition} />}
     </div>

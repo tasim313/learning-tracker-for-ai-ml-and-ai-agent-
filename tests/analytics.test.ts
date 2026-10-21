@@ -10,6 +10,7 @@ import { startExamination, submitExamination } from "../src/lib/services/examina
 import { appendMissingSamples, sampleBlueprints, sampleQuestionBank } from "../src/lib/seed-questions";
 import { migrateApplicationData } from "../src/lib/storage/migrations";
 import { assertPublicUrl, checkAvailability, isPublicAddress } from "../src/lib/net/url-guard";
+import { createSession, transitionSession } from "../src/lib/services/timer";
 
 function graded(data: ApplicationData, blueprintId: string, answers: (attempt: ExaminationAttempt) => Record<string, string>, startedAt: string, submittedAt: string) {
   const attempt = startExamination(data, blueprintId, startedAt, () => 0.4);
@@ -90,7 +91,7 @@ test("gap analysis categorizes possible gaps from evidence and labels them as po
 test("consistency excludes rest days and non-study days, and the flexible streak skips them", () => {
   const data = createSeedData();
   data.settings = { ...data.settings, timezone: "UTC", studyDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] };
-  const session = (day: string) => ({ id: `s-${day}`, topicId: "topic-1", plannedStartAt: null, startedAt: `${day}T09:00:00.000Z`, endedAt: `${day}T10:00:00.000Z`, stateChangedAt: null, state: "completed" as const, focusedSeconds: 3600, pausedSeconds: 0, breakSeconds: 0, plannedSeconds: 3600, notes: "", accomplishments: "", problems: "", distractions: "", manualAdjustmentNote: "", rating: null, manuallyAdjusted: false });
+  const session = (day: string) => ({ id: `s-${day}`, topicId: "topic-1", activityType: "learning" as const, plannedStartAt: null, startedAt: `${day}T09:00:00.000Z`, endedAt: `${day}T10:00:00.000Z`, stateChangedAt: null, state: "completed" as const, focusedSeconds: 3600, pausedSeconds: 0, breakSeconds: 0, plannedSeconds: 3600, notes: "", accomplishments: "", problems: "", distractions: "", manualAdjustmentNote: "", rating: null, manuallyAdjusted: false });
   // 2026-10-19 is a Monday. Study Fri 16th and Mon 19th; Thu 15th is a planned rest day; Wed 14th was studied.
   data.learningSessions = ["2026-10-14", "2026-10-16", "2026-10-19"].map(session);
   data.studyPlans = [{ id: "rest", title: "Rest", date: "2026-10-15", topicIds: [], plannedMinutes: 1, completed: false, restDay: true }];
@@ -122,6 +123,13 @@ test("dashboard series are empty for a new learner and reflect recorded data", (
   assert.ok(empty.daily.every((day) => day.focusedMinutes === 0));
   assert.deepEqual(empty.scores, []);
   assert.ok(empty.proficiency.every((row) => row.averageLevel === 0), "no invented proficiency");
+  const startedAt = "2026-10-19T10:00:00.000Z";
+  const review = transitionSession(createSession(data, "topic-1", 600, startedAt, "review"), "finish", "2026-10-19T10:02:00.000Z");
+  const practical = transitionSession(createSession(data, "topic-2", 600, startedAt, "practical"), "finish", "2026-10-19T10:03:00.000Z");
+  data.learningSessions = [review, practical];
+  const classified = dashboardSeries(data, new Date("2026-10-19T12:00:00.000Z"));
+  assert.equal(classified.activityBreakdown.find((item) => item.activityType === "review")?.focusedMinutes, 2);
+  assert.equal(classified.activityBreakdown.find((item) => item.activityType === "practical")?.focusedMinutes, 3);
 });
 
 test("revision scheduling uses configured intervals and advances only on passes", () => {

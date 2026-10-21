@@ -18,10 +18,16 @@ export const blockRoles = [
   "knowledge-check", "practical", "reflection", "further-reading"
 ] as const;
 
-const translation = z.object({ title: z.string().max(200).default(""), summary: z.string().max(4000).default("") });
+const translation = z.object({
+  title: z.string().max(200).default(""),
+  summary: z.string().max(4000).default(""),
+  /** Additional authored translations, addressed by JSON paths relative to this item (for example `body`, `prompt`, or `questions.0.explanation`). */
+  fields: z.record(z.string().max(200), z.string().max(50_000)).default({})
+});
 const translations = z.object({ bn: translation.optional() }).default({});
+const optionalTranslations = z.object({ bn: translation.optional() }).optional();
 
-const blockBase = { id: slug, role: z.enum(blockRoles).optional() };
+const blockBase = { id: slug, role: z.enum(blockRoles).optional(), translations: optionalTranslations };
 
 export const quizQuestionSchema = z.object({
   id: slug,
@@ -32,7 +38,8 @@ export const quizQuestionSchema = z.object({
   answer: z.array(z.string().min(1).max(500)).min(1),
   tolerance: z.number().nonnegative().default(0),
   hint: z.string().max(2000).default(""),
-  explanation: z.string().max(4000).default("")
+  explanation: z.string().max(4000).default(""),
+  translations: optionalTranslations
 }).superRefine((question, context) => {
   if (["single", "multiple"].includes(question.kind)) {
     if (question.options.length < 2) context.addIssue({ code: "custom", path: ["options"], message: "Choice questions need at least two options." });
@@ -149,6 +156,7 @@ export const moduleSchema = z.object({
   id: slug,
   title: z.string().min(1).max(200),
   description: z.string().max(4000).default(""),
+  translations: optionalTranslations,
   lessons: z.array(lessonSchema).max(100)
 });
 export type CourseModule = z.infer<typeof moduleSchema>;

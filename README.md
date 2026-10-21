@@ -12,7 +12,7 @@ The application never fabricates learner activity, scores, competencies, or achi
 - *Learning modes:* read and study, watch and take notes, visualize, practise step by step, challenge, exam mode, review mistakes, and build a project. Switching modes keeps your progress and the last mode is remembered. An *interactive tutorial player* steps through a lesson one section at a time and resumes where you stopped.
 - *Video lessons:* YouTube embeds use the privacy-enhanced domain with no autoplay, and only where embedding is marked as permitted; otherwise a link is shown. You can jump to chapters, take notes at timestamps, and record your own watch progress. The platform does not read the video provider's history and does not extract transcripts.
 - *Seed course:* "AI Engineering Foundations (introductory)" has 8 platform-authored lessons, from vectors to tool-calling agents. It is clearly labelled as introductory seed material, not a comprehensive curriculum. External links are attributed and have not been availability-checked by the platform.
-- *Roadmap:* 12 editable phases and 48 topics. Phases and topics can be reordered and reprioritized. Each topic has its own page with learning status, competency, a **Readiness to Advance** panel, estimated vs. revised vs. actual time, assessment history, linked lessons, resources, notes, and revisions.
+- *Roadmap:* 12 editable phases and 48 topics, grouped by subject and placed on a suggested one-phase-per-month schedule. Each topic has persistent subtopics and learning, recall, and practical tasks. Task progress is separate from topic completion and demonstrated competency. Phases and topics can be reordered and topics reprioritized. Each topic has its own page with learning status, competency, a **Readiness to Advance** panel, estimated vs. revised vs. actual time, assessment history, linked lessons, resources, notes, and revisions.
 - *Resource library:* Records publisher, licence, attribution, and language. A **link check** performs a real, SSRF-protected HTTP request and stores the result with a timestamp; links are marked "not checked" until one runs. The library also has a searchable Markdown **knowledge base**.
 
 **Practise**
@@ -20,7 +20,7 @@ The application never fabricates learner activity, scores, competencies, or achi
 - *Diagram Learning Studio:* diagrams are stored as structured nodes and edges (`@xyflow/react`). You can reveal them step by step, inspect nodes, read a text alternative, export JSON, answer questions generated from the diagram's structure, and copy or draw your own diagrams as exercises.
 - *Game and Challenge Centre:* concept matching, workflow reconstruction, code-output puzzles, bug hunts, AI-sales safety decisions, and an optionally timed maths sprint. Answers are graded on the server and you can revisit your mistakes. Game scores are kept separate from examinations, and rewards are granted once per game.
 - *Flashcards:* spaced repetition with configurable intervals (default 1/3/7/14/30 days). Cards can be generated from lesson glossaries.
-- *Timer and planning:* a timer, session history, daily and weekly planners, revision planner, and self-assessment, as described below.
+- *Timer and planning:* a timestamp-based timer with learning, review, debugging, and practical activity categories; session history, daily and weekly planners, revision planner, and self-assessment.
 
 **Assess**
 - *Examination engine:* 8 examination types and 18 question types. The seed includes a sample bank of 27 questions and 8 blueprints, all labelled as unverified samples. Before starting, you review the rules (objectives, time limit, threshold, allowed materials, practical requirements, retake policy) and must acknowledge them. The active examination has a timer computed from saved timestamps, debounced and strictly ordered draft saving, a question navigator, unanswered-question warnings, and confidence ratings kept separate from grading.
@@ -204,7 +204,7 @@ npm test               # unit and integration (route handlers called directly)
 npm run build && npm run test:e2e   # production server, real cookies, restart persistence
 ```
 
-Current results: **98 unit and integration tests** and **11 end-to-end tests** (5 HTTP-level tests against `next start`, plus 6 browser tests driving the locally installed Google Chrome through `playwright-core`; the browser tests are skipped automatically if Chrome is not installed). See `docs/IMPLEMENTATION_REPORT.md` for the latest recorded run.
+Current results: **101 unit and integration tests** and **11 end-to-end checks** (5 HTTP-level tests against `next start`; 6 browser tests are skipped automatically if Google Chrome is not installed). See `docs/IMPLEMENTATION_REPORT.md` for the latest recorded run.
 
 These suites cover: registration and login validation; Argon2id storage; session expiry, logout, and revocation; rate limiting and lockout; the password-reset and verification flows; anonymous, forged-cookie, and cross-site rejection; cross-user read, update, delete, timer, examination, export, and restore attempts; role enforcement and auditing; concurrent writes from several users, from one user, and from a second process; corruption handling; path traversal; snapshot retention; restore validation; legacy import; and persistence across a server restart.
 

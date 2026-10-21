@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { Markdown } from "@/components/markdown";
 import { Plot } from "@/components/math/plot";
+import { useLanguage } from "@/components/language-provider";
+import { translate } from "@/lib/i18n";
 import {
   angleDegrees, bayesPosterior, classificationMetrics, cosineSimilarity, dot, gradientDescent, mean, median, norm,
   normalCdfApprox, normalPdf, roundTo, sigmoid, standardDeviation, variance
@@ -12,19 +14,21 @@ const input = "mt-1 block min-h-9 w-full rounded-lg border border-slate-300 bg-w
 const fmt = (value: number | null, places = 4) => value === null || !Number.isFinite(value) ? "undefined" : String(roundTo(value, places));
 
 function Slider({ label, value, min, max, step, onChange }: { label: string; value: number; min: number; max: number; step: number; onChange: (value: number) => void }) {
+  const language = useLanguage();
   return (
     <label className="block text-xs font-medium text-slate-700">
-      <span className="flex justify-between"><span>{label}</span><span className="font-mono">{value}</span></span>
+      <span className="flex justify-between"><span>{translate(language, label)}</span><span className="font-mono">{value}</span></span>
       <input type="range" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} className="mt-1 w-full accent-blue-700" />
     </label>
   );
 }
 
 function Panel({ title, intuition, children }: { title: string; intuition: string; children: ReactNode }) {
+  const language = useLanguage();
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-600">{intuition}</p>
+      <h2 className="text-lg font-semibold text-slate-900">{translate(language, title)}</h2>
+      <p className="mt-1 text-sm text-slate-600">{translate(language, intuition)}</p>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -210,6 +214,8 @@ type ActiveProblem = { problemId: string; variant: number; title: string; level:
 type CheckResult = { correct: boolean; expected: number; exact: string | null; steps: string[]; commonMistakes: string[]; note: string | null };
 
 function Practice() {
+  const language = useLanguage();
+  const t = (text: string) => translate(language, text);
   const [catalogue, setCatalogue] = useState<ProblemSummary[]>([]);
   const [attempts, setAttempts] = useState<{ itemId: string; correct: boolean; kind: string }[]>([]);
   const [level, setLevel] = useState("beginner");
@@ -250,41 +256,49 @@ function Practice() {
     const mine = attempts.filter((item) => item.kind === "math" && item.itemId === id);
     return mine.length ? `${mine.filter((item) => item.correct).length}/${mine.length} correct` : "not attempted";
   };
+  const localizedPrompt = (active: ActiveProblem) => {
+    if (language === "en") return active.prompt;
+    if (active.problemId === "dot-product") return active.prompt.replace(/^Compute /, "হিসাব করুন ").replace(" for ", " নির্ণয় করুন ").replace(" and ", " এবং ").replace(/\.$/, "।");
+    if (active.problemId === "vector-norm") return active.prompt.replace(/^Compute /, "হিসাব করুন ").replace(/ to 2 decimal places\.$/, " দুই দশমিক ঘর পর্যন্ত।");
+    if (active.problemId === "cosine-similarity") return active.prompt.replace(/^Compute /, "হিসাব করুন ").replace(/ to 3 decimal places\.$/, " তিন দশমিক ঘর পর্যন্ত।");
+    if (active.problemId === "matrix-entry") return active.prompt.replace(/^Find /, "নির্ণয় করুন ").replace(/\.$/, "।");
+    return translate(language, active.prompt);
+  };
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="practice-heading">
-      <h2 id="practice-heading" className="text-lg font-semibold text-slate-900">Practice problems</h2>
-      <p className="mt-1 text-sm text-slate-600">Each problem is generated with new numbers. Show your work, check your answer on the server, then compare with the step-by-step solution.</p>
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Level">
-        {["beginner", "intermediate", "advanced"].map((item) => <button key={item} type="button" aria-pressed={level === item} onClick={() => setLevel(item)} className={`min-h-9 rounded-lg border px-3 text-xs font-semibold ${level === item ? "border-blue-700 bg-blue-50 text-blue-900" : "border-slate-300 text-slate-700"}`}>{item}</button>)}
+      <h2 id="practice-heading" className="text-lg font-semibold text-slate-900">{t("Practice problems")}</h2>
+      <p className="mt-1 text-sm text-slate-600">{t("Each problem is generated with new numbers. Show your work, check your answer on the server, then compare with the step-by-step solution.")}</p>
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("Level")}>
+        {["beginner", "intermediate", "advanced"].map((item) => <button key={item} type="button" aria-pressed={level === item} onClick={() => setLevel(item)} className={`min-h-9 rounded-lg border px-3 text-xs font-semibold ${level === item ? "border-blue-700 bg-blue-50 text-blue-900" : "border-slate-300 text-slate-700"}`}>{t(item)}</button>)}
       </div>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {catalogue.filter((item) => item.level === level).map((item) => (
-          <li key={item.id}><button type="button" onClick={() => void load(item.id)} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm"><span className="font-medium text-slate-900">{item.title}</span><span className="block text-xs text-slate-500">{item.concept} · {stats(item.id)}</span></button></li>
+          <li key={item.id}><button type="button" onClick={() => void load(item.id)} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm"><span className="font-medium text-slate-900">{t(item.title)}</span><span className="block text-xs text-slate-500">{t(item.concept)} · {t(stats(item.id))}</span></button></li>
         ))}
       </ul>
       {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
       {problem && (
         <form onSubmit={check} className="mt-5 space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{problem.title} · {problem.level}</p>
-          <Markdown>{problem.prompt}</Markdown>
-          <p className="text-xs text-slate-600">Answer format: {problem.answerFormat}. Fractions like 1/6 and percentages like 16.7% are accepted.</p>
-          <label className="block text-xs font-medium text-slate-700">Your working (saved with the attempt)<textarea rows={3} className={`${input} py-2 font-mono`} value={work} onChange={(event) => setWork(event.target.value)} /></label>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t(problem.title)} · {t(problem.level)}</p>
+          <Markdown>{localizedPrompt(problem)}</Markdown>
+          <p className="text-xs text-slate-600">{t("Answer format")}: {t(problem.answerFormat)}. {t("Fractions like 1/6 and percentages like 16.7% are accepted.")}</p>
+          <label className="block text-xs font-medium text-slate-700">{t("Your working (saved with the attempt)")}<textarea rows={3} className={`${input} py-2 font-mono`} value={work} onChange={(event) => setWork(event.target.value)} /></label>
           <div className="flex flex-wrap items-end gap-2">
-            <label className="text-xs font-medium text-slate-700">Answer<input className={`${input} w-40`} value={answer} onChange={(event) => setAnswer(event.target.value)} required inputMode="decimal" disabled={Boolean(result)} /></label>
-            {!result && <button type="submit" className="min-h-9 rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white">Check</button>}
-            {!result && hints < problem.hints.length && <button type="button" className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800" onClick={() => setHints((value) => value + 1)}>Hint</button>}
-            <button type="button" className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800" onClick={() => void load(problem.problemId)}>New numbers</button>
+            <label className="text-xs font-medium text-slate-700">{t("Answer")}<input className={`${input} w-40`} value={answer} onChange={(event) => setAnswer(event.target.value)} required inputMode="decimal" disabled={Boolean(result)} /></label>
+            {!result && <button type="submit" className="min-h-9 rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white">{t("Check")}</button>}
+            {!result && hints < problem.hints.length && <button type="button" className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800" onClick={() => setHints((value) => value + 1)}>{t("Hint")}</button>}
+            <button type="button" className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800" onClick={() => void load(problem.problemId)}>{t("New numbers")}</button>
           </div>
-          {problem.hints.slice(0, hints).map((hint) => <p key={hint} className="text-sm text-slate-700">Hint: {hint}</p>)}
+          {problem.hints.slice(0, hints).map((hint) => <p key={hint} className="text-sm text-slate-700">{t("Hint")}: {t(hint)}</p>)}
           {result && (
             <div className={`rounded-lg border p-3 text-sm ${result.correct ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`} role="status">
-              <p className="font-semibold">{result.correct ? "Correct." : "Not yet."} {result.note}</p>
-              <p className="mt-1">Expected ≈ <span className="font-mono">{fmt(result.expected)}</span>{result.exact ? ` (exact: ${result.exact})` : ""}</p>
-              <p className="mt-2 font-semibold">Worked solution</p>
-              <ol className="list-decimal space-y-1 pl-5">{result.steps.map((step) => <li key={step}>{step}</li>)}</ol>
-              {work && <><p className="mt-2 font-semibold">Your working</p><pre className="whitespace-pre-wrap font-mono text-xs">{work}</pre></>}
-              {result.commonMistakes.length > 0 && <><p className="mt-2 font-semibold">Common mistakes to check</p><ul className="list-disc pl-5">{result.commonMistakes.map((item) => <li key={item}>{item}</li>)}</ul></>}
+              <p className="font-semibold">{t(result.correct ? "Correct." : "Not yet.")} {t(result.note ?? "")}</p>
+              <p className="mt-1">{t("Expected ≈")} <span className="font-mono">{fmt(result.expected)}</span>{result.exact ? ` (${t("exact")}: ${result.exact})` : ""}</p>
+              <p className="mt-2 font-semibold">{t("Worked solution")}</p>
+              <ol className="list-decimal space-y-1 pl-5">{result.steps.map((step) => <li key={step}>{t(step)}</li>)}</ol>
+              {work && <><p className="mt-2 font-semibold">{t("Your working")}</p><pre className="whitespace-pre-wrap font-mono text-xs">{work}</pre></>}
+              {result.commonMistakes.length > 0 && <><p className="mt-2 font-semibold">{t("Common mistakes to check")}</p><ul className="list-disc pl-5">{result.commonMistakes.map((item) => <li key={item}>{t(item)}</li>)}</ul></>}
             </div>
           )}
         </form>
@@ -305,6 +319,7 @@ const sections = [
 ];
 
 export function MathLab() {
+  const language = useLanguage();
   const [active, setActive] = useState("practice");
   const Section = sections.find((section) => section.id === active)?.component ?? Practice;
   return (
@@ -312,7 +327,7 @@ export function MathLab() {
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Mathematics topics">
         {sections.map((section) => (
           <button key={section.id} type="button" role="tab" aria-selected={active === section.id} onClick={() => setActive(section.id)}
-            className={`min-h-9 rounded-lg border px-3 text-xs font-semibold ${active === section.id ? "border-blue-700 bg-blue-50 text-blue-900" : "border-slate-300 bg-white text-slate-700"}`}>{section.label}</button>
+            className={`min-h-9 rounded-lg border px-3 text-xs font-semibold ${active === section.id ? "border-blue-700 bg-blue-50 text-blue-900" : "border-slate-300 bg-white text-slate-700"}`}>{translate(language, section.label)}</button>
         ))}
       </div>
       <div role="tabpanel"><Section /></div>

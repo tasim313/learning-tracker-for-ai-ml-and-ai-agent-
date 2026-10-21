@@ -249,6 +249,13 @@ export function dashboardSeries(data: ApplicationData, now = new Date()) {
     const topics = data.topics.filter((topic) => topic.phaseId === phase.id);
     return { phase: `P${phase.order}`, title: phase.title, completed: topics.filter((topic) => topic.status === "completed").length, inProgress: topics.filter((topic) => topic.status === "in-progress").length, remaining: topics.filter((topic) => !["completed", "in-progress"].includes(topic.status)).length };
   });
+  const activityBreakdown = ([
+    ["learning", "Learning"], ["review", "Review"], ["debugging", "Debugging"], ["practical", "Practical exercises"]
+  ] as const).map(([activityType, label]) => ({
+    activityType,
+    label,
+    focusedMinutes: Math.round(completed.filter((session) => session.activityType === activityType).reduce((total, session) => total + session.focusedSeconds, 0) / 60)
+  }));
   const projects = (["planned", "in-progress", "completed", "blocked"] as const).map((status) => ({ status, count: data.projects.filter((project) => project.status === status).length }));
-  return { daily, weekly, scores, retention, proficiency, completion, projects, subjects };
+  return { daily, weekly, scores, retention, proficiency, completion, projects, subjects, activityBreakdown };
 }

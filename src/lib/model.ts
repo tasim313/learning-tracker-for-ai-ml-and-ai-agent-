@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const schemaVersion = 6;
+export const schemaVersion = 8;
 
 const id = z.string().min(1);
 const timestamp = z.string().datetime();
@@ -38,6 +38,31 @@ export const topicSchema = z.object({
   completionEvidence: z.string().max(5000).default("")
 });
 
+export const subtopicSchema = z.object({
+  id,
+  topicId: id,
+  title: z.string().min(1),
+  description: z.string().default(""),
+  objectives: z.array(z.string()).default([]),
+  order: z.number().int().nonnegative().default(0),
+  estimatedMinutes: z.number().int().nonnegative().default(0)
+});
+
+export const learningTaskSchema = z.object({
+  id,
+  subtopicId: id,
+  title: z.string().min(1),
+  description: z.string().default(""),
+  taskType: z.enum(["learn", "practice", "practical"]).default("learn"),
+  estimatedMinutes: z.number().int().nonnegative().default(0),
+  status: z.enum(["not-started", "in-progress", "completed"]).default("not-started"),
+  completionCriteria: z.string().default(""),
+  evidence: z.string().max(5000).default(""),
+  completedAt: timestamp.nullable().default(null)
+});
+
+export const learningActivityTypes = ["learning", "review", "debugging", "practical"] as const;
+
 export const resourceSchema = z.object({
   id,
   title: z.string().min(1),
@@ -64,6 +89,7 @@ export const resourceSchema = z.object({
 export const learningSessionSchema = z.object({
   id,
   topicId: id,
+  activityType: z.enum(learningActivityTypes).default("learning"),
   plannedStartAt: timestamp.nullable().default(null),
   startedAt: timestamp,
   endedAt: timestamp.nullable(),
@@ -490,6 +516,8 @@ export const applicationDataSchema = z.object({
   schemaVersion: z.literal(schemaVersion),
   roadmapPhases: z.array(roadmapPhaseSchema),
   topics: z.array(topicSchema),
+  subtopics: z.array(subtopicSchema).default([]),
+  learningTasks: z.array(learningTaskSchema).default([]),
   resources: z.array(resourceSchema),
   learningSessions: z.array(learningSessionSchema),
   studyPlans: z.array(studyPlanSchema),
@@ -552,6 +580,8 @@ export const applicationDataSchema = z.object({
   };
   checkUnique(data.roadmapPhases.map(({ id: value }) => value), "roadmapPhases");
   checkUnique(data.topics.map(({ id: value }) => value), "topics");
+  checkUnique(data.subtopics.map(({ id: value }) => value), "subtopics");
+  checkUnique(data.learningTasks.map(({ id: value }) => value), "learningTasks");
   checkUnique(data.resources.map(({ id: value }) => value), "resources");
   checkUnique(data.learningSessions.map(({ id: value }) => value), "learningSessions");
   checkUnique(data.examinationQuestions.map(({ id: value }) => value), "examinationQuestions");
@@ -567,6 +597,13 @@ export const applicationDataSchema = z.object({
   data.topics.forEach((topic, index) => {
     if (!phaseIds.has(topic.phaseId)) context.addIssue({ code: "custom", path: ["topics", index, "phaseId"], message: `Unknown phase id: ${topic.phaseId}` });
     topic.prerequisites.forEach((ref, refIndex) => checkTopic(ref, ["topics", index, "prerequisites", refIndex]));
+  });
+  const subtopicIds = new Set(data.subtopics.map(({ id: value }) => value));
+  data.subtopics.forEach((subtopic, index) => {
+    if (!topicIds.has(subtopic.topicId)) context.addIssue({ code: "custom", path: ["subtopics", index, "topicId"], message: `Unknown topic id: ${subtopic.topicId}` });
+  });
+  data.learningTasks.forEach((task, index) => {
+    if (!subtopicIds.has(task.subtopicId)) context.addIssue({ code: "custom", path: ["learningTasks", index, "subtopicId"], message: `Unknown subtopic id: ${task.subtopicId}` });
   });
   data.resources.forEach((resource, index) => {
     if (!phaseIds.has(resource.phaseId)) context.addIssue({ code: "custom", path: ["resources", index, "phaseId"], message: `Unknown phase id: ${resource.phaseId}` });
