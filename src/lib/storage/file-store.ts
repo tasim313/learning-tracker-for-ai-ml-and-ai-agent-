@@ -29,7 +29,18 @@ const lockTimeoutMs = 10_000;
 const queues = new Map<string, Promise<unknown>>();
 
 export function dataDirectory(): string {
+  // Next.js builds run in a separate, disposable process/environment. Keep any
+  // incidental build-time reads and writes away from the live runtime store.
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return path.resolve(/*turbopackIgnore: true*/ process.cwd(), ".next", "build-data");
+  }
+
   const configured = process.env.DATA_DIR?.trim();
+  if (process.env.NODE_ENV === "production") {
+    if (!configured || !path.isAbsolute(configured)) {
+      throw new StorageError("Production requires DATA_DIR to be an absolute path on persistent storage. Set it before starting the server.");
+    }
+  }
   return path.resolve(/*turbopackIgnore: true*/ configured || path.join(process.cwd(), "data"));
 }
 

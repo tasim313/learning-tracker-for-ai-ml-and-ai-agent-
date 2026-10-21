@@ -133,6 +133,8 @@ DATA_DIR/
 - Each write rewrites a whole file. System files (accounts, sessions) are shared by all users, so heavy sign-in traffic serializes on them.
 - The in-memory login rate limiter is per process. The persistent account lockout still applies after restarts.
 
+**Builds and runtime data are separate.** Production builds use a disposable build directory and do not initialize the superuser or read/write the live JSON store. At runtime, production requires `DATA_DIR` to be an absolute path backed by persistent storage. The server stops with a clear configuration error instead of silently creating a fresh empty database in an ephemeral application directory. For local development, the default remains `./data`.
+
 If the platform outgrows these limits, the storage layer (`lib/storage`) is the only module that needs replacing. That would be a deliberate decision; no database has been substituted.
 
 ## Authentication and security
