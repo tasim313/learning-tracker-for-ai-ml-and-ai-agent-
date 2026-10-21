@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CourseCatalogue } from "@/components/courses/course-catalogue";
 import { PageHeader } from "@/components/page-header";
 import { requireUser } from "@/lib/auth/server";
-import { localizedTitle } from "@/lib/content/display";
+import { localizedContent, localizedTitle } from "@/lib/content/display";
 import { courseMinutes } from "@/lib/content/schema";
 import { listPublishedCourses } from "@/lib/content/store";
 import { courseProgress } from "@/lib/services/learning";
@@ -16,12 +16,15 @@ export default async function CoursesPage() {
   return (
     <div className="space-y-7">
       <PageHeader eyebrow="Learn" title="Course catalogue" description="Platform-authored courses with explanations, diagrams, worked examples, practice, and knowledge checks. Third-party videos and readings are linked at their source, not copied." />
-      <CourseCatalogue courses={courses.map((course) => ({
-        id: course.id, title: course.title, description: course.description, difficulty: course.difficulty, tags: course.tags,
-        category: course.category, seed: course.seed, moduleCount: course.modules.length,
-        lessonCount: course.modules.reduce((total, module) => total + module.lessons.length, 0), estimatedMinutes: courseMinutes(course),
-        displayTitle: localizedTitle(course, user.profile.preferredLanguage), progress: courseProgress(data, course)
-      }))} />
+      <CourseCatalogue courses={courses.map((sourceCourse) => {
+        const course = localizedContent(sourceCourse, user.profile.preferredLanguage);
+        return {
+          id: course.id, title: course.title, description: course.description, difficulty: course.difficulty, tags: course.tags,
+          category: course.category, seed: course.seed, moduleCount: course.modules.length,
+          lessonCount: course.modules.reduce((total, module) => total + module.lessons.length, 0), estimatedMinutes: courseMinutes(course),
+          displayTitle: localizedTitle(sourceCourse, user.profile.preferredLanguage), progress: courseProgress(data, sourceCourse)
+        };
+      })} />
     </div>
   );
 }

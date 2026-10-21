@@ -1,12 +1,13 @@
 import { findLesson, getDiagrams, getPublishedCourse, redactCourseForLearner } from "@/lib/content/store";
-import { localizedTitle } from "@/lib/content/display";
+import { localizedContent, localizedTitle } from "@/lib/content/display";
 import type { PublicUser } from "@/lib/auth/schemas";
 import { loadUserData } from "@/lib/storage/user-store";
 
 /** Everything a lesson page needs, from published content and the learner's own data. */
 export async function loadLessonPage(user: PublicUser, courseId: string, lessonId: string) {
-  const course = await getPublishedCourse(courseId);
-  if (!course) return null;
+  const sourceCourse = await getPublishedCourse(courseId);
+  if (!sourceCourse) return null;
+  const course = localizedContent(sourceCourse, user.profile.preferredLanguage);
   const found = findLesson(course, lessonId);
   if (!found) return null;
   const data = await loadUserData(user.id);

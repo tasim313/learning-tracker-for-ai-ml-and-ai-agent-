@@ -1,4 +1,5 @@
 import type { ApplicationData } from "@/lib/model";
+import { addInitialCurriculum } from "@/lib/curriculum";
 import { projectSchema, schemaVersion } from "@/lib/model";
 import catalog from "@/data/workbook-catalog.json";
 import curatedResources from "@/data/learning-resource-catalog.json";
@@ -172,6 +173,21 @@ export function createSeedData(): ApplicationData {
     "Monitoring, usage limits, and operating cost report", "Deployment runbook and rollback plan",
     "Customer feedback and product readiness review"
   ];
+  const topics = [
+    ...roadmapTopics.map(([subject, title, description, exercise, estimatedMinutes], index) => ({
+      id: `topic-${index + 1}`, phaseId: `phase-${index + 1}`, subject: String(subject), title: String(title),
+      description: String(description), objectives: [String(description)], prerequisites: [], difficulty: "beginner" as const,
+      priority: index < 3 ? "high" as const : "medium" as const, estimatedMinutes: Number(estimatedMinutes),
+      practicalExercise: String(exercise), deliverable: String(exercise),
+      completionCriteria: "Explain the key concepts unaided and demonstrate the practical exercise with working evidence.",
+      practicalRequired: index !== 11, status: "not-started" as const, confidence: null,
+      revisedEstimatedMinutes: null, startedAt: null, completedAt: null, completionEvidence: ""
+    })),
+    ...(catalog.topics as Omit<ApplicationData["topics"][number], "revisedEstimatedMinutes" | "startedAt" | "completedAt" | "completionEvidence">[]).map((topic) => ({
+      revisedEstimatedMinutes: null, startedAt: null, completedAt: null, completionEvidence: "", ...topic
+    }))
+  ] as ApplicationData["topics"];
+  const curriculum = addInitialCurriculum({ topics, subtopics: [], learningTasks: [] });
   return {
     schemaVersion,
     roadmapPhases: phases.map((phase, index) => ({
@@ -181,20 +197,8 @@ export function createSeedData(): ApplicationData {
       summary: catalog.phases[index]?.summary ?? phase.summary,
       status: "not-started",
     })),
-    topics: [
-      ...roadmapTopics.map(([subject, title, description, exercise, estimatedMinutes], index) => ({
-        id: `topic-${index + 1}`, phaseId: `phase-${index + 1}`, subject: String(subject), title: String(title),
-        description: String(description), objectives: [String(description)], prerequisites: [], difficulty: "beginner" as const,
-        priority: index < 3 ? "high" as const : "medium" as const, estimatedMinutes: Number(estimatedMinutes),
-        practicalExercise: String(exercise), deliverable: String(exercise),
-        completionCriteria: "Explain the key concepts unaided and demonstrate the practical exercise with working evidence.",
-        practicalRequired: index !== 11, status: "not-started" as const, confidence: null,
-        revisedEstimatedMinutes: null, startedAt: null, completedAt: null, completionEvidence: ""
-      })),
-      ...(catalog.topics as Omit<ApplicationData["topics"][number], "revisedEstimatedMinutes" | "startedAt" | "completedAt" | "completionEvidence">[]).map((topic) => ({
-        revisedEstimatedMinutes: null, startedAt: null, completedAt: null, completionEvidence: "", ...topic
-      }))
-    ],
+    topics,
+    ...curriculum,
     resources: [...catalog.resources, ...curatedResources] as ApplicationData["resources"],
     learningSessions: [],
     studyPlans: [],

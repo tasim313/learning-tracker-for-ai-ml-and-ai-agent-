@@ -8,6 +8,8 @@ import {
 import { ChevronLeft, ChevronRight, Download, Eye, Plus, Trash2 } from "lucide-react";
 import type { DiagramDefinition } from "@/lib/model";
 import { maxStep } from "@/lib/diagrams";
+import { useLanguage } from "@/components/language-provider";
+import { translate } from "@/lib/i18n";
 
 const shapeStyles: Record<DiagramDefinition["nodes"][number]["shape"], string> = {
   process: "#eff6ff",
@@ -18,12 +20,12 @@ const shapeStyles: Record<DiagramDefinition["nodes"][number]["shape"], string> =
   note: "#ffffff"
 };
 
-function toFlowNodes(diagram: DiagramDefinition, visibleStep: number, selected: string | null): Node[] {
+function toFlowNodes(diagram: DiagramDefinition, visibleStep: number, selected: string | null, language: "en" | "bn"): Node[] {
   return diagram.nodes.filter((node) => node.step <= visibleStep).map((node) => ({
     id: node.id,
     position: { x: node.x, y: node.y },
-    data: { label: node.label },
-    ariaLabel: node.label,
+    data: { label: translate(language, node.label) },
+    ariaLabel: translate(language, node.label),
     style: {
       background: shapeStyles[node.shape],
       border: `${selected === node.id ? 3 : 1}px solid ${selected === node.id ? "#1d4ed8" : node.shape === "decision" ? "#d97706" : "#94a3b8"}`,
@@ -38,10 +40,10 @@ function toFlowNodes(diagram: DiagramDefinition, visibleStep: number, selected: 
   }));
 }
 
-function toFlowEdges(diagram: DiagramDefinition, visibleStep: number): Edge[] {
+function toFlowEdges(diagram: DiagramDefinition, visibleStep: number, language: "en" | "bn"): Edge[] {
   const visibleNodes = new Set(diagram.nodes.filter((node) => node.step <= visibleStep).map((node) => node.id));
   return diagram.edges.filter((edge) => edge.step <= visibleStep && visibleNodes.has(edge.source) && visibleNodes.has(edge.target)).map((edge) => ({
-    id: edge.id, source: edge.source, target: edge.target, label: edge.label || undefined,
+    id: edge.id, source: edge.source, target: edge.target, label: edge.label ? translate(language, edge.label) : undefined,
     markerEnd: { type: MarkerType.ArrowClosed, color: "#475569" },
     style: { stroke: "#475569" },
     labelStyle: { fontSize: 11, fill: "#334155" },
@@ -69,13 +71,15 @@ export function DiagramViewer({ diagram, editable = false, onChange, height = 38
   onChange?: (diagram: DiagramDefinition) => void;
   height?: number;
 }) {
+  const language = useLanguage();
+  const t = (text: string) => translate(language, text);
   const last = maxStep(diagram);
   const [stepMode, setStepMode] = useState(false);
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const visibleStep = stepMode && !editable ? step : Number.MAX_SAFE_INTEGER;
-  const nodes = useMemo(() => toFlowNodes(diagram, visibleStep, selected), [diagram, visibleStep, selected]);
-  const edges = useMemo(() => toFlowEdges(diagram, visibleStep), [diagram, visibleStep]);
+  const nodes = useMemo(() => toFlowNodes(diagram, visibleStep, selected, language), [diagram, visibleStep, selected, language]);
+  const edges = useMemo(() => toFlowEdges(diagram, visibleStep, language), [diagram, visibleStep, language]);
   const selectedNode = diagram.nodes.find((node) => node.id === selected) ?? null;
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -120,21 +124,21 @@ export function DiagramViewer({ diagram, editable = false, onChange, height = 38
     <figure className="rounded-xl border border-slate-200 bg-white" aria-labelledby={`diagram-${diagram.id}-title`}>
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
         <div>
-          <p id={`diagram-${diagram.id}-title`} className="text-sm font-semibold text-slate-900">{diagram.title}</p>
-          <p className="text-xs text-slate-500">Interactive {diagram.kind.replace(/-/g, " ")} diagram{editable ? " · drag nodes, connect handles, select to edit" : " · select a node to inspect it"}</p>
+          <p id={`diagram-${diagram.id}-title`} className="text-sm font-semibold text-slate-900">{t(diagram.title)}</p>
+          <p className="text-xs text-slate-500">{t(`Interactive ${diagram.kind.replace(/-/g, " ")} diagram`)}{editable ? ` · ${t("drag nodes, connect handles, select to edit")}` : ` · ${t("select a node to inspect it")}`}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {!editable && <button type="button" className={button} onClick={() => { setStepMode((value) => !value); setStep(0); }} aria-pressed={stepMode}><Eye size={14} aria-hidden="true" />{stepMode ? "Show all" : "Reveal step by step"}</button>}
+          {!editable && <button type="button" className={button} onClick={() => { setStepMode((value) => !value); setStep(0); }} aria-pressed={stepMode}><Eye size={14} aria-hidden="true" />{t(stepMode ? "Show all" : "Reveal step by step")}</button>}
           {editable && <button type="button" className={button} onClick={addNode}><Plus size={14} aria-hidden="true" />Add node</button>}
-          <button type="button" className={button} onClick={() => download(diagram)}><Download size={14} aria-hidden="true" />Export JSON</button>
+          <button type="button" className={button} onClick={() => download(diagram)}><Download size={14} aria-hidden="true" />{t("Export JSON")}</button>
         </div>
       </div>
       {stepMode && !editable && (
         <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 bg-slate-50 px-4 py-2" role="group" aria-label="Diagram steps">
-          <button type="button" className={button} disabled={step === 0} onClick={() => setStep((value) => value - 1)}><ChevronLeft size={14} aria-hidden="true" />Previous</button>
-          <span className="text-xs font-medium text-slate-700" aria-live="polite">Step {step + 1} of {last + 1}</span>
-          <button type="button" className={button} disabled={step >= last} onClick={() => setStep((value) => value + 1)}>Next<ChevronRight size={14} aria-hidden="true" /></button>
-          {diagram.explanationSteps[step] && <p className="w-full text-sm text-slate-800">{diagram.explanationSteps[step]}</p>}
+          <button type="button" className={button} disabled={step === 0} onClick={() => setStep((value) => value - 1)}><ChevronLeft size={14} aria-hidden="true" />{t("Previous")}</button>
+          <span className="text-xs font-medium text-slate-700" aria-live="polite">{t("Step")} {step + 1} {t("of")} {last + 1}</span>
+          <button type="button" className={button} disabled={step >= last} onClick={() => setStep((value) => value + 1)}>{t("Next")}<ChevronRight size={14} aria-hidden="true" /></button>
+          {diagram.explanationSteps[step] && <p className="w-full text-sm text-slate-800">{t(diagram.explanationSteps[step])}</p>}
         </div>
       )}
       <div style={{ height }} className="w-full">
@@ -161,7 +165,7 @@ export function DiagramViewer({ diagram, editable = false, onChange, height = 38
         <div className="border-t border-slate-100 bg-blue-50/50 px-4 py-3 text-sm" aria-live="polite">
           {editable ? (
             <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
-              <label className="text-xs font-medium text-slate-700">Label<input value={selectedNode.label} onChange={(event) => updateSelected({ label: event.target.value || " " })} className="mt-1 block min-h-9 w-full rounded-lg border border-slate-300 px-2 text-sm" /></label>
+              <label className="text-xs font-medium text-slate-700">{t("Label")}<input value={selectedNode.label} onChange={(event) => updateSelected({ label: event.target.value || " " })} className="mt-1 block min-h-9 w-full rounded-lg border border-slate-300 px-2 text-sm" /></label>
               <label className="text-xs font-medium text-slate-700">Detail<input value={selectedNode.detail} onChange={(event) => updateSelected({ detail: event.target.value })} className="mt-1 block min-h-9 w-full rounded-lg border border-slate-300 px-2 text-sm" /></label>
               <label className="text-xs font-medium text-slate-700">Shape
                 <select value={selectedNode.shape} onChange={(event) => updateSelected({ shape: event.target.value as DiagramDefinition["nodes"][number]["shape"] })} className="mt-1 block min-h-9 rounded-lg border border-slate-300 px-2 text-sm">
@@ -171,21 +175,21 @@ export function DiagramViewer({ diagram, editable = false, onChange, height = 38
               <button type="button" onClick={removeSelected} className={button}><Trash2 size={14} aria-hidden="true" />Delete node</button>
             </div>
           ) : (
-            <><p className="font-semibold text-slate-900">{selectedNode.label.replace(/\n/g, " ")}</p><p className="mt-1 text-slate-700">{selectedNode.detail || "No additional detail for this element."}</p></>
+            <><p className="font-semibold text-slate-900">{t(selectedNode.label.replace(/\n/g, " "))}</p><p className="mt-1 text-slate-700">{t(selectedNode.detail || "No additional detail for this element.")}</p></>
           )}
         </div>
       )}
       <figcaption className="space-y-2 border-t border-slate-100 px-4 py-3 text-sm text-slate-700">
-        {diagram.purpose && <p>{diagram.purpose}</p>}
+        {diagram.purpose && <p>{t(diagram.purpose)}</p>}
         <details>
-          <summary className="cursor-pointer text-xs font-semibold text-slate-700">Text description and elements</summary>
-          <p className="mt-2">{diagram.altText}</p>
+          <summary className="cursor-pointer text-xs font-semibold text-slate-700">{t("Text description and elements")}</summary>
+          <p className="mt-2">{t(diagram.altText)}</p>
           <ul className="mt-2 flex flex-wrap gap-2" aria-label="Diagram elements">
             {diagram.nodes.map((node) => (
-              <li key={node.id}><button type="button" onClick={() => setSelected(node.id)} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-800">{node.label.replace(/\n/g, " ")}</button></li>
+              <li key={node.id}><button type="button" onClick={() => setSelected(node.id)} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-800">{t(node.label.replace(/\n/g, " "))}</button></li>
             ))}
           </ul>
-          {diagram.explanationSteps.length > 0 && <ol className="mt-3 list-decimal space-y-1 pl-5">{diagram.explanationSteps.map((text, index) => <li key={index}>{text}</li>)}</ol>}
+          {diagram.explanationSteps.length > 0 && <ol className="mt-3 list-decimal space-y-1 pl-5">{diagram.explanationSteps.map((text, index) => <li key={index}>{t(text)}</li>)}</ol>}
         </details>
       </figcaption>
     </figure>

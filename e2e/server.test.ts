@@ -100,7 +100,7 @@ test("every application page renders for a signed-in learner, and admin pages fo
     "/timer", "/sessions", "/planner", "/revisions", "/exams", "/exam-library", "/questions", "/blueprints",
     "/active-exam", "/practical-exam", "/exam-results", "/answer-review", "/gaps", "/competency", "/exam-history",
     "/exam-analytics", "/assessments", "/projects", "/sales-agent", "/goals", "/discipline", "/rewards", "/reports",
-    "/experiments", "/opportunities", "/settings", "/backup", "/account"
+    "/experiments", "/opportunities", "/subtopics", "/learning-tasks", "/settings", "/backup", "/account"
   ];
   const failures: string[] = [];
   for (const page of learnerPages) {

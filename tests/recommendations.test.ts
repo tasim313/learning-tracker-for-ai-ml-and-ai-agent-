@@ -91,7 +91,7 @@ test("learner overrides dismiss, snooze until a date, and pin", () => {
 
 test("time spent and lesson completion alone never produce mastery-style recommendations", () => {
   const data = createSeedData();
-  data.learningSessions = [{ id: "s1", topicId: "topic-1", plannedStartAt: null, startedAt: "2026-10-01T00:00:00.000Z", endedAt: "2026-10-01T10:00:00.000Z", stateChangedAt: null, state: "completed", focusedSeconds: 36000, pausedSeconds: 0, breakSeconds: 0, plannedSeconds: 3600, notes: "", accomplishments: "", problems: "", distractions: "", manualAdjustmentNote: "", rating: 5, manuallyAdjusted: false }];
+  data.learningSessions = [{ id: "s1", topicId: "topic-1", activityType: "learning", plannedStartAt: null, startedAt: "2026-10-01T00:00:00.000Z", endedAt: "2026-10-01T10:00:00.000Z", stateChangedAt: null, state: "completed", focusedSeconds: 36000, pausedSeconds: 0, breakSeconds: 0, plannedSeconds: 3600, notes: "", accomplishments: "", problems: "", distractions: "", manualAdjustmentNote: "", rating: 5, manuallyAdjusted: false }];
   const result = keys(data);
   assert.ok(!result.some((key) => key.startsWith("skip:")));
   assert.ok(!result.some((key) => key.startsWith("practical:")));

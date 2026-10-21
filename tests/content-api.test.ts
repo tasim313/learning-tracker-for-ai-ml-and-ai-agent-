@@ -110,6 +110,36 @@ test("lesson progress and notes are private to each learner", async () => {
   assert.equal(unknownLesson.status, 404);
 });
 
+test("roadmap subtopics and tasks are validated, persisted, and isolated by learner", async () => {
+  const alice = await register();
+  const bob = await register();
+  const topic = (await call(rewardsRoute.GET, "GET", "/api/collections/topics", { cookie: alice.cookie, params: { collection: "topics" } })).json as { id: string }[];
+  const createdSubtopic = await call(rewardsRoute.POST, "POST", "/api/collections/subtopics", {
+    cookie: alice.cookie, params: { collection: "subtopics" },
+    body: { topicId: topic[0].id, title: "Vector operations", description: "Work with vector representations." }
+  });
+  assert.equal(createdSubtopic.status, 201);
+  const subtopicId = createdSubtopic.json.id as string;
+  const createdTask = await call(rewardsRoute.POST, "POST", "/api/collections/learningTasks", {
+    cookie: alice.cookie, params: { collection: "learningTasks" },
+    body: { subtopicId, title: "Implement cosine similarity", taskType: "practical", completionCriteria: "Explain and test the calculation." }
+  });
+  assert.equal(createdTask.status, 201);
+  const taskId = createdTask.json.id as string;
+  assert.equal((await call(rewardsRoute.POST, "POST", "/api/collections/learningTasks", {
+    cookie: alice.cookie, params: { collection: "learningTasks" }, body: { subtopicId: "missing", title: "Invalid reference" }
+  })).status, 400);
+  const completed = await call(rewardsRoute.PATCH, "PATCH", "/api/collections/learningTasks", {
+    cookie: alice.cookie, params: { collection: "learningTasks" }, body: { id: taskId, status: "completed", evidence: "Unit-tested implementation" }
+  });
+  assert.equal(completed.status, 200);
+  assert.equal(typeof completed.json.completedAt, "string");
+  assert.equal(((await call(rewardsRoute.GET, "GET", "/api/collections/learningTasks", { cookie: bob.cookie, params: { collection: "learningTasks" } })).json as { id: string }[]).some((task) => task.id === taskId), false);
+  assert.equal((await call(rewardsRoute.DELETE, "DELETE", `/api/collections/subtopics?id=${subtopicId}`, { cookie: alice.cookie, params: { collection: "subtopics" } })).status, 400);
+  assert.equal((await call(rewardsRoute.DELETE, "DELETE", `/api/collections/learningTasks?id=${taskId}`, { cookie: alice.cookie, params: { collection: "learningTasks" } })).status, 200);
+  assert.equal((await call(rewardsRoute.DELETE, "DELETE", `/api/collections/subtopics?id=${subtopicId}`, { cookie: alice.cookie, params: { collection: "subtopics" } })).status, 200);
+});
+
 test("lessons are hidden during a self-declared closed-book examination", async () => {
   const learner = await register();
   await updateUserData(learner.id, (data) => ({

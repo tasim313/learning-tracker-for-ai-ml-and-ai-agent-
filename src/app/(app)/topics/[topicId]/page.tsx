@@ -10,6 +10,8 @@ import { listPublishedCourses } from "@/lib/content/store";
 import { competencyReadiness, topicScore } from "@/lib/services/competency";
 import { buildRecommendations } from "@/lib/services/recommendations";
 import { loadUserData } from "@/lib/storage/user-store";
+import { translate } from "@/lib/i18n";
+import { localizedContent } from "@/lib/content/display";
 
 export const metadata: Metadata = { title: "Topic" };
 
@@ -18,6 +20,8 @@ const hours = (seconds: number) => `${Math.floor(seconds / 3600)}h ${Math.round(
 export default async function TopicPage({ params }: { params: Promise<{ topicId: string }> }) {
   const { topicId } = await params;
   const { user } = await requireUser();
+  const language = user.profile.preferredLanguage ?? "en";
+  const t = (text: string) => translate(language, text);
   const [data, courses] = await Promise.all([loadUserData(user.id), listPublishedCourses()]);
   const topic = data.topics.find((item) => item.id === topicId);
   if (!topic) notFound();
@@ -37,7 +41,7 @@ export default async function TopicPage({ params }: { params: Promise<{ topicId:
   const resources = data.resources.filter((item) => item.topicIds.includes(topic.id));
   const notes = data.notes.filter((item) => item.topicId === topic.id);
   const revision = data.revisionSchedules.find((item) => item.topicId === topic.id);
-  const lessons = courses.flatMap((course) => course.modules.flatMap((module) => module.lessons.filter((lesson) => lesson.relatedTopicIds.includes(topic.id)).map((lesson) => ({ course, lesson }))));
+  const lessons = courses.flatMap((sourceCourse) => { const course = localizedContent(sourceCourse, language); return course.modules.flatMap((module) => module.lessons.filter((lesson) => lesson.relatedTopicIds.includes(topic.id)).map((lesson) => ({ course, lesson }))); });
   const completedLessons = new Set(data.lessonProgress.filter((item) => item.completedAt).map((item) => item.lessonId));
   const practice = data.practiceAttempts.filter((item) => item.topicId === topic.id);
   const nextActions = buildRecommendations({ data, courses }).visible.filter((item) => item.key.endsWith(`:${topic.id}`) || item.href.includes(topic.id));
@@ -46,92 +50,92 @@ export default async function TopicPage({ params }: { params: Promise<{ topicId:
 
   return (
     <div className="space-y-6">
-      <nav aria-label="Breadcrumb" className="text-xs text-slate-500"><Link href="/topics" className="underline">Topics</Link> / {phase ? `Phase ${phase.order}: ${phase.title}` : "Roadmap"}</nav>
+      <nav aria-label={t("Breadcrumb")} className="text-xs text-slate-500"><Link href="/topics" className="underline">{t("Topics")}</Link> / {phase ? `${t("Phase")} ${phase.order}: ${t(phase.title)}` : t("Roadmap")}</nav>
       <header className={card}>
-        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{topic.subject}</p>
-        <h1 className="mt-1 text-2xl font-semibold text-slate-900">{topic.title}</h1>
-        <p className="mt-2 max-w-3xl text-sm text-slate-700">{topic.description}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">{t(topic.subject)}</p>
+        <h1 className="mt-1 text-2xl font-semibold text-slate-900">{t(topic.title)}</h1>
+        <p className="mt-2 max-w-3xl text-sm text-slate-700">{t(topic.description)}</p>
         <div className="mt-3 flex flex-wrap gap-2 text-xs">
-          <span className="rounded bg-slate-100 px-2 py-1">Learning status: {topic.status.replace(/-/g, " ")}</span>
-          <span className={`rounded px-2 py-1 font-semibold ${levelTone}`}>Competency: {readiness.level}</span>
-          <span className="rounded bg-slate-100 px-2 py-1">Difficulty: {topic.difficulty}</span>
-          <span className="rounded bg-slate-100 px-2 py-1">Priority: {topic.priority}</span>
-          {topic.practicalRequired && <span className="rounded bg-amber-50 px-2 py-1 text-amber-900">Practical evidence required</span>}
+          <span className="rounded bg-slate-100 px-2 py-1">{t("Learning status:")} {t(topic.status.replace(/-/g, " "))}</span>
+          <span className={`rounded px-2 py-1 font-semibold ${levelTone}`}>{t("Competency:")} {t(readiness.level)}</span>
+          <span className="rounded bg-slate-100 px-2 py-1">{t("Difficulty:")} {t(topic.difficulty)}</span>
+          <span className="rounded bg-slate-100 px-2 py-1">{t("Priority:")} {t(topic.priority)}</span>
+          {topic.practicalRequired && <span className="rounded bg-amber-50 px-2 py-1 text-amber-900">{t("Practical evidence required")}</span>}
         </div>
-        <p className="mt-2 text-xs text-slate-500">Learning status is what you record. Competency comes only from graded assessments and practical evidence.</p>
+        <p className="mt-2 text-xs text-slate-500">{t("Learning status is what you record. Competency comes only from graded assessments and practical evidence.")}</p>
       </header>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-5">
           <section className={card} aria-labelledby="readiness-heading">
-            <h2 id="readiness-heading" className="text-lg font-semibold text-slate-900">Readiness to advance</h2>
+            <h2 id="readiness-heading" className="text-lg font-semibold text-slate-900">{t("Readiness to advance")}</h2>
             <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-4">
-              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">Learning activities</dt><dd className="font-semibold">{sessions.length} sessions · {lessons.filter(({ lesson }) => completedLessons.has(lesson.id)).length}/{lessons.length} lessons · {practice.length} practice</dd></div>
-              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">Best examination score</dt><dd className="font-semibold">{attempts.some((item) => item.score !== null) ? `${Math.max(...attempts.flatMap((item) => item.score === null ? [] : [item.score])).toFixed(0)}%` : "None yet"}</dd></div>
-              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">Practical assessment</dt><dd className="font-semibold">{practicalAttempts.length ? practicalAttempts.map(({ score }) => score === null ? "awaiting grading" : `${score.toFixed(0)}%`).join(", ") : topic.practicalRequired ? "Not yet submitted" : "Not required"}</dd></div>
-              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">Delayed retention</dt><dd className="font-semibold">{retentionAttempts.length ? retentionAttempts.map(({ score }) => score === null ? "pending" : `${score.toFixed(0)}%`).join(", ") : "Not yet tested"}</dd></div>
+              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">{t("Learning activities")}</dt><dd className="font-semibold">{sessions.length} {t("sessions")} · {lessons.filter(({ lesson }) => completedLessons.has(lesson.id)).length}/{lessons.length} {t("lessons")} · {practice.length} {t("practice")}</dd></div>
+              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">{t("Best examination score")}</dt><dd className="font-semibold">{attempts.some((item) => item.score !== null) ? `${Math.max(...attempts.flatMap((item) => item.score === null ? [] : [item.score])).toFixed(0)}%` : t("None yet")}</dd></div>
+              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">{t("Practical assessment")}</dt><dd className="font-semibold">{practicalAttempts.length ? practicalAttempts.map(({ score }) => score === null ? t("awaiting grading") : `${score.toFixed(0)}%`).join(", ") : topic.practicalRequired ? t("Not yet submitted") : t("Not required")}</dd></div>
+              <div className="rounded-lg bg-slate-50 p-3"><dt className="text-xs text-slate-500">{t("Delayed retention")}</dt><dd className="font-semibold">{retentionAttempts.length ? retentionAttempts.map(({ score }) => score === null ? t("pending") : `${score.toFixed(0)}%`).join(", ") : t("Not yet tested")}</dd></div>
             </dl>
-            <h3 className="mt-4 text-sm font-semibold text-slate-900">Outstanding requirements</h3>
-            {readiness.requirements.length ? <ul className="mt-1 space-y-1 text-sm">{readiness.requirements.map((requirement) => <li key={requirement} className="flex gap-2"><Circle size={15} className="mt-0.5 shrink-0 text-slate-400" aria-hidden="true" />{requirement}</li>)}</ul> : <p className="mt-1 flex items-center gap-2 text-sm text-emerald-800"><CheckCircle2 size={15} aria-hidden="true" />All requirements met.</p>}
-            {readiness.evidence.length > 0 && <><h3 className="mt-4 text-sm font-semibold text-slate-900">Evidence</h3><ul className="mt-1 list-disc pl-5 text-sm text-slate-700">{readiness.evidence.map((item) => <li key={item}>{item}</li>)}</ul></>}
-            <h3 className="mt-4 text-sm font-semibold text-slate-900">Recommended next actions</h3>
+            <h3 className="mt-4 text-sm font-semibold text-slate-900">{t("Outstanding requirements")}</h3>
+            {readiness.requirements.length ? <ul className="mt-1 space-y-1 text-sm">{readiness.requirements.map((requirement) => <li key={requirement} className="flex gap-2"><Circle size={15} className="mt-0.5 shrink-0 text-slate-400" aria-hidden="true" />{t(requirement)}</li>)}</ul> : <p className="mt-1 flex items-center gap-2 text-sm text-emerald-800"><CheckCircle2 size={15} aria-hidden="true" />{t("All requirements met.")}</p>}
+            {readiness.evidence.length > 0 && <><h3 className="mt-4 text-sm font-semibold text-slate-900">{t("Evidence")}</h3><ul className="mt-1 list-disc pl-5 text-sm text-slate-700">{readiness.evidence.map((item) => <li key={item}>{t(item)}</li>)}</ul></>}
+            <h3 className="mt-4 text-sm font-semibold text-slate-900">{t("Recommended next actions")}</h3>
             {nextActions.length ? <ul className="mt-1 space-y-1 text-sm">{nextActions.map((item) => <li key={item.key}><Link href={item.href} className="font-medium text-blue-800 underline">{item.title}</Link> <span className="text-slate-600">— {item.reason}</span></li>)}</ul>
               : <p className="mt-1 text-sm text-slate-600">{readiness.requirements.length ? <>Work on the first outstanding requirement. Start an examination from the <Link href="/exams" className="underline">Examination dashboard</Link>.</> : "Keep this topic fresh with flashcards and scheduled revisions."}</p>}
           </section>
 
           <section className={card}>
-            <h2 className="text-base font-semibold text-slate-900">Objectives and completion criteria</h2>
-            {topic.objectives.length > 0 && <ul className="mt-2 list-disc pl-5 text-sm">{topic.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul>}
-            {topic.prerequisites.length > 0 && <p className="mt-2 text-sm">Prerequisites: {topic.prerequisites.map((id, index) => <span key={id}>{index ? ", " : ""}<Link href={`/topics/${id}`} className="text-blue-800 underline">{data.topics.find((item) => item.id === id)?.title ?? id}</Link></span>)}</p>}
-            {topic.practicalExercise && <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm"><p className="font-semibold">Practical exercise</p><p className="mt-1 whitespace-pre-wrap">{topic.practicalExercise}</p>{topic.deliverable && <p className="mt-1 text-xs text-slate-600">Deliverable: {topic.deliverable}</p>}</div>}
-            {topic.completionCriteria && <p className="mt-3 text-sm"><span className="font-semibold">Completion criteria: </span>{topic.completionCriteria}</p>}
-            {topic.completionEvidence && <div className="mt-3 text-sm"><p className="font-semibold">Your completion evidence</p><Markdown>{topic.completionEvidence}</Markdown></div>}
+            <h2 className="text-base font-semibold text-slate-900">{t("Objectives and completion criteria")}</h2>
+            {topic.objectives.length > 0 && <ul className="mt-2 list-disc pl-5 text-sm">{topic.objectives.map((objective) => <li key={objective}>{t(objective)}</li>)}</ul>}
+            {topic.prerequisites.length > 0 && <p className="mt-2 text-sm">{t("Prerequisites")}: {topic.prerequisites.map((id, index) => <span key={id}>{index ? ", " : ""}<Link href={`/topics/${id}`} className="text-blue-800 underline">{t(data.topics.find((item) => item.id === id)?.title ?? id)}</Link></span>)}</p>}
+            {topic.practicalExercise && <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm"><p className="font-semibold">{t("Practical exercise")}</p><p className="mt-1 whitespace-pre-wrap">{t(topic.practicalExercise)}</p>{topic.deliverable && <p className="mt-1 text-xs text-slate-600">{t("Deliverable:")} {t(topic.deliverable)}</p>}</div>}
+            {topic.completionCriteria && <p className="mt-3 text-sm"><span className="font-semibold">{t("Completion criteria:")} </span>{t(topic.completionCriteria)}</p>}
+            {topic.completionEvidence && <div className="mt-3 text-sm"><p className="font-semibold">{t("Your completion evidence")}</p><Markdown>{t(topic.completionEvidence)}</Markdown></div>}
           </section>
 
           <section className={card}>
-            <h2 className="text-base font-semibold text-slate-900">Assessment history</h2>
-            {attempts.length === 0 && assessments.length === 0 ? <p className="mt-2 text-sm text-slate-600">No examinations or self-assessments recorded for this topic.</p> : (
+            <h2 className="text-base font-semibold text-slate-900">{t("Assessment history")}</h2>
+            {attempts.length === 0 && assessments.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("No examinations or self-assessments recorded for this topic.")}</p> : (
               <ul className="mt-2 divide-y divide-slate-100 text-sm">
-                {attempts.map(({ attempt, score }) => <li key={attempt.id} className="flex flex-wrap justify-between gap-2 py-2"><span>{attempt.examType} examination · {new Date(attempt.submittedAt!).toLocaleDateString()}</span><span className="font-mono">{score === null ? "awaiting grading" : `${score.toFixed(0)}% on this topic`}</span></li>)}
-                {assessments.map((item) => <li key={item.id} className="flex flex-wrap justify-between gap-2 py-2"><span>Self-assessment · {new Date(item.assessedAt).toLocaleDateString()} (confidence, not verified)</span><span>confidence {item.confidence}/5</span></li>)}
+                {attempts.map(({ attempt, score }) => <li key={attempt.id} className="flex flex-wrap justify-between gap-2 py-2"><span>{t(attempt.examType)} {t("examination")} · {new Date(attempt.submittedAt!).toLocaleDateString()}</span><span className="font-mono">{score === null ? t("awaiting grading") : `${score.toFixed(0)}% ${t("on this topic")}`}</span></li>)}
+                {assessments.map((item) => <li key={item.id} className="flex flex-wrap justify-between gap-2 py-2"><span>{t("Self-assessment")} · {new Date(item.assessedAt).toLocaleDateString()} ({t("confidence, not verified")})</span><span>{t("confidence")} {item.confidence}/5</span></li>)}
               </ul>
             )}
-            {revision && <p className="mt-3 text-sm">Next revision due {new Date(revision.dueAt).toLocaleDateString()} ({revision.intervalDays}-day interval).</p>}
+            {revision && <p className="mt-3 text-sm">{t("Next revision due")} {new Date(revision.dueAt).toLocaleDateString()} ({revision.intervalDays}-{t("day interval")}).</p>}
           </section>
 
           {lessons.length > 0 && (
             <section className={card}>
-              <h2 className="text-base font-semibold text-slate-900">Lessons for this topic</h2>
-              <ul className="mt-2 space-y-1 text-sm">{lessons.map(({ course, lesson }) => <li key={lesson.id} className="flex items-center gap-2">{completedLessons.has(lesson.id) ? <CheckCircle2 size={15} className="text-emerald-600" aria-label="Completed" /> : <Circle size={15} className="text-slate-300" aria-label="Not completed" />}<Link href={`/courses/${course.id}/lessons/${lesson.id}`} className="text-blue-800 underline">{lesson.title}</Link><span className="text-xs text-slate-500">{course.title}</span></li>)}</ul>
+              <h2 className="text-base font-semibold text-slate-900">{t("Lessons for this topic")}</h2>
+              <ul className="mt-2 space-y-1 text-sm">{lessons.map(({ course, lesson }) => <li key={lesson.id} className="flex items-center gap-2">{completedLessons.has(lesson.id) ? <CheckCircle2 size={15} className="text-emerald-600" aria-label={t("Completed")} /> : <Circle size={15} className="text-slate-300" aria-label={t("Not completed")} />}<Link href={`/courses/${course.id}/lessons/${lesson.id}`} className="text-blue-800 underline">{lesson.title}</Link><span className="text-xs text-slate-500">{course.title}</span></li>)}</ul>
             </section>
           )}
         </div>
 
         <aside className="space-y-5">
           <section className={card}>
-            <h2 className="text-sm font-semibold text-slate-900">Update this topic</h2>
+            <h2 className="text-sm font-semibold text-slate-900">{t("Update this topic")}</h2>
             <div className="mt-3"><TopicQuickUpdate topic={{ id: topic.id, status: topic.status, revisedEstimatedMinutes: topic.revisedEstimatedMinutes, completionEvidence: topic.completionEvidence }} /></div>
           </section>
           <section className={card}>
-            <h2 className="text-sm font-semibold text-slate-900">Time</h2>
+            <h2 className="text-sm font-semibold text-slate-900">{t("Time")}</h2>
             <dl className="mt-2 space-y-1 text-sm">
-              <div className="flex justify-between"><dt className="text-slate-500">Estimated</dt><dd>{topic.estimatedMinutes} min</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Revised estimate</dt><dd>{topic.revisedEstimatedMinutes === null ? "—" : `${topic.revisedEstimatedMinutes} min`}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Actual elapsed</dt><dd>{hours(elapsed)}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Focused</dt><dd>{hours(focused)}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Estimation accuracy</dt><dd>{accuracy === null ? "N/A" : `${Math.round(accuracy)}%`}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Started</dt><dd>{topic.startedAt ? new Date(topic.startedAt).toLocaleDateString() : "—"}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Completed</dt><dd>{topic.completedAt ? new Date(topic.completedAt).toLocaleDateString() : "—"}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">{t("Estimated")}</dt><dd>{topic.estimatedMinutes} {t("min")}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">{t("Revised estimate")}</dt><dd>{topic.revisedEstimatedMinutes === null ? "—" : `${topic.revisedEstimatedMinutes} ${t("min")}`}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">{t("Actual elapsed")}</dt><dd>{hours(elapsed)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">{t("Focused")}</dt><dd>{hours(focused)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">{t("Estimation accuracy")}</dt><dd>{accuracy === null ? "N/A" : `${Math.round(accuracy)}%`}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">{t("Started")}</dt><dd>{topic.startedAt ? new Date(topic.startedAt).toLocaleDateString() : "—"}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">{t("Completed")}</dt><dd>{topic.completedAt ? new Date(topic.completedAt).toLocaleDateString() : "—"}</dd></div>
             </dl>
-            <p className="mt-2 text-xs text-slate-500">Accuracy = 100 × (1 − |focused − estimate| ÷ estimate), clamped to 0–100, using the revised estimate when set. It measures planning, not ability.</p>
+            <p className="mt-2 text-xs text-slate-500">{t("Accuracy = 100 × (1 − |focused − estimate| ÷ estimate), clamped to 0–100, using the revised estimate when set. It measures planning, not ability.")}</p>
           </section>
           <section className={card}>
-            <h2 className="text-sm font-semibold text-slate-900">Resources ({resources.length})</h2>
-            {resources.length ? <ul className="mt-2 space-y-1 text-sm">{resources.slice(0, 12).map((resource) => <li key={resource.id}><a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 underline">{resource.title}</a> <span className="text-xs text-slate-500">{resource.status.replace(/-/g, " ")}</span></li>)}</ul> : <p className="mt-2 text-sm text-slate-600">No resources linked.</p>}
+            <h2 className="text-sm font-semibold text-slate-900">{t("Resources")} ({resources.length})</h2>
+            {resources.length ? <ul className="mt-2 space-y-1 text-sm">{resources.slice(0, 12).map((resource) => <li key={resource.id}><a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 underline">{t(resource.title)}</a> <span className="text-xs text-slate-500">{t(resource.status.replace(/-/g, " "))}</span></li>)}</ul> : <p className="mt-2 text-sm text-slate-600">{t("No resources linked.")}</p>}
           </section>
           <section className={card}>
-            <h2 className="text-sm font-semibold text-slate-900">Notes ({notes.length})</h2>
-            {notes.length ? <ul className="mt-2 space-y-1 text-sm">{notes.map((note) => <li key={note.id}>{note.title}</li>)}</ul> : <p className="mt-2 text-sm text-slate-600">No notes for this topic. Add them in the <Link href="/knowledge" className="underline">Knowledge base</Link>.</p>}
+            <h2 className="text-sm font-semibold text-slate-900">{t("Notes")} ({notes.length})</h2>
+            {notes.length ? <ul className="mt-2 space-y-1 text-sm">{notes.map((note) => <li key={note.id}>{t(note.title)}</li>)}</ul> : <p className="mt-2 text-sm text-slate-600">{t("No notes for this topic.")} {t("Add them in the")} <Link href="/knowledge" className="underline">{t("Knowledge base")}</Link>.</p>}
           </section>
         </aside>
       </div>

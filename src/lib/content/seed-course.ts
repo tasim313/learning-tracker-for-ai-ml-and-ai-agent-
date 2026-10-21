@@ -27,7 +27,19 @@ const vectors: Lesson = {
     { term: "Norm (length)", definition: "The Euclidean length of a vector: the square root of the sum of its squared elements." },
     { term: "Cosine similarity", definition: "The dot product divided by the product of the lengths; the cosine of the angle between the vectors." }
   ],
-  translations: {},
+  translations: { bn: {
+    title: "ভেক্টর, ডট গুণফল ও সাদৃশ্য",
+    summary: "ডেটাকে ভেক্টর হিসেবে প্রকাশ করুন এবং দুটি ভেক্টর কতটা সাদৃশ্যপূর্ণ তা মাপুন—লিনিয়ার মডেল, অ্যাটেনশন ও এমবেডিং সার্চে ব্যবহৃত একটি মৌলিক গণনা।",
+    fields: {
+      "objectives.0": "হাতে ডট গুণফল ও ভেক্টরের দৈর্ঘ্য নির্ণয় করুন",
+      "objectives.1": "কোসাইন সাদৃশ্য কী এবং কখন ব্যবহার হয় তা ব্যাখ্যা করুন",
+      "objectives.2": "NumPy দিয়ে সাদৃশ্য নির্ণয় করুন",
+      "glossary.0.term": "ভেক্টর", "glossary.0.definition": "সংখ্যার একটি সুশৃঙ্খল তালিকা; যেমন কোনো উদাহরণের বৈশিষ্ট্য বা একটি এমবেডিং।",
+      "glossary.1.term": "ডট গুণফল", "glossary.1.definition": "সমান দৈর্ঘ্যের দুটি ভেক্টরের একই অবস্থানের উপাদানগুলোর গুণফলের যোগফল।",
+      "glossary.2.term": "নর্ম (দৈর্ঘ্য)", "glossary.2.definition": "ভেক্টরের ইউক্লিডীয় দৈর্ঘ্য: উপাদানগুলোর বর্গের যোগফলের বর্গমূল।",
+      "glossary.3.term": "কোসাইন সাদৃশ্য", "glossary.3.definition": "ডট গুণফলকে দুই ভেক্টরের দৈর্ঘ্যের গুণফল দিয়ে ভাগ করলে যে মান পাওয়া যায়; এটি ভেক্টর দুটির মধ্যবর্তী কোণের কোসাইন।"
+    }
+  } },
   blocks: [
     { id: "pre-check", type: "quiz", title: "Before you start", phase: "before", questions: [
       { id: "q-pre-1", prompt: "What is $3 \\times 4 + 1 \\times 2$?", kind: "numeric", options: [], answer: ["14"], tolerance: 0, hint: "Multiply first, then add.", explanation: "12 + 2 = 14. A dot product is exactly this pattern: multiply matching elements, then add." }
@@ -52,6 +64,26 @@ const vectors: Lesson = {
     ] }
   ]
 };
+
+const vectorsBanglaBlocks: Record<string, Record<string, string>> = {
+  "pre-check": { title: "শুরু করার আগে", "questions.0.prompt": "$3 × 4 + 1 × 2$ এর মান কত?", "questions.0.hint": "আগে গুণ করুন, তারপর যোগ করুন।", "questions.0.explanation": "12 + 2 = 14। ডট গুণফলেও ঠিক এই কাজ হয়: মিল থাকা উপাদানগুলো গুণ করে যোগ করা হয়।" },
+  intuition: { title: "আগে ধারণাটি বুঝি", body: "একটি **ভেক্টর** হলো সংখ্যার সুশৃঙ্খল তালিকা। একটি বাড়িকে `[আয়তন, শোবার ঘর]` দিয়ে বর্ণনা করা যায়, আর একটি বাক্যকে শত শত সংখ্যার *এমবেডিং*-এ রূপান্তর করা যায়।\n\n**ডট গুণফল** জানতে চায়: দুটি ভেক্টর তাদের দৈর্ঘ্য বিবেচনায় নিয়ে একই দিকে কতটা নির্দেশ করে? তারা একই দিকে হলে ফল বড় ও ধনাত্মক, পরস্পর লম্ব হলে শূন্য, আর বিপরীত দিকে হলে ঋণাত্মক হয়।" },
+  formal: { title: "সংজ্ঞা", body: "ভেক্টর $\\mathbf{a}, \\mathbf{b} \\in \\mathbb{R}^n$ হলে:\n\n$$\\mathbf{a}\\cdot\\mathbf{b} = \\sum_{i=1}^{n} a_i b_i = \\lVert\\mathbf{a}\\rVert\\,\\lVert\\mathbf{b}\\rVert\\cos\\theta$$\n\n$$\\lVert\\mathbf{a}\\rVert = \\sqrt{\\sum_i a_i^2}\\qquad \\text{কোসাইন সাদৃশ্য} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\lVert\\mathbf{a}\\rVert\\,\\lVert\\mathbf{b}\\rVert}$$\n\nকোসাইন সাদৃশ্য −1 থেকে 1-এর মধ্যে থাকে এবং ভেক্টরের দৈর্ঘ্য বিবেচনা করে না। তাই এমবেডিং তুলনা করতে এটি বহুল ব্যবহৃত হয়।" },
+  worked: { title: "সমাধানসহ উদাহরণ", body: "ধরি $\\mathbf{a} = [2, 1]$ এবং $\\mathbf{b} = [3, 4]$।\n\n1. ডট গুণফল: $2\\cdot3 + 1\\cdot4 = 6 + 4 = 10$।\n2. দৈর্ঘ্য: $\\lVert\\mathbf{a}\\rVert = \\sqrt{4+1} = \\sqrt5 \\approx 2.2361$, $\\lVert\\mathbf{b}\\rVert = \\sqrt{9+16} = 5$।\n3. কোসাইন সাদৃশ্য: $10 / (\\sqrt5 \\cdot 5) = 2/\\sqrt5 \\approx 0.8944$।\n\nসঠিক মান $2/\\sqrt5$; 0.8944 হলো কাছাকাছি মান।" },
+  numpy: { title: "NumPy দিয়ে একই হিসাব" },
+  video: { title: "ডট গুণফল ও দ্বৈততা (Essence of Linear Algebra, অধ্যায় ৯)", "keyConcepts.0": "প্রক্ষেপণ হিসেবে ডট গুণফল", "keyConcepts.1": "ডট গুণফলের চিহ্ন ও দিক", "followUpQuestions.0": "পরস্পর লম্ব ভেক্টরের ডট গুণফল শূন্য হয় কেন?" },
+  misconception: { body: "**বড় ডট গুণফল মানেই বেশি সাদৃশ্য নয়।** কোণ বেশি হলেও লম্বা ভেক্টরের ডট গুণফল বড় হতে পারে। শুধু দিকের সাদৃশ্য জানতে কোসাইন সাদৃশ্য ব্যবহার করুন।" },
+  guided: { title: "নির্দেশিত অনুশীলন: [1, 0] ও [1, 1]-এর কোসাইন সাদৃশ্য", prompt: "$\\mathbf{u} = [1, 0]$ এবং $\\mathbf{v} = [1, 1]$-এর কোসাইন সাদৃশ্য নির্ণয় করুন। চার দশমিক ঘর পর্যন্ত উত্তর দিন।", "steps.0": "ডট গুণফল: $1\\cdot1 + 0\\cdot1$", "steps.1": "দৈর্ঘ্য: $\\lVert\\mathbf{u}\\rVert = 1$, $\\lVert\\mathbf{v}\\rVert = \\sqrt2$", "steps.2": "ডট গুণফলকে দৈর্ঘ্য দুটির গুণফল দিয়ে ভাগ করুন", "hints.0": "ভেক্টর দুটির মধ্যবর্তী কোণ ৪৫°।", solution: "ডট গুণফল = 1; দৈর্ঘ্য 1 ও $\\sqrt2$; কোসাইন সাদৃশ্য $= 1/\\sqrt2 \\approx 0.7071$ (সঠিকভাবে $\\cos 45°$)।" },
+  independent: { title: "স্বাধীন অনুশীলন: সাদৃশ্য অনুযায়ী নথি সাজান", prompt: "একটি প্রশ্নের এমবেডিং $q = [1, 2, 0]$। দুটি নথি হলো $d_1 = [2, 4, 0]$ এবং $d_2 = [0, 1, 3]$। কোসাইন সাদৃশ্য অনুযায়ী কোন নথিটি বেশি সাদৃশ্যপূর্ণ? `d1` অথবা `d2` লিখুন।", "hints.0": "$d_1$ হলো $q$-এর স্কেল করা রূপ।", solution: "$d_1 = 2q$, তাই এর কোসাইন সাদৃশ্য ঠিক 1। $d_2$-এর জন্য: $q\\cdot d_2 = 2$, $\\lVert q\\rVert = \\sqrt5$, $\\lVert d_2\\rVert = \\sqrt{10}$, ফলে $2/\\sqrt{50} \\approx 0.283$। **d1** বেশি সাদৃশ্যপূর্ণ।" },
+  "after-check": { title: "আপনি কতটা বুঝেছেন যাচাই করুন", "questions.0.prompt": "$[1, -2, 3] · [4, 0, -1]$ এর মান কত?", "questions.0.hint": "একই অবস্থানের উপাদান গুণ করুন: 4, 0, −3।", "questions.0.explanation": "4 + 0 − 3 = 1।", "questions.1.prompt": "দুটি অশূন্য ভেক্টরের ডট গুণফল 0 হলে তাদের মধ্যবর্তী কোণ কত?", "questions.1.explanation": "$\\cos\\theta = 0$ হলে θ = 90°: ভেক্টর দুটি পরস্পর লম্ব।", "questions.2.prompt": "একটি ভেক্টরের দৈর্ঘ্য দ্বিগুণ করলে কোসাইন সাদৃশ্য বদলে যায়।", "questions.2.explanation": "ধনাত্মক সংখ্যা দিয়ে ভেক্টর স্কেল করলে দিক বদলায় না, তাই কোসাইন সাদৃশ্যও বদলায় না।" },
+  reflect: { prompt: "এআই বিক্রয় সহকারীতে কোথায় ভেক্টর তুলনা করতে পারেন? কোনো গ্রাহকের প্রশ্নের সঙ্গে পণ্যের নথি মেলানোর কথা ভাবুন।" },
+  reading: { title: "আরও পড়ুন", "items.0.title": "numpy.dot-এর নির্দেশিকা", "items.1.title": "Essence of Linear Algebra (ভিডিও সিরিজ)", "items.1.note": "ভেক্টর ও ম্যাট্রিক্স সম্পর্কে দৃশ্যমান ধারণা।" }
+};
+
+vectors.blocks = vectors.blocks.map((block) => {
+  const fields = vectorsBanglaBlocks[block.id];
+  return fields ? { ...block, translations: { bn: { title: "", summary: "", fields } } } as LessonBlock : block;
+});
 
 const gradientDescent: Lesson = {
   id: "derivatives-and-gradient-descent",

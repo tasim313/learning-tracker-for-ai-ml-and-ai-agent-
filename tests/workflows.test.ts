@@ -141,6 +141,7 @@ test("time accuracy, daily focus, and streak calculations use recorded sessions 
   data.learningSessions.push({
     id: "completed-session",
     topicId: "topic-1",
+    activityType: "learning",
     plannedStartAt: null,
     startedAt: "2026-10-19T10:00:00.000Z",
     endedAt: "2026-10-19T10:30:00.000Z",
@@ -303,6 +304,30 @@ test("schema version two migration adds blank workbook-derived tracking collecti
   assert.equal(migrated.data.topics.length, seed.topics.length);
   assert.deepEqual(migrated.data.experiments, []);
   assert.deepEqual(migrated.data.opportunities, []);
+});
+
+test("schema version six migration adds roadmap subtopics and tasks without inventing learner activity", () => {
+  const seed = createSeedData();
+  const legacy: Record<string, unknown> = { ...seed, schemaVersion: 6 };
+  delete legacy.subtopics;
+  delete legacy.learningTasks;
+  const migrated = migrateApplicationData(legacy);
+  assert.equal(migrated.migrated, true);
+  assert.equal(migrated.data.subtopics.length, seed.topics.length * 2);
+  assert.equal(migrated.data.learningTasks.length, seed.topics.length * 3);
+  assert.equal(migrated.data.learningTasks.some((task) => task.taskType === "practical"), true);
+  assert.deepEqual(migrated.data.learningTasks.map((task) => task.status).filter((status) => status === "completed"), []);
+  assert.deepEqual(migrated.data.learningSessions, []);
+  assert.deepEqual(migrated.data.examinationAttempts, []);
+});
+
+test("schema version seven migration defaults session activity without changing durations", () => {
+  const seed = createSeedData();
+  const session = createSession(seed, "topic-1", 900, "2026-10-19T09:00:00.000Z");
+  const versionSevenSession = Object.fromEntries(Object.entries(session).filter(([key]) => key !== "activityType"));
+  const migrated = migrateApplicationData({ ...seed, schemaVersion: 7, learningSessions: [versionSevenSession] });
+  assert.equal(migrated.data.learningSessions[0].activityType, "learning");
+  assert.equal(migrated.data.learningSessions[0].plannedSeconds, 900);
 });
 
 test("empty version one workspace receives the workbook catalog during migration", () => {

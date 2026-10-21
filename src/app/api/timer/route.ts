@@ -13,8 +13,9 @@ export const POST = withUser(async ({ request, user }) => {
     if (payload.action === "start") {
       const topicId = typeof payload.topicId === "string" ? payload.topicId : "";
       const plannedSeconds = typeof payload.plannedSeconds === "number" ? payload.plannedSeconds : 0;
+      const activityType = typeof payload.activityType === "string" ? payload.activityType : "learning";
       const session = await updateUserData(user.id, (data) => {
-        const created = createSession(data, topicId, plannedSeconds);
+        const created = createSession(data, topicId, plannedSeconds, undefined, activityType);
         return {
           data: { ...data, learningSessions: [...data.learningSessions, created] },
           result: created

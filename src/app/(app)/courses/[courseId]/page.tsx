@@ -5,7 +5,7 @@ import { CheckCircle2, Circle } from "lucide-react";
 import { EnrolButton } from "@/components/courses/enrol-button";
 import { Markdown } from "@/components/markdown";
 import { requireUser } from "@/lib/auth/server";
-import { localizedTitle } from "@/lib/content/display";
+import { localizedContent, localizedTitle } from "@/lib/content/display";
 import { courseMinutes } from "@/lib/content/schema";
 import { getPublishedCourse } from "@/lib/content/store";
 import { courseProgress } from "@/lib/services/learning";
@@ -16,12 +16,13 @@ export const metadata: Metadata = { title: "Course details" };
 export default async function CourseDetailsPage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const { user } = await requireUser();
-  const course = await getPublishedCourse(courseId);
-  if (!course) notFound();
+  const sourceCourse = await getPublishedCourse(courseId);
+  if (!sourceCourse) notFound();
+  const language = user.profile.preferredLanguage ?? "en";
+  const course = localizedContent(sourceCourse, language);
   const data = await loadUserData(user.id);
   const progress = courseProgress(data, course);
   const done = new Set(data.lessonProgress.filter((item) => item.courseId === course.id && item.completedAt).map((item) => item.lessonId));
-  const language = user.profile.preferredLanguage;
   return (
     <div className="space-y-6">
       <nav aria-label="Breadcrumb" className="text-xs text-slate-500"><Link href="/courses" className="underline">Courses</Link> / {course.title}</nav>
@@ -34,7 +35,7 @@ export default async function CourseDetailsPage({ params }: { params: Promise<{ 
           {course.seed && <span className="rounded bg-amber-50 px-2 py-0.5 text-amber-800">Introductory seed course — not comprehensive</span>}
         </div>
         <h1 className="mt-3 text-3xl font-semibold text-slate-900">{localizedTitle(course, language)}</h1>
-        {language === "bn" && !course.translations.bn && <p className="mt-1 text-xs text-slate-500">A Bangla translation of this course is not available yet; showing English.</p>}
+        {language === "bn" && <p className="mt-1 text-xs text-slate-500">বাংলা অনুবাদ যেখানে আছে সেখানে দেখানো হচ্ছে; অনুবাদ না থাকা অংশ ইংরেজিতে থাকবে।</p>}
         <Markdown className="mt-2 max-w-3xl">{course.description}</Markdown>
         <p className="mt-3 text-sm text-slate-600">{course.modules.length} modules · {progress.totalLessons} lessons · about {Math.round(courseMinutes(course) / 6) / 10} hours</p>
         <div className="mt-5 flex flex-wrap items-center gap-3">

@@ -7,7 +7,7 @@ import { StorageError } from "@/lib/storage/file-store";
 import { recordRewardEvent } from "@/lib/services/rewards";
 
 const collectionNames = [
-  "roadmapPhases", "topics", "resources", "learningSessions", "studyPlans",
+  "roadmapPhases", "topics", "subtopics", "learningTasks", "resources", "learningSessions", "studyPlans",
   "assessments", "examinationQuestions", "examinationBlueprints",
   "examinationAttempts", "competencies", "revisionSchedules", "notes",
   "projects", "goals", "achievements", "rewards", "dailyReviews", "weeklyReviews",
@@ -95,6 +95,7 @@ export const POST = withUser<{ collection: string }>(async ({ request, user, par
       record.correctAnswer = correctNumber;
     }
     if (collection === "examinationQuestions") Object.assign(record, { version: 1, createdAt: now, updatedAt: now });
+    if (collection === "learningTasks" && record.status === "completed") Object.assign(record, { completedAt: now });
     if (collection === "assessments") Object.assign(record, { assessedAt: now });
     if (collection === "notes" || collection === "projects") Object.assign(record, { updatedAt: now });
     if (collection === "competencies") Object.assign(record, { updatedAt: now });
@@ -153,6 +154,9 @@ export const PATCH = withUser<{ collection: string }>(async ({ request, user, pa
         const now = new Date().toISOString();
         if (["in-progress", "needs-practice", "needs-revision", "completed"].includes(String(replacement.status)) && !previous.startedAt) replacement.startedAt = now;
         replacement.completedAt = replacement.status === "completed" ? (previous.completedAt ?? now) : null;
+      }
+      if (collection === "learningTasks" && replacement.status !== previous.status) {
+        replacement.completedAt = replacement.status === "completed" ? new Date().toISOString() : null;
       }
       if (collection === "examinationQuestions") {
         replacement.version = Number(previous.version ?? 1) + 1;

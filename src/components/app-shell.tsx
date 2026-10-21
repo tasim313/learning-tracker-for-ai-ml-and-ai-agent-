@@ -2,8 +2,11 @@ import Link from "next/link";
 import { Menu, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { AppNav, type NavGroup } from "@/components/app-nav";
 import { SignOutButton } from "@/components/sign-out-button";
+import { LanguageToggle } from "@/components/language-toggle";
+import { translate, type Language } from "@/lib/i18n";
+import { LanguageProvider } from "@/components/language-provider";
 
-export type ShellUser = { email: string; displayName: string; role: "learner" | "admin"; emailVerified: boolean };
+export type ShellUser = { email: string; displayName: string; role: "learner" | "admin"; emailVerified: boolean; preferredLanguage: Language };
 
 const learnerGroups: NavGroup[] = [
   { label: "Learn", links: [
@@ -13,6 +16,8 @@ const learnerGroups: NavGroup[] = [
     { href: "/videos", label: "Video lessons" },
     { href: "/roadmap", label: "Learning roadmap" },
     { href: "/topics", label: "Topics and tasks" },
+    { href: "/subtopics", label: "Subtopics" },
+    { href: "/learning-tasks", label: "Learning tasks" },
     { href: "/resources", label: "Resource library" },
     { href: "/knowledge", label: "Knowledge base" }
   ] },
@@ -66,16 +71,19 @@ const adminGroup: NavGroup = { label: "Administration", links: [
 ] };
 
 export function AppShell({ children, user }: { children: React.ReactNode; user: ShellUser }) {
-  const groups = user.role === "admin" ? [...learnerGroups, adminGroup] : learnerGroups;
+  const language = user.preferredLanguage;
+  const t = (text: string) => translate(language, text);
+  const sourceGroups = user.role === "admin" ? [...learnerGroups, adminGroup] : learnerGroups;
+  const groups = sourceGroups.map((group) => ({ label: t(group.label), links: group.links.map((link) => ({ ...link, label: t(link.label) })) }));
   const brand = (
     <Link href="/dashboard" className="flex h-16 items-center gap-3 border-b border-slate-100 px-5">
       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700"><Sparkles size={19} aria-hidden="true" /></span>
-      <span><span className="block text-sm font-semibold text-slate-900">Learning Tracker</span><span className="block text-xs text-slate-500">AI engineering journey</span></span>
+      <span><span className="block text-sm font-semibold text-slate-900">{t("Learning Tracker")}</span><span className="block text-xs text-slate-500">{t("AI engineering journey")}</span></span>
     </Link>
   );
   return (
-    <div className="min-h-screen lg:flex">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:text-sm">Skip to content</a>
+    <LanguageProvider language={language}><div lang={language === "bn" ? "bn" : "en"} className="min-h-screen lg:flex">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:text-sm">{t("Skip to content")}</a>
       <aside className="hidden border-r border-slate-200 bg-white lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         {brand}
         <div className="flex-1 overflow-y-auto"><AppNav groups={groups} /></div>
@@ -83,28 +91,29 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
       <div className="border-b border-slate-200 bg-white lg:hidden">
         <details>
           <summary className="flex h-14 cursor-pointer list-none items-center justify-between px-4 text-sm font-semibold text-slate-900">
-            <span className="flex items-center gap-2"><Sparkles size={17} className="text-blue-700" aria-hidden="true" />Learning Tracker</span>
-            <span className="flex items-center gap-1 text-slate-700"><Menu size={18} aria-hidden="true" />Menu</span>
+            <span className="flex items-center gap-2"><Sparkles size={17} className="text-blue-700" aria-hidden="true" />{t("Learning Tracker")}</span>
+            <span className="flex items-center gap-1 text-slate-700"><Menu size={18} aria-hidden="true" />{t("Menu")}</span>
           </summary>
           <div className="max-h-[70vh] overflow-y-auto border-t border-slate-100"><AppNav groups={groups} /></div>
         </details>
       </div>
       <main id="main" className="min-w-0 flex-1 lg:ml-64">
         <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-2 sm:px-8">
-          <p className="truncate text-sm font-medium text-slate-600">{user.displayName ? `${user.displayName}’s learning workspace` : "Your learning workspace"}</p>
+          <p className="truncate text-sm font-medium text-slate-600">{user.displayName ? (language === "bn" ? `${user.displayName}${t("’s learning workspace")}` : `${user.displayName}’s learning workspace`) : t("Your learning workspace")}</p>
           <div className="flex items-center gap-3">
-            {user.role === "admin" && <span className="hidden items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800 sm:inline-flex"><ShieldCheck size={13} aria-hidden="true" />Administrator</span>}
+            <LanguageToggle language={language} />
+            {user.role === "admin" && <span className="hidden items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800 sm:inline-flex"><ShieldCheck size={13} aria-hidden="true" />{t("Administrator")}</span>}
             <Link href="/account" className="hidden items-center gap-1 text-xs text-slate-600 focus-visible:underline sm:inline-flex"><UserRound size={14} aria-hidden="true" />{user.email}</Link>
-            <SignOutButton />
+            <SignOutButton language={language} />
           </div>
         </header>
         {!user.emailVerified && (
           <p className="border-b border-amber-200 bg-amber-50 px-5 py-2 text-xs text-amber-900 sm:px-8">
-            Your email address is not verified yet. <Link href="/account" className="font-semibold underline">Verify it from your account page</Link> so password recovery can reach you.
+            {t("Your email address is not verified yet.")} <Link href="/account" className="font-semibold underline">{t("Verify it from your account page")}</Link> {t("so password recovery can reach you.")}
           </p>
         )}
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-8">{children}</div>
       </main>
-    </div>
+    </div></LanguageProvider>
   );
 }

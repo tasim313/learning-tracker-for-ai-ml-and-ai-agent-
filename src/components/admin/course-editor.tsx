@@ -23,6 +23,26 @@ function move<T>(items: T[], index: number, delta: number): T[] {
 const lines = (value: string) => value.split("\n").map((line) => line.trim()).filter(Boolean);
 const commas = (value: string) => value.split(",").map((item) => item.trim()).filter(Boolean);
 
+function BanglaFields({ value, onChange, help }: { value: Record<string, string>; onChange: (next: Record<string, string>) => void; help: string }) {
+  const [text, setText] = useState(() => JSON.stringify(value, null, 2));
+  const [error, setError] = useState("");
+  useEffect(() => { setText(JSON.stringify(value, null, 2)); }, [value]);
+  return <label className="block text-xs font-medium text-slate-700">Bangla translations (JSON)
+    <textarea rows={4} className={`${input} py-2 font-mono text-xs`} value={text} onChange={(event) => {
+      const next = event.target.value;
+      setText(next);
+      try {
+        const parsed = JSON.parse(next) as unknown;
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || Object.values(parsed).some((item) => typeof item !== "string")) throw new Error();
+        setError("");
+        onChange(parsed as Record<string, string>);
+      } catch { setError("Enter a JSON object with string values."); }
+    }} spellCheck={false} />
+    <span className="mt-1 block font-normal text-slate-500">{help}</span>
+    {error && <span role="alert" className="mt-1 block text-red-700">{error}</span>}
+  </label>;
+}
+
 function BlockEditor({ block, onChange }: { block: LessonBlock; onChange: (block: LessonBlock) => void }) {
   const markdownField = block.type === "text" || block.type === "callout" ? "body" : block.type === "checkpoint" || block.type === "reflection" ? "prompt" : null;
   const [json, setJson] = useState(() => JSON.stringify(block, null, 2));
@@ -56,6 +76,7 @@ function BlockEditor({ block, onChange }: { block: LessonBlock; onChange: (block
         <label className="block text-xs font-medium text-slate-700">Markdown (tables, code, and $maths$ supported; raw HTML is not rendered)
           <textarea rows={8} className={`${input} py-2 font-mono`} value={String(record[markdownField] ?? "")} onChange={(event) => onChange({ ...block, [markdownField]: event.target.value } as LessonBlock)} />
         </label>
+        <BanglaFields value={block.translations?.bn?.fields ?? {}} help={`Translate the block fields, for example {"${markdownField}": "Bangla text", "title": "Bangla heading"}.`} onChange={(fields) => onChange({ ...block, translations: { ...(block.translations ?? {}), bn: { ...block.translations?.bn, title: block.translations?.bn?.title ?? "", summary: block.translations?.bn?.summary ?? "", fields } } } as LessonBlock)} />
       </div>
     );
   }
@@ -63,6 +84,7 @@ function BlockEditor({ block, onChange }: { block: LessonBlock; onChange: (block
     <label className="block text-xs font-medium text-slate-700">Block definition (JSON, validated as you type)
       <textarea rows={12} className={`${input} py-2 font-mono text-xs`} value={json} onChange={(event) => applyJson(event.target.value)} spellCheck={false} />
       {jsonError ? <span role="alert" className="mt-1 block text-xs text-red-700">{jsonError}</span> : <span className="mt-1 block text-xs text-emerald-700">Valid</span>}
+      <BanglaFields value={block.translations?.bn?.fields ?? {}} help={`Use English field names as keys, such as {"prompt": "…", "questions.0.prompt": "…"}. Nested paths and list indexes are supported.`} onChange={(fields) => onChange({ ...block, translations: { ...(block.translations ?? {}), bn: { ...block.translations?.bn, title: block.translations?.bn?.title ?? "", summary: block.translations?.bn?.summary ?? "", fields } } } as LessonBlock)} />
     </label>
   );
 }
@@ -183,7 +205,9 @@ export function CourseEditor({ courseId }: { courseId: string }) {
                 <label className="block text-xs font-medium text-slate-700">Category<input className={input} value={course.category} onChange={(event) => update((current) => ({ ...current, category: event.target.value }))} /></label>
               </div>
               <label className="block text-xs font-medium text-slate-700">Tags (comma-separated)<input className={input} value={course.tags.join(", ")} onChange={(event) => update((current) => ({ ...current, tags: commas(event.target.value) }))} /></label>
-              <label className="block text-xs font-medium text-slate-700">Bangla title (optional)<input className={input} value={course.translations.bn?.title ?? ""} onChange={(event) => update((current) => ({ ...current, translations: { bn: { title: event.target.value, summary: current.translations.bn?.summary ?? "" } } }))} /></label>
+              <label className="block text-xs font-medium text-slate-700">Bangla title<input className={input} value={course.translations.bn?.title ?? ""} onChange={(event) => update((current) => ({ ...current, translations: { ...current.translations, bn: { ...current.translations?.bn, title: event.target.value, summary: current.translations.bn?.summary ?? "", fields: current.translations.bn?.fields ?? {} } } }))} /></label>
+              <label className="block text-xs font-medium text-slate-700">Bangla summary<textarea rows={3} className={`${input} py-2`} value={course.translations.bn?.summary ?? ""} onChange={(event) => update((current) => ({ ...current, translations: { ...current.translations, bn: { ...current.translations?.bn, title: current.translations.bn?.title ?? "", summary: event.target.value, fields: current.translations.bn?.fields ?? {} } } }))} /></label>
+              <BanglaFields value={course.translations.bn?.fields ?? {}} help="Translate description and objectives with keys such as description and objectives.0." onChange={(fields) => update((current) => ({ ...current, translations: { ...current.translations, bn: { ...current.translations?.bn, title: current.translations.bn?.title ?? "", summary: current.translations.bn?.summary ?? "", fields } } }))} />
             </div>
           </details>
           <section className="rounded-xl border border-slate-200 bg-white p-4" aria-label="Modules and lessons">
@@ -192,6 +216,8 @@ export function CourseEditor({ courseId }: { courseId: string }) {
               {course.modules.map((module, moduleIndex) => (
                 <li key={module.id} className="rounded-lg border border-slate-100 p-3">
                   <input aria-label={`Module ${moduleIndex + 1} title`} className={`${input} font-semibold`} value={module.title} onChange={(event) => update((current) => ({ ...current, modules: current.modules.map((item, index) => index === moduleIndex ? { ...item, title: event.target.value } : item) }))} />
+                  <label className="mt-2 block text-xs text-slate-500">Bangla module title<input className={input} value={module.translations?.bn?.title ?? ""} onChange={(event) => update((current) => ({ ...current, modules: current.modules.map((item, index) => index === moduleIndex ? { ...item, translations: { ...(item.translations ?? {}), bn: { ...item.translations?.bn, title: event.target.value, summary: item.translations?.bn?.summary ?? "", fields: item.translations?.bn?.fields ?? {} } } } : item) }))} /></label>
+                  <BanglaFields value={module.translations?.bn?.fields ?? {}} help="Translate the module description with the description key." onChange={(fields) => update((current) => ({ ...current, modules: current.modules.map((item, index) => index === moduleIndex ? { ...item, translations: { ...(item.translations ?? {}), bn: { ...item.translations?.bn, title: item.translations?.bn?.title ?? "", summary: item.translations?.bn?.summary ?? "", fields } } } : item) }))} />
                   <div className="mt-2 flex flex-wrap gap-1">
                     <button type="button" className={small} disabled={moduleIndex === 0} onClick={() => { update((current) => ({ ...current, modules: move(current.modules, moduleIndex, -1) })); setSelected(null); }} aria-label="Move module up"><ArrowUp size={12} /></button>
                     <button type="button" className={small} disabled={moduleIndex === course.modules.length - 1} onClick={() => { update((current) => ({ ...current, modules: move(current.modules, moduleIndex, 1) })); setSelected(null); }} aria-label="Move module down"><ArrowDown size={12} /></button>
@@ -246,7 +272,9 @@ export function CourseEditor({ courseId }: { courseId: string }) {
                   <label className="block text-xs font-medium text-slate-700">Prerequisite lesson ids (comma-separated)<input className={input} value={lesson.prerequisites.join(", ")} onChange={(event) => updateLesson((current) => ({ ...current, prerequisites: commas(event.target.value) }))} /></label>
                   <label className="block text-xs font-medium text-slate-700">Related roadmap topic ids (comma-separated)<input className={input} value={lesson.relatedTopicIds.join(", ")} onChange={(event) => updateLesson((current) => ({ ...current, relatedTopicIds: commas(event.target.value) }))} /></label>
                   <label className="block text-xs font-medium text-slate-700">Tags (comma-separated)<input className={input} value={lesson.tags.join(", ")} onChange={(event) => updateLesson((current) => ({ ...current, tags: commas(event.target.value) }))} /></label>
-                  <label className="block text-xs font-medium text-slate-700">Bangla title (optional)<input className={input} value={lesson.translations.bn?.title ?? ""} onChange={(event) => updateLesson((current) => ({ ...current, translations: { bn: { title: event.target.value, summary: current.translations.bn?.summary ?? "" } } }))} /></label>
+                  <label className="block text-xs font-medium text-slate-700">Bangla title<input className={input} value={lesson.translations.bn?.title ?? ""} onChange={(event) => updateLesson((current) => ({ ...current, translations: { ...current.translations, bn: { ...current.translations?.bn, title: event.target.value, summary: current.translations.bn?.summary ?? "", fields: current.translations.bn?.fields ?? {} } } }))} /></label>
+                  <label className="block text-xs font-medium text-slate-700">Bangla summary<textarea rows={3} className={`${input} py-2`} value={lesson.translations.bn?.summary ?? ""} onChange={(event) => updateLesson((current) => ({ ...current, translations: { ...current.translations, bn: { ...current.translations?.bn, title: current.translations.bn?.title ?? "", summary: event.target.value, fields: current.translations.bn?.fields ?? {} } } }))} /></label>
+                  <BanglaFields value={lesson.translations.bn?.fields ?? {}} help="Translate objectives with keys such as objectives.0. Other lesson fields can also be translated here." onChange={(fields) => updateLesson((current) => ({ ...current, translations: { ...current.translations, bn: { ...current.translations?.bn, title: current.translations.bn?.title ?? "", summary: current.translations.bn?.summary ?? "", fields } } }))} />
                 </div>
                 <button type="button" className={`${small} mt-3 border-red-300 text-red-800`} onClick={() => {
                   if (!selected || !window.confirm(`Remove "${lesson.title}" from the draft?`)) return;

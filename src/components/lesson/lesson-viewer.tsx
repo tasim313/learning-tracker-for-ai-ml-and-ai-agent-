@@ -6,6 +6,8 @@ import { ArrowLeft, ArrowRight, Bookmark, BookmarkCheck, CheckCircle2, PlayCircl
 import { LessonBlockView } from "@/components/lesson/blocks";
 import { formatSeconds, learningAction } from "@/components/lesson/api";
 import { Markdown } from "@/components/markdown";
+import { useLanguage } from "@/components/language-provider";
+import { translate } from "@/lib/i18n";
 import { defaultRole, type Lesson, type LessonBlock, type blockRoles } from "@/lib/content/schema";
 import type { DiagramDefinition, LearningMode } from "@/lib/model";
 
@@ -41,6 +43,8 @@ export const modes: { id: LearningMode; label: string; roles: Role[] | "all"; de
 const interactiveTypes = new Set<LessonBlock["type"]>(["quiz", "exercise", "checkpoint", "reflection", "video"]);
 
 export function LessonViewer(props: LessonViewerProps) {
+  const language = useLanguage();
+  const t = (text: string) => translate(language, text);
   const { courseId, lesson } = props;
   const [completed, setCompleted] = useState(new Set(props.progress?.completedBlockIds ?? []));
   const [lessonDone, setLessonDone] = useState(Boolean(props.progress?.completedAt));
@@ -110,32 +114,32 @@ export function LessonViewer(props: LessonViewerProps) {
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="min-w-0 space-y-5">
-        <nav aria-label="Breadcrumb" className="text-xs text-slate-500"><Link href="/courses" className="underline">Courses</Link> / <Link href={`/courses/${courseId}`} className="underline">{props.courseTitle}</Link> / {props.moduleTitle}</nav>
+        <nav aria-label="Breadcrumb" className="text-xs text-slate-500"><Link href="/courses" className="underline">{t("Courses")}</Link> / <Link href={`/courses/${courseId}`} className="underline">{props.courseTitle}</Link> / {props.moduleTitle}</nav>
         <header className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-2xl font-semibold text-slate-900">{props.displayTitle}</h1>
               <p className="mt-1 text-sm text-slate-600">{lesson.summary}</p>
-              <p className="mt-2 text-xs text-slate-500">{lesson.difficulty} · about {lesson.estimatedMinutes} min · content version {lesson.version}</p>
+              <p className="mt-2 text-xs text-slate-500">{t(lesson.difficulty)} · {t("about")} {lesson.estimatedMinutes} {t("min")} · {t("content version")} {lesson.version}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" className={button} onClick={toggleBookmark} aria-pressed={bookmarked}>{bookmarked ? <BookmarkCheck size={14} aria-hidden="true" /> : <Bookmark size={14} aria-hidden="true" />}{bookmarked ? "Bookmarked" : "Bookmark"}</button>
-              <Link href={`/courses/${courseId}/lessons/${lesson.id}/tutorial`} className={button}><PlayCircle size={14} aria-hidden="true" />Interactive tutorial</Link>
+              <button type="button" className={button} onClick={toggleBookmark} aria-pressed={bookmarked}>{bookmarked ? <BookmarkCheck size={14} aria-hidden="true" /> : <Bookmark size={14} aria-hidden="true" />}{t(bookmarked ? "Bookmarked" : "Bookmark")}</button>
+              <Link href={`/courses/${courseId}/lessons/${lesson.id}/tutorial`} className={button}><PlayCircle size={14} aria-hidden="true" />{t("Interactive tutorial")}</Link>
             </div>
           </div>
           <div className="mt-4">
-            <div className="flex justify-between text-xs text-slate-600"><span>Interactive sections completed</span><span>{doneCount} of {interactive.length}</span></div>
+            <div className="flex justify-between text-xs text-slate-600"><span>{t("Interactive sections completed")}</span><span>{doneCount} {t("of")} {interactive.length}</span></div>
             <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuemin={0} aria-valuemax={interactive.length} aria-valuenow={doneCount} aria-label="Lesson progress"><div className="h-full bg-blue-600" style={{ width: `${interactive.length ? doneCount / interactive.length * 100 : 0}%` }} /></div>
           </div>
           <fieldset className="mt-4">
-            <legend className="text-xs font-semibold text-slate-700">Learning mode (your progress is kept when you switch)</legend>
+            <legend className="text-xs font-semibold text-slate-700">{t("Learning mode (your progress is kept when you switch)")}</legend>
             <div className="mt-2 flex flex-wrap gap-2">
               {modes.map((item) => (
                 <button key={item.id} type="button" onClick={() => changeMode(item.id)} aria-pressed={mode === item.id}
-                  className={`min-h-9 rounded-lg border px-3 text-xs font-semibold ${mode === item.id ? "border-blue-700 bg-blue-50 text-blue-900" : "border-slate-300 bg-white text-slate-700"}`}>{item.label}</button>
+                  className={`min-h-9 rounded-lg border px-3 text-xs font-semibold ${mode === item.id ? "border-blue-700 bg-blue-50 text-blue-900" : "border-slate-300 bg-white text-slate-700"}`}>{t(item.label)}</button>
               ))}
             </div>
-            <p className="mt-2 text-xs text-slate-600">{modeDefinition.description}{" "}
+            <p className="mt-2 text-xs text-slate-600">{t(modeDefinition.description)}{" "}
               {mode === "challenge" && <Link href="/games" className="underline">Open the Game and Challenge Centre</Link>}
               {mode === "exam" && <Link href="/exams" className="underline">Open the Examination dashboard</Link>}
               {mode === "build" && <Link href="/projects" className="underline">Record evidence in Projects</Link>}
@@ -172,10 +176,10 @@ export function LessonViewer(props: LessonViewerProps) {
       </div>
 
       <aside className="space-y-4" aria-label="Lesson details and notes">
-        {lesson.objectives.length > 0 && <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-sm font-semibold text-slate-900">Objectives</h2><ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">{lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul></section>}
-        {lesson.prerequisites.length > 0 && <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-sm font-semibold text-slate-900">Prerequisites</h2><ul className="mt-2 space-y-1 text-sm">{lesson.prerequisites.map((id) => <li key={id}><Link href={`/courses/${courseId}/lessons/${id}`} className="text-blue-800 underline">{props.prerequisiteTitles[id] ?? id}</Link></li>)}</ul></section>}
+        {lesson.objectives.length > 0 && <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-sm font-semibold text-slate-900">{t("Objectives")}</h2><ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">{lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul></section>}
+        {lesson.prerequisites.length > 0 && <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-sm font-semibold text-slate-900">{t("Prerequisites")}</h2><ul className="mt-2 space-y-1 text-sm">{lesson.prerequisites.map((id) => <li key={id}><Link href={`/courses/${courseId}/lessons/${id}`} className="text-blue-800 underline">{props.prerequisiteTitles[id] ?? id}</Link></li>)}</ul></section>}
         {lesson.relatedTopicIds.length > 0 && <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-sm font-semibold text-slate-900">Related roadmap topics</h2><ul className="mt-2 space-y-1 text-sm">{lesson.relatedTopicIds.map((id) => <li key={id}><Link href={`/topics/${encodeURIComponent(id)}`} className="text-blue-800 underline">{props.topicTitles[id] ?? id}</Link></li>)}</ul></section>}
-        {lesson.glossary.length > 0 && <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-sm font-semibold text-slate-900">Glossary</h2><dl className="mt-2 space-y-2 text-sm">{lesson.glossary.map((entry) => <div key={entry.term}><dt className="font-medium text-slate-900">{entry.term}</dt><dd className="text-slate-700">{entry.definition}</dd></div>)}</dl></section>}
+        {lesson.glossary.length > 0 && <section className="rounded-xl border border-slate-200 bg-white p-4"><h2 className="text-sm font-semibold text-slate-900">{t("Glossary")}</h2><dl className="mt-2 space-y-2 text-sm">{lesson.glossary.map((entry) => <div key={entry.term}><dt className="font-medium text-slate-900">{entry.term}</dt><dd className="text-slate-700">{entry.definition}</dd></div>)}</dl></section>}
         <section className="rounded-xl border border-slate-200 bg-white p-4">
           <h2 className="text-sm font-semibold text-slate-900">My notes, highlights, and questions</h2>
           <form onSubmit={addNote} className="mt-2 space-y-2">
