@@ -616,7 +616,8 @@ export async function setAccountRole(actor: PublicUser, targetUserId: string, re
     const target = document.users.find((user) => user.id === targetUserId);
     if (!target) throw new AuthError("Account was not found.", 404);
     if (target.role === "superuser") throw new AuthError("The configured superuser role cannot be changed here.", 403);
-    if (target.role === "admin" && role === "learner" && document.users.filter((user) => user.role === "admin").length === 1) {
+    const remainingAdministrators = document.users.filter((user) => user.id !== targetUserId && hasAdminAccess(user.role)).length;
+    if (target.role === "admin" && role === "learner" && remainingAdministrators === 0) {
       throw new AuthError("At least one administrator must remain.", 409);
     }
     return { data: { ...document, users: document.users.map((user) => user.id === targetUserId ? { ...user, role, updatedAt: new Date().toISOString() } : user) }, result: undefined };
