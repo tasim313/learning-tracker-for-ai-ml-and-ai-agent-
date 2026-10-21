@@ -19,7 +19,8 @@ const features = [
 ];
 
 export default async function LandingPage() {
-  if (await getCurrentSession()) redirect("/dashboard");
+  const session = await getCurrentSession();
+  if (session) redirect(session.user.role === "admin" || session.user.role === "superuser" ? "/admin" : "/dashboard");
   return (
     <div className="min-h-screen">
       <header className="border-b border-slate-200 bg-white">

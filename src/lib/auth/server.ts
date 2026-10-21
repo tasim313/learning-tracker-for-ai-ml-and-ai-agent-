@@ -18,6 +18,6 @@ export async function requireUser(): Promise<ValidatedSession> {
 
 export async function requireAdmin(): Promise<ValidatedSession> {
   const session = await requireUser();
-  if (session.user.role !== "admin") notFound();
+  if (session.user.role !== "admin" && session.user.role !== "superuser") notFound();
   return session;
 }

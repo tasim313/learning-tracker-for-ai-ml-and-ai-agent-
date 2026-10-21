@@ -3,8 +3,10 @@ import { z } from "zod";
 const uuid = z.string().uuid();
 const timestamp = z.string().datetime();
 
-export const roles = ["learner", "admin"] as const;
+export const roles = ["learner", "admin", "superuser"] as const;
 export type Role = (typeof roles)[number];
+export const accountStatuses = ["active", "inactive", "suspended"] as const;
+export type AccountStatus = (typeof accountStatuses)[number];
 
 export const emailSchema = z.string().trim().toLowerCase().max(254).email("Enter a valid email address.");
 
@@ -25,11 +27,13 @@ export const accountSchema = z.object({
   email: emailSchema,
   passwordHash: z.string().startsWith("$argon2id$"),
   role: z.enum(roles),
+  status: z.enum(accountStatuses).default("active"),
   emailVerifiedAt: timestamp.nullable(),
   createdAt: timestamp,
   updatedAt: timestamp,
   passwordChangedAt: timestamp,
   lastLoginAt: timestamp.nullable().default(null),
+  lastLogoutAt: timestamp.nullable().default(null),
   failedLoginCount: z.number().int().nonnegative().default(0),
   lockedUntil: timestamp.nullable().default(null),
   profile: profileSchema
@@ -58,7 +62,12 @@ export const sessionRecordSchema = z.object({
   createdAt: timestamp,
   lastUsedAt: timestamp,
   expiresAt: timestamp,
-  userAgent: z.string().max(200).default("")
+  endedAt: timestamp.nullable().default(null),
+  userAgent: z.string().max(200).default(""),
+  activeLearningSeconds: z.number().int().nonnegative().default(0),
+  learningActive: z.boolean().default(false),
+  currentActivity: z.string().max(250).default(""),
+  lastHeartbeatId: uuid.nullable().default(null)
 });
 export type SessionRecord = z.infer<typeof sessionRecordSchema>;
 
@@ -107,6 +116,7 @@ export type PublicUser = {
   id: string;
   email: string;
   role: Role;
+  status: AccountStatus;
   emailVerified: boolean;
   createdAt: string;
   profile: Profile;
@@ -117,6 +127,7 @@ export function toPublicUser(account: Account): PublicUser {
     id: account.id,
     email: account.email,
     role: account.role,
+    status: account.status,
     emailVerified: account.emailVerifiedAt !== null,
     createdAt: account.createdAt,
     profile: account.profile

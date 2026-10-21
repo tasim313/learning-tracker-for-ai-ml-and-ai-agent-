@@ -7,7 +7,8 @@ export const metadata: Metadata = { title: "Sign in" };
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  if (await getCurrentSession()) redirect("/dashboard");
+  const session = await getCurrentSession();
+  if (session) redirect(session.user.role === "admin" || session.user.role === "superuser" ? "/admin" : "/dashboard");
   const { next } = await searchParams;
   return (
     <>

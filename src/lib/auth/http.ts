@@ -85,7 +85,8 @@ export function withUser<P = Record<string, never>>(
       if (!isSameOriginMutation(request)) return jsonError("Cross-site request rejected.", 403);
       const validated = await validateSessionToken(sessionTokenFrom(request));
       if (!validated) return jsonError("Sign in to continue.", 401);
-      if (options.role === "admin" && validated.user.role !== "admin") return jsonError("Administrator access is required.", 403);
+      if (validated.user.status !== "active") return jsonError("This account is not active.", 403);
+      if (options.role === "admin" && validated.user.role !== "admin" && validated.user.role !== "superuser") return jsonError("Administrator access is required.", 403);
       const params = await context.params;
       const response = await handler({ request, params, user: validated.user, session: validated.session });
       response.headers.set("Cache-Control", "no-store");

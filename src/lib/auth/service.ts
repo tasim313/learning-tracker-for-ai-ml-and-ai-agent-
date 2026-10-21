@@ -5,9 +5,10 @@ import { deleteUserData, loadUserData } from "@/lib/storage/user-store";
 import { emailDeliveryAvailable, sendMail } from "@/lib/email/mailer";
 import { consumeRateLimit, rateLimits, resetRateLimit } from "@/lib/auth/rate-limit";
 import { accountsStore, recordAudit, sessionsStore, tokensStore } from "@/lib/auth/stores";
+import { listPublishedCourses } from "@/lib/content/store";
 import {
   emailSchema, passwordSchema, profileSchema, toPublicUser,
-  type Account, type Profile, type PublicUser, type Role, type SessionRecord
+  type Account, type AccountStatus, type Profile, type PublicUser, type Role, type SessionRecord, type SessionsDocument
 } from "@/lib/auth/schemas";
 
 export class AuthError extends Error {
@@ -46,6 +47,15 @@ function adminEmails(): Set<string> {
   return new Set((process.env.ADMIN_EMAILS ?? "").split(",").map((value) => value.trim().toLowerCase()).filter(Boolean));
 }
 
+export function hasAdminAccess(role: Role): boolean {
+  return role === "admin" || role === "superuser";
+}
+
+export function presenceTimeoutMs(): number {
+  const seconds = Number.parseInt(process.env.PRESENCE_TIMEOUT_SECONDS ?? "120", 10);
+  return (Number.isInteger(seconds) && seconds >= 30 && seconds <= 900 ? seconds : 120) * 1000;
+}
+
 function parseEmail(value: unknown): string {
   const parsed = emailSchema.safeParse(value);
   if (!parsed.success) throw new AuthError("Enter a valid email address.");
@@ -74,6 +84,73 @@ export async function findAccountById(userId: string): Promise<Account | undefin
   return (await readDocument(accountsStore())).users.find((user) => user.id === userId);
 }
 
+/** Create the configured first administrator once; subsequent starts never replace the password. */
+export async function initializeConfiguredSuperuser(): Promise<void> {
+  const configuredEmail = process.env.SUPERUSER_EMAIL?.trim();
+  const configuredPassword = process.env.SUPERUSER_PASSWORD;
+  if (!configuredEmail && !configuredPassword) return;
+  if (!configuredEmail || !configuredPassword) {
+    throw new Error("Set both SUPERUSER_EMAIL and SUPERUSER_PASSWORD to initialize the superuser.");
+  }
+  const email = parseEmail(configuredEmail);
+  const password = parsePassword(configuredPassword, email);
+  const existing = await findAccountByEmail(email);
+  const passwordHash = existing ? null : await hash(password);
+  const now = new Date().toISOString();
+  const account = await updateDocument(accountsStore(), (document) => {
+    const match = document.users.find((user) => user.email === email);
+    if (match) {
+      const updated: Account = {
+        ...match,
+        role: "superuser",
+        status: "active",
+        emailVerifiedAt: match.emailVerifiedAt ?? now,
+        updatedAt: now
+      };
+      return {
+        data: { ...document, users: document.users.map((user) => user.id === match.id ? updated : user) },
+        result: { account: updated, created: false }
+      };
+    }
+    if (!passwordHash) throw new Error("Superuser account state changed during initialization.");
+    const created: Account = {
+      id: randomUUID(),
+      email,
+      passwordHash,
+      role: "superuser",
+      status: "active",
+      emailVerifiedAt: now,
+      createdAt: now,
+      updatedAt: now,
+      passwordChangedAt: now,
+      lastLoginAt: null,
+      lastLogoutAt: null,
+      failedLoginCount: 0,
+      lockedUntil: null,
+      profile: profileSchema.parse({ displayName: "Superuser" })
+    };
+    return { data: { ...document, users: [...document.users, created] }, result: { account: created, created: true } };
+  });
+  if (account.created) {
+    try {
+      await loadUserData(account.account.id);
+    } catch (error) {
+      await updateDocument(accountsStore(), (document) => ({
+        data: { ...document, users: document.users.filter((user) => user.id !== account.account.id) },
+        result: undefined
+      }));
+      throw error;
+    }
+    await recordAudit({
+      actorUserId: null,
+      action: "account.superuser-initialized",
+      targetType: "account",
+      targetId: account.account.id,
+      details: "Configured superuser account initialized."
+    });
+  }
+}
+
 async function createSession(userId: string, context: RequestContext): Promise<{ token: string; expiresAt: string }> {
   const token = newToken();
   const now = Date.now();
@@ -84,7 +161,12 @@ async function createSession(userId: string, context: RequestContext): Promise<{
     createdAt: new Date(now).toISOString(),
     lastUsedAt: new Date(now).toISOString(),
     expiresAt: new Date(now + sessionTtlMs()).toISOString(),
-    userAgent: context.userAgent.slice(0, 200)
+    endedAt: null,
+    userAgent: context.userAgent.slice(0, 200),
+    activeLearningSeconds: 0,
+    learningActive: false,
+    currentActivity: "",
+    lastHeartbeatId: null
   };
   await updateDocument(sessionsStore(), (document) => ({
     data: { ...document, sessions: [...document.sessions.filter((session) => Date.parse(session.expiresAt) > now), record] },
@@ -147,8 +229,8 @@ export async function register(input: { email: unknown; password: unknown; displ
   const account = await updateDocument(accountsStore(), (document) => {
     if (document.users.some((user) => user.email === email)) throw new AuthError("An account with this email already exists. Sign in or reset your password.", 409);
     const created: Account = {
-      id: randomUUID(), email, passwordHash, role, emailVerifiedAt: null, createdAt: now, updatedAt: now,
-      passwordChangedAt: now, lastLoginAt: now, failedLoginCount: 0, lockedUntil: null,
+      id: randomUUID(), email, passwordHash, role, status: "active", emailVerifiedAt: null, createdAt: now, updatedAt: now,
+      passwordChangedAt: now, lastLoginAt: now, lastLogoutAt: null, failedLoginCount: 0, lockedUntil: null,
       profile: profileSchema.parse({ displayName })
     };
     return { data: { ...document, users: [...document.users, created] }, result: created };
@@ -206,7 +288,8 @@ export async function login(input: { email: unknown; password: unknown }, contex
     }));
     throw new AuthError(invalidCredentials, 401);
   }
-  if (verificationRequired() && !account.emailVerifiedAt) {
+  if (account.status !== "active") throw new AuthError("This account is not active. Contact an administrator.", 403);
+  if (verificationRequired() && !account.emailVerifiedAt && account.role !== "superuser") {
     throw new AuthError("Verify your email address before signing in. Check your inbox for the link.", 403);
   }
   await updateDocument(accountsStore(), (document) => ({
@@ -215,6 +298,7 @@ export async function login(input: { email: unknown; password: unknown }, contex
   }));
   resetRateLimit(`login:email:${email}`);
   const session = await createSession(account.id, context);
+  await recordAudit({ actorUserId: account.id, action: "auth.login", targetType: "account", targetId: account.id, details: "Successful sign-in." });
   return { user: toPublicUser(account), session };
 }
 
@@ -226,9 +310,9 @@ export async function validateSessionToken(token: string | null | undefined, now
   const tokenHash = hashToken(token);
   const document = await readDocument(sessionsStore());
   const session = document.sessions.find((item) => item.tokenHash === tokenHash);
-  if (!session || Date.parse(session.expiresAt) <= now) return null;
+  if (!session || session.endedAt || Date.parse(session.expiresAt) <= now) return null;
   const account = await findAccountById(session.userId);
-  if (!account) return null;
+  if (!account || account.status !== "active") return null;
   if (now - Date.parse(session.lastUsedAt) > hourMs) {
     const expiresAt = new Date(Math.min(now + sessionTtlMs(), Date.parse(session.createdAt) + absoluteSessionMs)).toISOString();
     await updateDocument(sessionsStore(), (current) => ({
@@ -242,30 +326,79 @@ export async function validateSessionToken(token: string | null | undefined, now
 export async function logout(token: string | null | undefined): Promise<void> {
   if (!token) return;
   const tokenHash = hashToken(token);
-  await updateDocument(sessionsStore(), (document) => ({
-    data: { ...document, sessions: document.sessions.filter((session) => session.tokenHash !== tokenHash) },
+  const session = await updateDocument(sessionsStore(), (document) => {
+    const current = document.sessions.find((item) => item.tokenHash === tokenHash && item.endedAt === null);
+    if (!current) return { data: document, result: null };
+    const now = new Date().toISOString();
+    return {
+      data: { ...document, sessions: document.sessions.map((item) => item.id === current.id ? { ...item, endedAt: now, learningActive: false, currentActivity: "" } : item) },
+      result: { ...current, endedAt: now }
+    };
+  });
+  if (!session) return;
+  await updateDocument(accountsStore(), (document) => ({
+    data: { ...document, users: document.users.map((user) => user.id === session.userId ? { ...user, lastLogoutAt: session.endedAt, updatedAt: session.endedAt } : user) },
     result: undefined
   }));
+  await recordAudit({ actorUserId: session.userId, action: "auth.logout", targetType: "session", targetId: session.id, details: "Signed out." });
+}
+
+export async function recordHeartbeat(
+  sessionId: string,
+  input: { eventId: unknown; learningActive: unknown; activity: unknown },
+  now = Date.now()
+): Promise<{ accepted: boolean }> {
+  if (typeof input.eventId !== "string" || !/^[0-9a-f-]{36}$/i.test(input.eventId)) throw new AuthError("Heartbeat id is invalid.");
+  const eventId = input.eventId;
+  const learningActive = input.learningActive === true;
+  const activity = typeof input.activity === "string" ? input.activity.trim().slice(0, 250) : "";
+  return updateDocument(sessionsStore(), (document): { data: SessionsDocument; result: { accepted: boolean } } => {
+    const session = document.sessions.find((item) => item.id === sessionId);
+    if (!session || session.endedAt || Date.parse(session.expiresAt) <= now) throw new AuthError("Sign in to continue.", 401);
+    if (session.lastHeartbeatId === eventId) return { data: document, result: { accepted: false } };
+    const previousAt = Date.parse(session.lastUsedAt);
+    const elapsedSeconds = Math.floor((now - previousAt) / 1000);
+    const creditSeconds = session.learningActive && learningActive && elapsedSeconds > 0 && elapsedSeconds <= Math.ceil(presenceTimeoutMs() / 1000)
+      ? Math.min(60, elapsedSeconds)
+      : 0;
+    const absoluteExpiry = Date.parse(session.createdAt) + absoluteSessionMs;
+    const expiresAt = new Date(Math.min(now + sessionTtlMs(), absoluteExpiry)).toISOString();
+    const updated = {
+      ...session,
+      lastUsedAt: new Date(now).toISOString(),
+      expiresAt,
+      activeLearningSeconds: session.activeLearningSeconds + creditSeconds,
+      learningActive,
+      currentActivity: learningActive ? activity : "",
+      lastHeartbeatId: eventId
+    };
+    return {
+      data: { ...document, sessions: document.sessions.map((item) => item.id === session.id ? updated : item) },
+      result: { accepted: true }
+    };
+  });
 }
 
 export async function listSessions(userId: string) {
   const document = await readDocument(sessionsStore());
   return document.sessions
-    .filter((session) => session.userId === userId && Date.parse(session.expiresAt) > Date.now())
-    .map(({ id, createdAt, lastUsedAt, expiresAt, userAgent }) => ({ id, createdAt, lastUsedAt, expiresAt, userAgent }));
+    .filter((session) => session.userId === userId)
+    .map(({ id, createdAt, lastUsedAt, expiresAt, endedAt, userAgent, activeLearningSeconds, currentActivity }) => ({ id, createdAt, lastUsedAt, expiresAt, endedAt, userAgent, activeLearningSeconds, currentActivity }));
 }
 
 /** Revoke one of the caller's own sessions. Session ids of other users are treated as not found. */
 export async function revokeSession(userId: string, sessionId: string): Promise<void> {
   await updateDocument(sessionsStore(), (document) => {
-    if (!document.sessions.some((session) => session.id === sessionId && session.userId === userId)) throw new AuthError("Session was not found.", 404);
-    return { data: { ...document, sessions: document.sessions.filter((session) => session.id !== sessionId) }, result: undefined };
+    const session = document.sessions.find((item) => item.id === sessionId && item.userId === userId);
+    if (!session) throw new AuthError("Session was not found.", 404);
+    const now = new Date().toISOString();
+    return { data: { ...document, sessions: document.sessions.map((item) => item.id === sessionId ? { ...item, endedAt: item.endedAt ?? now, learningActive: false, currentActivity: "" } : item) }, result: undefined };
   });
 }
 
 async function revokeAllSessions(userId: string, exceptSessionId?: string): Promise<void> {
   await updateDocument(sessionsStore(), (document) => ({
-    data: { ...document, sessions: document.sessions.filter((session) => session.userId !== userId || session.id === exceptSessionId) },
+    data: { ...document, sessions: document.sessions.map((session) => session.userId === userId && session.id !== exceptSessionId && session.endedAt === null ? { ...session, endedAt: new Date().toISOString(), learningActive: false, currentActivity: "" } : session) },
     result: undefined
   }));
 }
@@ -378,24 +511,133 @@ export async function deleteAccount(userId: string, input: { password: unknown; 
 
 /** Account metadata for administrators. Learning records are deliberately not included. */
 export async function listAccountsForAdmin() {
-  const document = await readDocument(accountsStore());
-  return document.users.map((user) => ({
-    id: user.id, email: user.email, role: user.role, emailVerified: user.emailVerifiedAt !== null,
-    createdAt: user.createdAt, lastLoginAt: user.lastLoginAt
+  const [document, sessionDocument, courses] = await Promise.all([
+    readDocument(accountsStore()),
+    readDocument(sessionsStore()),
+    listPublishedCourses()
+  ]);
+  const now = Date.now();
+  return Promise.all(document.users.map(async (user) => {
+    const sessions = sessionDocument.sessions.filter((item) => item.userId === user.id);
+    const currentSession = sessions
+      .filter((item) => !item.endedAt && Date.parse(item.expiresAt) > now)
+      .sort((a, b) => Date.parse(b.lastUsedAt) - Date.parse(a.lastUsedAt))[0];
+    const lastActivityAt = sessions.reduce<string | null>((latest, item) =>
+      !latest || Date.parse(item.lastUsedAt) > Date.parse(latest) ? item.lastUsedAt : latest, null);
+    const data = await loadUserData(user.id);
+    const completedLessons = data.lessonProgress.filter((item) => item.completedAt).length;
+    const totalLessons = courses.reduce((total, course) => total + course.modules.reduce((subtotal, module) => subtotal + module.lessons.length, 0), 0);
+    const heartbeatedLearningSeconds = sessions.reduce((total, item) => total + item.activeLearningSeconds, 0);
+    const timerFocusedSeconds = data.learningSessions.filter((item) => item.state === "completed").reduce((total, item) => total + item.focusedSeconds, 0);
+    const submittedExams = data.examinationAttempts.filter((item) => item.submittedAt);
+    return {
+      id: user.id,
+      email: user.email,
+      displayName: user.profile.displayName,
+      role: user.role,
+      status: user.status,
+      emailVerified: user.emailVerifiedAt !== null,
+      createdAt: user.createdAt,
+      lastLoginAt: user.lastLoginAt,
+      lastLogoutAt: user.lastLogoutAt,
+      lastActivityAt,
+      online: Boolean(currentSession && now - Date.parse(currentSession.lastUsedAt) <= presenceTimeoutMs()),
+      sessionStartedAt: currentSession?.createdAt ?? null,
+      currentActivity: currentSession && currentSession.learningActive && now - Date.parse(currentSession.lastUsedAt) <= presenceTimeoutMs()
+        ? currentSession.currentActivity : "",
+      activeLearningSeconds: heartbeatedLearningSeconds,
+      timerFocusedSeconds,
+      lessonsStarted: data.lessonProgress.length,
+      lessonsCompleted: completedLessons,
+      lessonsRemaining: Math.max(0, totalLessons - completedLessons),
+      topicsCompleted: data.topics.filter((item) => item.status === "completed").length,
+      topicsInProgress: data.topics.filter((item) => item.status === "in-progress").length,
+      completedAssessments: data.assessments.filter((item) => item.scorePercent !== null).length + submittedExams.length,
+      assessmentAttempts: data.assessments.length + submittedExams.length,
+      learningProgressPercent: totalLessons > 0 ? Math.round(completedLessons / totalLessons * 100) : 0,
+      goalsTotal: data.goals.length,
+      goalsCompleted: data.goals.filter((item) => item.completed).length,
+      totalLessons
+    };
   }));
 }
 
+export async function readAdminUserDetail(userId: string) {
+  const account = await findAccountById(userId);
+  if (!account) throw new AuthError("Account was not found.", 404);
+  const [data, sessions] = await Promise.all([loadUserData(userId), listSessions(userId)]);
+  const learningEvents = [
+    ...data.lessonProgress.flatMap((progress) => [
+      { at: progress.startedAt, type: "lesson.started", courseId: progress.courseId, lessonId: progress.lessonId, status: "in-progress" },
+      ...(progress.completedAt ? [{ at: progress.completedAt, type: "lesson.completed", courseId: progress.courseId, lessonId: progress.lessonId, status: "completed" }] : [])
+    ]),
+    ...data.assessments.map((assessment) => ({
+      at: assessment.assessedAt,
+      type: "assessment.completed",
+      courseId: null,
+      lessonId: null,
+      topicId: assessment.topicId,
+      status: assessment.scorePercent === null ? "submitted" : "scored",
+      scorePercent: assessment.scorePercent
+    })),
+    ...data.examinationAttempts.filter((attempt) => attempt.submittedAt).map((attempt) => ({
+      at: attempt.submittedAt as string,
+      type: "exam.submitted",
+      courseId: null,
+      lessonId: null,
+      topicId: null,
+      status: attempt.result ?? "pending",
+      scorePercent: attempt.scorePercent
+    }))
+  ].sort((a, b) => Date.parse(b.at) - Date.parse(a.at)).slice(0, 500);
+  return {
+    account: toPublicUser(account),
+    accountStatus: account.status,
+    lastLoginAt: account.lastLoginAt,
+    lastLogoutAt: account.lastLogoutAt,
+    sessions,
+    learningEvents,
+    learningData: {
+      learningSessions: data.learningSessions,
+      lessonProgress: data.lessonProgress,
+      assessments: data.assessments,
+      examinationAttempts: data.examinationAttempts,
+      topics: data.topics,
+      goals: data.goals
+    }
+  };
+}
+
 export async function setAccountRole(actor: PublicUser, targetUserId: string, requestedRole: unknown): Promise<void> {
-  if (actor.role !== "admin") throw new AuthError("Administrator access is required.", 403);
+  if (!hasAdminAccess(actor.role)) throw new AuthError("Administrator access is required.", 403);
   if (requestedRole !== "admin" && requestedRole !== "learner") throw new AuthError("Unknown role.");
   const role: Role = requestedRole;
   await updateDocument(accountsStore(), (document) => {
     const target = document.users.find((user) => user.id === targetUserId);
     if (!target) throw new AuthError("Account was not found.", 404);
+    if (target.role === "superuser") throw new AuthError("The configured superuser role cannot be changed here.", 403);
     if (target.role === "admin" && role === "learner" && document.users.filter((user) => user.role === "admin").length === 1) {
       throw new AuthError("At least one administrator must remain.", 409);
     }
     return { data: { ...document, users: document.users.map((user) => user.id === targetUserId ? { ...user, role, updatedAt: new Date().toISOString() } : user) }, result: undefined };
   });
   await recordAudit({ actorUserId: actor.id, action: "account.role-changed", targetType: "account", targetId: targetUserId, details: `Role set to ${role}.` });
+}
+
+export async function setAccountStatus(actor: PublicUser, targetUserId: string, requestedStatus: unknown): Promise<void> {
+  if (!hasAdminAccess(actor.role)) throw new AuthError("Administrator access is required.", 403);
+  if (requestedStatus !== "active" && requestedStatus !== "inactive" && requestedStatus !== "suspended") throw new AuthError("Unknown account status.");
+  const status: AccountStatus = requestedStatus;
+  await updateDocument(accountsStore(), (document) => {
+    const target = document.users.find((user) => user.id === targetUserId);
+    if (!target) throw new AuthError("Account was not found.", 404);
+    if (target.role === "superuser") throw new AuthError("The configured superuser account cannot be disabled here.", 403);
+    const now = new Date().toISOString();
+    return {
+      data: { ...document, users: document.users.map((user) => user.id === targetUserId ? { ...user, status, updatedAt: now } : user) },
+      result: undefined
+    };
+  });
+  if (requestedStatus !== "active") await revokeAllSessions(targetUserId);
+  await recordAudit({ actorUserId: actor.id, action: `account.status-${status}`, targetType: "account", targetId: targetUserId, details: `Account status set to ${status}.` });
 }
