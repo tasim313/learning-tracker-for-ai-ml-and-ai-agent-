@@ -1,6 +1,7 @@
 import path from "node:path";
 import { readDocument, updateDocument, type DocumentDefinition } from "@/lib/storage/document";
 import { StorageError, readJsonFile, resolveDataPath, writeJsonAtomic } from "@/lib/storage/file-store";
+import { isMongoConfigured, getMongoDb, type StoredMongoDoc } from "@/lib/storage/mongodb";
 import { recordAudit } from "@/lib/auth/stores";
 import type { PublicUser } from "@/lib/auth/schemas";
 import type { DiagramDefinition } from "@/lib/model";
@@ -26,6 +27,7 @@ export function createSeedCatalog(): CatalogDocument {
 function catalogDefinition(): DocumentDefinition<CatalogDocument> {
   return {
     filePath: resolveDataPath("content", "catalog.json"),
+    key: "content:catalog",
     parse: (raw) => ({ data: catalogDocumentSchema.parse(raw), migrated: false }),
     create: createSeedCatalog,
     validate: (data) => catalogDocumentSchema.parse(data)
@@ -133,6 +135,51 @@ export function versionLessons(course: Course, previous: PublishedCourse | undef
   };
 }
 
+async function readHistoryIndex(courseId: string): Promise<{ latest: number } | null> {
+  if (isMongoConfigured()) {
+    const db = await getMongoDb();
+    const doc = await db.collection<StoredMongoDoc>("documents").findOne({ _id: `content:history:${courseId}-index` });
+    return doc ? (doc.data as { latest: number }) : null;
+  }
+  return readJsonFile(resolveDataPath("content", "history", `${courseId}-index.json`)) as Promise<{ latest: number } | null>;
+}
+
+async function writeHistoryIndex(courseId: string, latest: number): Promise<void> {
+  if (isMongoConfigured()) {
+    const db = await getMongoDb();
+    await db.collection<StoredMongoDoc>("documents").updateOne(
+      { _id: `content:history:${courseId}-index` },
+      { $set: { data: { latest }, updatedAt: new Date() } },
+      { upsert: true }
+    );
+    return;
+  }
+  await writeJsonAtomic(resolveDataPath("content", "history", `${courseId}-index.json`), { latest });
+}
+
+async function writeHistorySnapshot(courseId: string, version: number, snapshot: PublishedCourse): Promise<void> {
+  if (isMongoConfigured()) {
+    const db = await getMongoDb();
+    await db.collection<StoredMongoDoc>("documents").updateOne(
+      { _id: `content:history:${courseId}-v${version}` },
+      { $set: { data: snapshot, updatedAt: new Date() } },
+      { upsert: true }
+    );
+    return;
+  }
+  await writeJsonAtomic(path.join(resolveDataPath("content", "history"), `${courseId}-v${version}.json`), snapshot);
+}
+
+async function readCourseVersionSnapshot(courseId: string, version: number): Promise<PublishedCourse | null> {
+  if (isMongoConfigured()) {
+    const db = await getMongoDb();
+    const doc = await db.collection<StoredMongoDoc>("documents").findOne({ _id: `content:history:${courseId}-v${version}` });
+    return doc ? (doc.data as PublishedCourse) : null;
+  }
+  const raw = await readJsonFile(path.join(resolveDataPath("content", "history"), `${courseId}-v${version}.json`)).catch(() => null);
+  return raw as PublishedCourse | null;
+}
+
 export async function publishCourse(actor: PublicUser, courseId: string): Promise<PublishedCourse> {
   requireAdmin(actor);
   const published = await updateDocument(catalogDefinition(), async (catalog) => {
@@ -140,13 +187,13 @@ export async function publishCourse(actor: PublicUser, courseId: string): Promis
     if (!working) throw new StorageError("Course was not found.", { status: 404 });
     if (working.modules.every((module) => module.lessons.length === 0)) throw new StorageError("Add at least one lesson before publishing.", { status: 400 });
     const previous = catalog.published[courseId];
-    const history = await readJsonFile(resolveDataPath("content", "history", `${courseId}-index.json`)) as { latest: number } | null;
+    const history = await readHistoryIndex(courseId);
     const version = Math.max(previous?.version ?? 0, history?.latest ?? 0) + 1;
     const versioned = versionLessons(working, previous);
     const snapshot: PublishedCourse = { ...versioned, version, publishedAt: new Date().toISOString(), publishedBy: actor.id };
     // Every published version is kept so historical attempts can always be explained.
-    await writeJsonAtomic(path.join(resolveDataPath("content", "history"), `${courseId}-v${version}.json`), snapshot);
-    await writeJsonAtomic(resolveDataPath("content", "history", `${courseId}-index.json`), { latest: version });
+    await writeHistorySnapshot(courseId, version, snapshot);
+    await writeHistoryIndex(courseId, version);
     return {
       data: { ...catalog, courses: catalog.courses.map((course) => course.id === courseId ? { ...versioned, version } : course), published: { ...catalog.published, [courseId]: snapshot } },
       result: snapshot
@@ -169,8 +216,7 @@ export async function unpublishCourse(actor: PublicUser, courseId: string): Prom
 
 export async function readCourseVersion(courseId: string, version: number): Promise<PublishedCourse | null> {
   if (!Number.isInteger(version) || version < 1) return null;
-  const raw = await readJsonFile(path.join(resolveDataPath("content", "history"), `${courseId}-v${version}.json`)).catch(() => null);
-  return raw as PublishedCourse | null;
+  return readCourseVersionSnapshot(courseId, version);
 }
 
 export async function saveDiagram(actor: PublicUser, input: unknown): Promise<DiagramDefinition> {

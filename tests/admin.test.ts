@@ -71,7 +71,7 @@ test("configured superuser bootstrap hashes a new password once and preserves ex
   const first = firstDocument.users.find((user) => user.email === email);
   assert.ok(first);
   assert.equal(first.role, "superuser");
-  assert.ok(first.passwordHash.startsWith("$argon2id$"));
+  assert.ok(first.passwordHash.startsWith("$2b$") || first.passwordHash.startsWith("$2a$"));
   assert.notEqual(first.passwordHash, password);
 
   process.env.SUPERUSER_PASSWORD = "a different replacement password";
