@@ -37,7 +37,10 @@ export function getMongoClient(): Promise<MongoClient> {
         serverSelectionTimeoutMS: 8000,
         maxPoolSize: 10
       });
-      global._mongoClientPromise = client.connect();
+      global._mongoClientPromise = client.connect().catch((error) => {
+        global._mongoClientPromise = undefined;
+        throw error;
+      });
     }
     return global._mongoClientPromise;
   }
@@ -47,7 +50,10 @@ export function getMongoClient(): Promise<MongoClient> {
       serverSelectionTimeoutMS: 8000,
       maxPoolSize: 10
     });
-    clientPromise = client.connect();
+    clientPromise = client.connect().catch((error) => {
+      clientPromise = null;
+      throw error;
+    });
   }
   return clientPromise;
 }
