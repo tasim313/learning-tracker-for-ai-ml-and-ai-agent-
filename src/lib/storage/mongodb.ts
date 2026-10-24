@@ -35,7 +35,9 @@ export function getMongoClient(): Promise<MongoClient> {
     if (!global._mongoClientPromise) {
       const client = new MongoClient(uri, {
         serverSelectionTimeoutMS: 8000,
-        maxPoolSize: 10
+        maxPoolSize: 10,
+        family: 4,
+        autoSelectFamily: false
       });
       global._mongoClientPromise = client.connect().catch((error) => {
         global._mongoClientPromise = undefined;
@@ -48,7 +50,9 @@ export function getMongoClient(): Promise<MongoClient> {
   if (!clientPromise) {
     const client = new MongoClient(uri, {
       serverSelectionTimeoutMS: 8000,
-      maxPoolSize: 10
+      maxPoolSize: 10,
+      family: 4,
+      autoSelectFamily: false
     });
     clientPromise = client.connect().catch((error) => {
       clientPromise = null;
