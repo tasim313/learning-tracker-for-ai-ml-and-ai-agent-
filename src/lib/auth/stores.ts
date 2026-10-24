@@ -8,13 +8,15 @@ import {
 } from "@/lib/auth/schemas";
 
 /**
- * System documents live in DATA_DIR/system and are never served over HTTP.
- * They contain only password hashes and SHA-256 hashes of session/one-time tokens.
+ * System documents are never served over HTTP.
+ * They contain bcrypt password hashes and token hashes of session/one-time tokens.
  */
 
 function systemDocument<T>(name: string, schema: { parse: (value: unknown) => T }, empty: () => T): DocumentDefinition<T> {
+  const baseName = name.replace(/\.json$/, "");
   return {
     filePath: resolveDataPath("system", name),
+    key: `system:${baseName}`,
     parse: (raw) => ({ data: schema.parse(raw), migrated: false }),
     create: empty,
     validate: (data) => schema.parse(data)

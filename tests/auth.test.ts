@@ -51,11 +51,11 @@ test("registration validates input and rejects duplicate emails", async () => {
   assert.equal(duplicate.status, 409);
 });
 
-test("passwords are stored only as Argon2id hashes and sessions only as token hashes", async () => {
+test("passwords are stored only as bcrypt hashes and sessions only as token hashes", async () => {
   const { email, cookie } = await register();
   const accounts = await readFile(path.join(dataDir.directory, "system", "accounts.json"), "utf8");
   assert.ok(!accounts.includes(strongPassword));
-  assert.match(accounts, /\$argon2id\$/);
+  assert.match(accounts, /\$2[ab]\$/);
   const token = cookie.split("=")[1];
   const sessions = await readFile(path.join(dataDir.directory, "system", "sessions.json"), "utf8");
   assert.ok(!sessions.includes(token), "raw session token must not be stored");

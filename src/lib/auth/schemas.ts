@@ -25,7 +25,7 @@ export type Profile = z.infer<typeof profileSchema>;
 export const accountSchema = z.object({
   id: uuid,
   email: emailSchema,
-  passwordHash: z.string().startsWith("$argon2id$"),
+  passwordHash: z.string().regex(/^(\$2[aby]\$|\$argon2id\$)/, "Password hash must be a valid bcrypt or argon2id hash"),
   role: z.enum(roles),
   status: z.enum(accountStatuses).default("active"),
   emailVerifiedAt: timestamp.nullable(),

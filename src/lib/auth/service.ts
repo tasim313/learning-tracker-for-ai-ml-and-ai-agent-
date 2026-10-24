@@ -1,5 +1,20 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { hash, verify } from "@node-rs/argon2";
+import bcrypt from "bcryptjs";
+import { verify as verifyArgon2 } from "@node-rs/argon2";
+
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 10);
+}
+
+export async function verifyPassword(passwordHash: string, plain: string): Promise<boolean> {
+  if (passwordHash.startsWith("$2a$") || passwordHash.startsWith("$2b$") || passwordHash.startsWith("$2y$")) {
+    return bcrypt.compare(plain, passwordHash);
+  }
+  if (passwordHash.startsWith("$argon2id$")) {
+    return verifyArgon2(passwordHash, plain).catch(() => false);
+  }
+  return false;
+}
 import { readDocument, updateDocument } from "@/lib/storage/document";
 import { deleteUserData, loadUserData } from "@/lib/storage/user-store";
 import { emailDeliveryAvailable, sendMail } from "@/lib/email/mailer";
@@ -95,7 +110,7 @@ export async function initializeConfiguredSuperuser(): Promise<void> {
   const email = parseEmail(configuredEmail);
   const password = parsePassword(configuredPassword, email);
   const existing = await findAccountByEmail(email);
-  const passwordHash = existing ? null : await hash(password);
+  const passwordHash = existing ? null : await hashPassword(password);
   const now = new Date().toISOString();
   const account = await updateDocument(accountsStore(), (document) => {
     const match = document.users.find((user) => user.email === email);
@@ -223,7 +238,7 @@ export async function register(input: { email: unknown; password: unknown; displ
   const email = parseEmail(input.email);
   const password = parsePassword(input.password, email);
   const displayName = typeof input.displayName === "string" ? input.displayName.trim().slice(0, 80) : "";
-  const passwordHash = await hash(password);
+  const passwordHash = await hashPassword(password);
   const now = new Date().toISOString();
   const role: Role = adminEmails().has(email) ? "admin" : "learner";
   const account = await updateDocument(accountsStore(), (document) => {
@@ -263,11 +278,11 @@ export async function login(input: { email: unknown; password: unknown }, contex
   consumeRateLimit(`login:email:${email}`, rateLimits.loginPerEmail);
   const account = await findAccountByEmail(email);
   if (!account) {
-    dummyHash ??= hash("timing-equalization-placeholder");
-    await verify(await dummyHash, password).catch(() => false);
+    dummyHash ??= hashPassword("timing-equalization-placeholder");
+    await verifyPassword(await dummyHash, password).catch(() => false);
     throw new AuthError(invalidCredentials, 401);
   }
-  const valid = await verify(account.passwordHash, password).catch(() => false);
+  const valid = await verifyPassword(account.passwordHash, password).catch(() => false);
   const now = Date.now();
   if (account.lockedUntil && Date.parse(account.lockedUntil) > now) {
     throw new AuthError("Too many attempts. Please wait before trying again.", 429);
@@ -404,7 +419,7 @@ async function revokeAllSessions(userId: string, exceptSessionId?: string): Prom
 }
 
 async function setPassword(userId: string, password: string): Promise<void> {
-  const passwordHash = await hash(password);
+  const passwordHash = await hashPassword(password);
   const now = new Date().toISOString();
   await updateDocument(accountsStore(), (document) => {
     if (!document.users.some((user) => user.id === userId)) throw new AuthError("Account was not found.", 404);
@@ -418,7 +433,7 @@ async function setPassword(userId: string, password: string): Promise<void> {
 export async function changePassword(userId: string, currentSessionId: string, input: { currentPassword: unknown; newPassword: unknown }) {
   const account = await findAccountById(userId);
   if (!account) throw new AuthError("Account was not found.", 404);
-  const ok = typeof input.currentPassword === "string" && await verify(account.passwordHash, input.currentPassword).catch(() => false);
+  const ok = typeof input.currentPassword === "string" && await verifyPassword(account.passwordHash, input.currentPassword).catch(() => false);
   if (!ok) throw new AuthError("Your current password is incorrect.", 403);
   const password = parsePassword(input.newPassword, account.email);
   await setPassword(userId, password);
@@ -496,7 +511,7 @@ export async function deleteAccount(userId: string, input: { password: unknown; 
   const account = await findAccountById(userId);
   if (!account) throw new AuthError("Account was not found.", 404);
   if (input.confirmation !== "DELETE") throw new AuthError("Type DELETE to confirm permanent account deletion.");
-  const ok = typeof input.password === "string" && await verify(account.passwordHash, input.password).catch(() => false);
+  const ok = typeof input.password === "string" && await verifyPassword(account.passwordHash, input.password).catch(() => false);
   if (!ok) throw new AuthError("Your password is incorrect.", 403);
   if (account.role === "admin") {
     const admins = (await readDocument(accountsStore())).users.filter((user) => user.role === "admin");

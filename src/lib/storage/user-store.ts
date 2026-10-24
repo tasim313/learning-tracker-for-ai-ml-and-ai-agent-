@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { z } from "zod";
 import { applicationDataSchema, type ApplicationData } from "@/lib/model";
@@ -7,6 +8,7 @@ import {
   StorageError, backupRetention, ensureDirectory, listSnapshots, readJsonFile, removeDirectory,
   resolveDataPath, withFileLock, writeSnapshot
 } from "@/lib/storage/file-store";
+import { isMongoConfigured, getMongoDb, type StoredMongoDoc, type StoredUserSnapshot } from "@/lib/storage/mongodb";
 import { migrateApplicationData } from "@/lib/storage/migrations";
 
 /**
@@ -73,6 +75,7 @@ function parseEnvelope(raw: unknown, userId: string): { data: UserDocument; migr
 function definition(userId: string): DocumentDefinition<UserDocument> {
   return {
     filePath: path.join(userDirectory(userId), "learning-data.json"),
+    key: `user:${userId}:learning-data`,
     parse: (raw) => parseEnvelope(raw, userId),
     create: () => ({
       format: documentFormat,
@@ -91,6 +94,37 @@ function definition(userId: string): DocumentDefinition<UserDocument> {
       return { ...document, data: parsed.data };
     }
   };
+}
+
+async function writeMongoSnapshot(userId: string, value: unknown, retention = backupRetention()): Promise<string> {
+  const db = await getMongoDb();
+  const name = `snapshot-${new Date().toISOString().replaceAll(":", "-")}-${randomUUID()}.json`;
+  const createdAt = new Date().toISOString();
+  await db.collection<StoredUserSnapshot>("user_snapshots").insertOne({
+    _id: `${userId}:${name}`,
+    userId,
+    name,
+    data: value,
+    createdAt
+  });
+  const snapshots = await db.collection<StoredUserSnapshot>("user_snapshots").find({ userId }).sort({ createdAt: -1 }).toArray();
+  if (snapshots.length > retention) {
+    const toDelete = snapshots.slice(retention).map((s) => s._id);
+    await db.collection<StoredUserSnapshot>("user_snapshots").deleteMany({ _id: { $in: toDelete } });
+  }
+  return name;
+}
+
+async function listMongoSnapshots(userId: string): Promise<string[]> {
+  const db = await getMongoDb();
+  const docs = await db.collection<StoredUserSnapshot>("user_snapshots").find({ userId }).sort({ createdAt: -1 }).toArray();
+  return docs.map((doc) => doc.name);
+}
+
+async function readMongoSnapshot(userId: string, name: string): Promise<unknown | null> {
+  const db = await getMongoDb();
+  const doc = await db.collection<StoredUserSnapshot>("user_snapshots").findOne({ userId, name });
+  return doc ? doc.data : null;
 }
 
 export async function loadUserData(userId: string): Promise<ApplicationData> {
@@ -142,7 +176,11 @@ export async function restoreUserData(userId: string, input: unknown): Promise<A
   const restored = validateUserBackup(userId, input);
   const retention = backupRetention();
   return updateDocument(definition(userId), async (current) => {
-    await writeSnapshot(backupDirectory(userId), current, retention);
+    if (isMongoConfigured()) {
+      await writeMongoSnapshot(userId, current, retention);
+    } else {
+      await writeSnapshot(backupDirectory(userId), current, retention);
+    }
     return {
       data: { ...current, revision: current.revision + 1, updatedAt: new Date().toISOString(), data: restored },
       result: restored
@@ -153,11 +191,14 @@ export async function restoreUserData(userId: string, input: unknown): Promise<A
 export async function createUserSnapshot(userId: string): Promise<string> {
   const retention = backupRetention();
   const document = await readDocument(definition(userId));
+  if (isMongoConfigured()) {
+    return writeMongoSnapshot(userId, document, retention);
+  }
   return writeSnapshot(backupDirectory(userId), document, retention);
 }
 
 export async function listUserSnapshots(userId: string): Promise<{ name: string; createdAt: string }[]> {
-  const names = await listSnapshots(backupDirectory(userId));
+  const names = isMongoConfigured() ? await listMongoSnapshots(userId) : await listSnapshots(backupDirectory(userId));
   return names.map((name) => {
     const stamp = name.slice("snapshot-".length, "snapshot-".length + 24);
     const createdAt = stamp.replace(/T(\d{2})-(\d{2})-(\d{2})/, "T$1:$2:$3");
@@ -167,15 +208,33 @@ export async function listUserSnapshots(userId: string): Promise<{ name: string;
 
 /** Restore one of the user's own automatic snapshots by name (validated against the listing). */
 export async function restoreUserSnapshot(userId: string, name: string): Promise<ApplicationData> {
-  const available = await listSnapshots(backupDirectory(userId));
+  const available = isMongoConfigured() ? await listMongoSnapshots(userId) : await listSnapshots(backupDirectory(userId));
   if (!available.includes(name)) throw new StorageError("Backup was not found.", { status: 404 });
-  const raw = await readJsonFile(path.join(backupDirectory(userId), name));
+  const raw = isMongoConfigured()
+    ? await readMongoSnapshot(userId, name)
+    : await readJsonFile(path.join(backupDirectory(userId), name));
   if (raw === null) throw new StorageError("Backup was not found.");
   const snapshot = parseEnvelope(raw, userId).data;
   return restoreUserData(userId, { ...snapshot, format: documentFormat });
 }
 
 async function ensureDailySnapshot(userId: string): Promise<void> {
+  if (isMongoConfigured()) {
+    const today = new Date().toISOString().slice(0, 10);
+    const existing = await listMongoSnapshots(userId);
+    if (existing.some((name) => name.startsWith(`snapshot-${today}T`))) return;
+    const current = await readDocument(definition(userId)).catch(() => null);
+    if (!current) return;
+    await writeMongoSnapshot(userId, {
+      format: documentFormat,
+      formatVersion: 1,
+      ownerUserId: userId,
+      revision: 0,
+      updatedAt: new Date().toISOString(),
+      data: current
+    });
+    return;
+  }
   const directory = backupDirectory(userId);
   const today = new Date().toISOString().slice(0, 10);
   const existing = await listSnapshots(directory);
@@ -192,6 +251,12 @@ async function ensureDailySnapshot(userId: string): Promise<void> {
 }
 
 export async function deleteUserData(userId: string): Promise<void> {
+  if (isMongoConfigured()) {
+    const db = await getMongoDb();
+    await db.collection<StoredMongoDoc>("documents").deleteOne({ _id: `user:${userId}:learning-data` });
+    await db.collection<StoredUserSnapshot>("user_snapshots").deleteMany({ userId });
+    return;
+  }
   await removeDirectory(userDirectory(userId));
 }
 
